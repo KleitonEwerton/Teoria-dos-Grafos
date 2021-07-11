@@ -33,27 +33,29 @@ Make clean
 ## Gerar o arquivo dot
 
 Comando para criação do gráfico via o programa Grafix
-...
+
+```
 dot -Tpng output.dot -o output.png
-...
+```
 ## Como rodar?
 
 Grafo não direcionado, sem peso nas aresta e sem peso nos vértices 
-...
+```
 ./grafo.exe input.txt output.txt 0 0 0
-...
+```
 
 Grafo direcionado 
-...
+```
 ./grafo.exe input.txt output.txt 1 0 0
-...
+```
 
 Grafo com peso na aresta 
-...
+```
 ./grafo.exe input.txt output.txt 0 1 0
-...
+```
 
 Grafo com peso no vértices 
-...
+```
 ./grafo.exe input.txt output.txt 0 0 1
-...
+
+```
