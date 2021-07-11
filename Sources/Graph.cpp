@@ -239,11 +239,11 @@ void Graph::printGraph2()
     Node *node = first_node;
     while (node != nullptr)
     {
-        cout << node->getId() << ": ";
+        cout << "No - " << node->getId();
         Edge *edge = node->getFirstEdge();
         while (edge != nullptr)
         {
-            cout << " - " << edge->getTargetId();
+            cout << " -> " << edge->getTargetId();
             edge = edge->getNextEdge();
         }
         cout << endl;
@@ -254,40 +254,82 @@ void Graph::printGraph2()
 void Graph::printGraph_Dot_Not_Directed()
 {
     fstream arqDot;
-    arqDot.open("output.dot", ios::out |ios::trunc);
-        if (!arqDot.is_open())
+    arqDot.open("output.dot", ios::out | ios::trunc);
+    if (!arqDot.is_open())
     {
         arqDot << "\nErro ao abrir o arquivo dot\n";
         exit(1);
     }
     else
     {
-    int k = this->getOrder();
-    int cont = 0;
-    Node *node = first_node;
-    int *vet = new int[k];
+        int k = this->getOrder();
+        int cont = 0;
+        Node *node = first_node;
+        int *vet = new int[k];
 
-    for (int i = 0; i < k; i++)
-        vet[i] = 0;
+        for (int i = 0; i < k; i++)
+            vet[i] = 0;
 
-    arqDot << "graph{\n";
-    while (node != nullptr)
-    {
-        vet[cont] = node->getId();
-        Edge *edge = node->getFirstEdge();
-        while (edge != nullptr)
+        arqDot << "graph{\n";
+        while (node != nullptr)
         {
+            vet[cont] = node->getId();
+            Edge *edge = node->getFirstEdge();
+            while (edge != nullptr)
+            {
                 int v = edge->getTargetId();
-                if(!findEdge(vet, cont, v))
-                    arqDot << node->getId() << "--" << edge->getTargetId() <<"\n";
-                
-            edge = edge->getNextEdge();
+                if (!findEdge(vet, cont, v))
+                    arqDot << node->getId() << "--" << edge->getTargetId() << "\n";
+
+                edge = edge->getNextEdge();
+            }
+            node = node->getNextNode();
+            cont++;
         }
-        node = node->getNextNode();
-        cont++;
+        arqDot << "}\n";
+        delete[] vet;
     }
-    arqDot << "}\n";
-    delete[] vet;
+
+    arqDot.close();
+}
+
+void Graph::printGraph_Dot_Directed()
+{
+    fstream arqDot;
+    arqDot.open("output.dot", ios::out | ios::trunc);
+    if (!arqDot.is_open())
+    {
+        arqDot << "\nErro ao abrir o arquivo dot\n";
+        exit(1);
+    }
+    else
+    {
+        int k = this->getOrder();
+        int cont = 0;
+        Node *node = first_node;
+        int *vet = new int[k];
+
+        for (int i = 0; i < k; i++)
+            vet[i] = 0;
+
+        arqDot << "digraph graph{\n";
+        while (node != nullptr)
+        {
+            vet[cont] = node->getId();
+            Edge *edge = node->getFirstEdge();
+            while (edge != nullptr)
+            {
+                int v = edge->getTargetId();
+                if (!findEdge(vet, cont, v))
+                    arqDot << node->getId() << "->" << edge->getTargetId() << ";\n";
+
+                edge = edge->getNextEdge();
+            }
+            node = node->getNextNode();
+            cont++;
+        }
+        arqDot << "}\n";
+        delete[] vet;
     }
 
     arqDot.close();
@@ -298,13 +340,77 @@ bool Graph::findEdge(int vet[], int cont, int v)
     for (int i = 0; i < cont; i++)
     {
         if (vet[i] == v)
+        {
             return true;
+        }
     }
-            return false;
+    return false;
 }
 
-//Function that prints a set of edges belongs breadth tree
+//Busca em profundidade de um Nó dado
+void Graph::deepSearch(int id)
+{
+    vector<int> retorno;
+   
+    int k = this->getOrder();
+    int cont = 0;
+    Node *node = this->getNode(id);
+    int *vet = new int[k];
 
+    for (int i = 0; i < k; i++)
+        vet[i] = 0;
+
+    vet[0] = id;
+    cout << "\n -- Árvore em Profundidade -- \n\n";
+    auxDeepSearch(node, vet, cont, &retorno);
+    this->printGraph_Dot_Not_Directed();
+    delete[] vet;
+
+    cout << "\n\n -- Arestas de Retorno -- \n\n";
+    for(int i = 0; i < retorno.size(); i++)
+    cout<< retorno[i] << " < ";
+    cout << "\n\n --- \n";
+    
+}
+//Auxiliar da busca em profundidade de um Nó dado
+void Graph::auxDeepSearch(Node *node, int vet[], int cont, vector<int> *retorno)
+{
+    cout << node->getId() << " > ";
+    Edge *edge = node->getFirstEdge();
+    while (edge != nullptr)
+    {
+        if (!findEdge(vet, this->getOrder(), edge->getTargetId()))
+        {
+            node = this->getNode(edge->getTargetId());
+            cont++;                     
+            vet[cont] = node->getId(); 
+            auxDeepSearch(node, vet, cont, retorno);
+            edge = edge->getNextEdge();
+            retorno->push_back(node->getId());
+        }
+        else
+            edge = edge->getNextEdge();
+    }
+}
+
+
+void Graph::directTransitiveClosing(int id)
+{
+    Node *node = this->getNode(id);
+
+    Edge *edge = node->getFirstEdge();
+    while (edge != nullptr)
+    {
+
+        edge = edge->getNextEdge();
+    }
+
+
+}
+void Graph::inDirectTransitiveClosing(int id)
+{
+
+}    
 void Graph::breadthFirstSearch(ofstream &output_file)
 {
 }

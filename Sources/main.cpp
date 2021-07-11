@@ -19,9 +19,14 @@ Graph *leitura(ifstream &input_file, int directed, int weightedEdge, int weighte
     int idNodeSource;
     int idNodeTarget;
     int order;
+    int numEdges;
+    float edgeWeight;
 
     //Pegando a ordem do grafo
-    input_file >> order;
+    input_file >> order >> numEdges;
+
+    cout << "\nLendo o arquivo input.txt..." << endl;
+    cout << "Ordem: " << order << " - Arestas: " << numEdges << endl;
 
     //Criando objeto grafo: Ordem - direcionado - peso Aresta - peso Nó
     Graph *graph = new Graph(order, directed, weightedEdge, weightedNode);
@@ -33,17 +38,15 @@ Graph *leitura(ifstream &input_file, int directed, int weightedEdge, int weighte
 
         while (input_file >> idNodeSource >> idNodeTarget)
         {
-
+            cout << "Edge: " << idNodeSource << " - " << idNodeTarget << endl;
             graph->insertEdge(idNodeSource, idNodeTarget, 0);
         }
     }
     else if (graph->getWeightedEdge() && !graph->getWeightedNode())
     {
-
-        float edgeWeight;
-
         while (input_file >> idNodeSource >> idNodeTarget >> edgeWeight)
         {
+            cout << "Edge: " << idNodeSource << " - " << idNodeTarget << " - " << edgeWeight << endl;
             graph->insertEdge(idNodeSource, idNodeTarget, edgeWeight);
         }
     }
@@ -70,34 +73,6 @@ Graph *leitura(ifstream &input_file, int directed, int weightedEdge, int weighte
             graph->getNode(idNodeSource)->setWeight(nodeSourceWeight);
             graph->getNode(idNodeTarget)->setWeight(nodeTargetWeight);
         }
-    }
-
-    return graph;
-}
-
-// Ler arquivo grafo não direcionado e sem pesos
-Graph *leituraInstancia(ifstream &input_file, int directed, int weightedEdge, int weightedNode)
-{
-    //Variáveis para auxiliar na criação dos nós no Grafo
-    int idNodeSource;
-    int idNodeTarget;
-    int order;
-    int numEdges;
-
-    //Pegando a ordem do grafo
-    input_file >> order >> numEdges;
-
-    cout << "\nLendo o arquivo input.txt..." << endl;
-    cout << "Ordem: " << order << " - Arestas: " << numEdges << endl;
-
-    //Criando objeto grafo
-    Graph *graph = new Graph(order, directed, weightedEdge, weightedNode);
-
-    //Leitura de arquivo
-    while (input_file >> idNodeSource >> idNodeTarget)
-    {
-        cout << "Edge: " << idNodeSource << " - " << idNodeTarget << endl;
-        graph->insertEdge(idNodeSource, idNodeTarget, 0);
     }
 
     return graph;
@@ -131,77 +106,53 @@ void selecionar(int selecao, Graph *graph, ofstream &output_file)
 
     switch (selecao)
     {
-
-    //Subgrafo induzido por um conjunto de vértices X;
-    case 1:
-    {
-        break;
-    }
-        //Caminho mínimo entre dois vértices usando Dijkstra;
-    case 2:
-    {
-        break;
-    }
-
-        //Caminho mínimo entre dois vértices usando Floyd;
-    case 3:
-    {
-        break;
-    }
-
-        //AGM - Kruscal;
-    case 4:
-    {
-        break;
-    }
-
-        //AGM Prim;
-    case 5:
-    {
-        break;
-    }
-        //Busca em largura;
-    case 6:
-    {
-        break;
-    }
-        //Ordenação Topologica;
-    case 7:
-    {
-        break;
-    }
-    case 8:
-    {
-        break;
-    }
-    case 9:
-    {
-        graph->printGraph2();
-        break;
-    }
-    case 10:
-    {
-
-        graph->printGraph_Dot_Not_Directed();
-        break;
-    }
-        case 11:
-    {
-
-       
-        break;
-    }
+        //Subgrafo induzido por um conjunto de vértices X;
     case 0:
-    {
         exit(0);
         break;
-    }
+    case 1:
+        break;
+        //Caminho mínimo entre dois vértices usando Dijkstra;
+    case 2:
+        break;
+        //Caminho mínimo entre dois vértices usando Floyd;
+    case 3:
+        break;
+        //AGM - Kruscal;
+    case 4:
+        break;
+        //AGM Prim;
+    case 5:
+        break;
+        //Busca em largura;
+    case 6:
+        break;
+        //Ordenação Topologica;
+    case 7:
+        int n;
+        cout << "\n --- Caminhamento Profundidade destacando as Arestas de retorno --- \n\n";
+        do
+        {
+            cout << "Informe o numero no nó: ";
+            cin >> n;
+        } while (!graph->searchNode(n));
 
+        graph->deepSearch(n);
+        break;
+    case 8:
+        break;
+    case 9:
+        graph->printGraph2();
+        break;
+    case 10:
+        graph->printGraph_Dot_Not_Directed();
+        break;
+    case 11:
+        graph->printGraph_Dot_Directed();
+        break;
     default:
-    {
         system("clear");
         cout << " Erro!!! Opção invalida." << endl;
-    }
     }
     menu();
 }
@@ -209,19 +160,20 @@ void selecionar(int selecao, Graph *graph, ofstream &output_file)
 int mainMenu(ofstream &output_file, Graph *graph)
 {
 
-    int selecao = 1;
+    int selecao = -1;
 
     while (selecao != 0)
     {
         // system("clear");
         selecao = menu();
 
+        if(!selecao)
+        exit(0);
+        
         if (output_file.is_open())
             selecionar(selecao, graph, output_file);
-
         else
-            cout << "Unable to open the output_file" << endl;
-
+            cout << "Arquivo não encontrado!" << endl;
         output_file << endl;
     }
 
@@ -258,13 +210,11 @@ int main(int argc, char const *argv[])
     if (input_file.is_open())
     {
 
-        graph = leituraInstancia(input_file, atoi(argv[3]), atoi(argv[4]), atoi(argv[5]));
-        //graph = leitura(input_file, atoi(argv[3]), atoi(argv[4]), atoi(argv[5]));
+        //graph = leituraInstancia(input_file, atoi(argv[3]), atoi(argv[4]), atoi(argv[5]));
+        graph = leitura(input_file, atoi(argv[3]), atoi(argv[4]), atoi(argv[5]));
     }
     else
         cout << "Não foi possível abrir o arquivo! " << argv[1];
-
-
 
     string d = "Sim";
     string a = "Sim";
