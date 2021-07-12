@@ -106,29 +106,29 @@ void selecionar(int selecao, Graph *graph, ofstream &output_file)
 
     switch (selecao)
     {
-        //Subgrafo induzido por um conjunto de vértices X;
+        //Sair;
     case 0:
         exit(0);
         break;
-    case 1:
+    case 1: // Fecho Transitivo Direto;
         break;
-        //Caminho mínimo entre dois vértices usando Dijkstra;
-    case 2:
+        
+    case 2: // Fecho Transitivo Indireto;
         break;
-        //Caminho mínimo entre dois vértices usando Floyd;
-    case 3:
+        
+    case 3: //Caminho Mínimo entre dois vértices - Dijkstra
         break;
-        //AGM - Kruscal;
-    case 4:
+        
+    case 4: // Caminho Mínimo entre dois vértices - Floyd
         break;
-        //AGM Prim;
-    case 5:
+        
+    case 5: //Árvore Geradora Mínima sobre subgrafo vertice induzido por X usando algorítmo de Prim
         break;
-        //Busca em largura;
-    case 6:
+        
+    case 6: //Árvore Geradora Mínima sobre subgrafo vertice induzido por X usando algorítmo de Kruskal
         break;
-        //Ordenação Topologica;
-    case 7:
+        
+    case 7: //Caminhamento Profundidade destacando as Arestas de retorno
         int n;
         cout << "\n --- Caminhamento Profundidade destacando as Arestas de retorno --- \n\n";
         do
@@ -139,17 +139,22 @@ void selecionar(int selecao, Graph *graph, ofstream &output_file)
 
         graph->deepSearch(n);
         break;
-    case 8:
+
+    case 8: //Ordenação topologica em D ou a informação de que não é um grafo acíclico direcionado
         break;
-    case 9:
+
+    case 9: //Modulo de teste
         graph->printGraph2();
         break;
-    case 10:
+
+    case 10: //Salvar grafo em arquivo .dot - Não direcionado
         graph->printGraph_Dot_Not_Directed();
         break;
-    case 11:
+
+    case 11: //Salvar grafo em arquivo .dot - Direcionado
         graph->printGraph_Dot_Directed();
         break;
+        
     default:
         system("clear");
         cout << " Erro!!! Opção invalida." << endl;
