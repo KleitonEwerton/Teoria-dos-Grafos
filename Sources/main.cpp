@@ -117,6 +117,23 @@ void selecionar(int selecao, Graph *graph, ofstream &output_file)
         break;
         
     case 3: //Caminho Mínimo entre dois vértices - Dijkstra
+
+        int sourceD, targetD;
+        try{   
+
+        cout <<"Digite o node Source" << endl;
+        cin >> sourceD;
+        cout << "Digite o node Target"<< endl;
+        cin >> targetD;
+        cout << "A distância é: " << graph->dijkstra(sourceD,targetD)<<endl;
+            
+        }
+        catch(const exception& e){ 
+
+            cout << "Parâmetros inválidos" << endl;
+
+        }
+
         break;
         
     case 4: // Caminho Mínimo entre dois vértices - Floyd

@@ -424,7 +424,84 @@ float Graph::floydMarshall(int idSource, int idTarget)
 float Graph::dijkstra(int idSource, int idTarget)
 {
 
-    return 0;
+    Node *noSource = getNode(idSource);
+    Node *noTarget = getNode(idTarget);
+
+    if(noSource != nullptr && noTarget != nullptr){
+
+        int V = getOrder();
+        int INF = 999999999;
+
+        int distance[V];   //  Vetor para os distâncias
+        bool visited[V];   //  Vetor para os já visitados
+
+        //Fila de prioridade para os pares distancia e vertice
+        priority_queue<pair<int, int>, vector<pair<int,int>>, greater<pair<int,int>>> fp; 
+        
+        //Inicializador dos vetores visitados e distância
+        for(int i = 0; i < V;i++){distance[i] = INF;visited[i]=false;}
+        
+        distance[idSource] = 0;     //Distância do vertice para ele mesmo
+
+        fp.push(make_pair(distance[idSource], idSource));
+
+        pair<int, int> p = fp.top();
+
+        
+        int ver = 0,c_edge = 0;
+
+        while (!fp.empty()){
+            
+            //Pega o do topo
+            pair<int , int> p = fp.top();
+            //Obtem o vértice
+            int u = p.second;
+            //Remove da lista de prioridade
+            fp.pop();
+
+            if(visited[u] == false){
+
+                visited[u] = true;
+                
+                Node *node = getNode(u);
+                Edge *edge = node->getFirstEdge();
+                
+                //Passa por todas as arestas do vertice u
+                while (edge != nullptr)
+                {   
+		    //Para caso não haja pesso a distância será 1 por aresta percorrida
+                    if(edge->getWeight() == 0)c_edge = 1;
+                    else c_edge = edge->getWeight();
+                    
+                    ver = edge->getTargetId();
+                    
+
+                    if(distance[ver] > (distance[u]+ c_edge)){
+
+                        distance[ver] = (distance[u]+ c_edge);
+                        fp.push(make_pair(distance[ver], ver));
+
+                    }
+                    edge = edge->getNextEdge();
+                }
+                
+            }
+            
+
+        }
+
+    
+        return distance[idTarget];
+
+    }else{
+        
+
+        if(noSource == nullptr)cout<<"Node source inesistente"<<endl;
+        if(noTarget == nullptr)cout <<"Node target inesistente" << endl;
+        return 0;
+    }
+    
+    
 }
 
 //function that prints a topological sorting
