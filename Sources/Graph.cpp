@@ -394,19 +394,8 @@ void Graph::auxDeepSearch(Node *node, int vet[], int cont, vector<int> *retorno)
 }
 
 
-void Graph::directTransitiveClosing(int id)
-{
-    Node *node = this->getNode(id);
-
-    Edge *edge = node->getFirstEdge();
-    while (edge != nullptr)
-    {
-
-        edge = edge->getNextEdge();
-    }
 
 
-}
 void Graph::inDirectTransitiveClosing(int id)
 {
 
