@@ -419,7 +419,7 @@ void Graph::auxDirectTransitiveClosing(int id, bool *visited[]){
 
     //Realiza a busca em profundidade para visitar todos os nós acessíveis a partir do nó estabelecido
     while(edge->getNextEdge()!= nullptr){
-        if(visited[edge->getTargetId()==false]){
+        if(!visited[edge->getTargetId()]){
             visited[edge->getTargetId()] = 0;
             auxDirectTransitiveClosing(edge->getTargetId(), visited);
         }
