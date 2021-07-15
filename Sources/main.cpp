@@ -111,6 +111,14 @@ void selecionar(int selecao, Graph *graph, ofstream &output_file)
         exit(0);
         break;
     case 1: // Fecho Transitivo Direto;
+        int v;
+        do{
+            cout << "Digite o id do nó: ";
+            cin >> v;
+        }while(!graph->searchNode(v));
+
+        cout << "Fecho transitivo direto: ";
+        graph->directTransitiveClosing(v);
         break;
         
     case 2: // Fecho Transitivo Indireto;
