@@ -400,14 +400,14 @@ void Graph::directTransitiveClosing(int id)
 
     // Inicializa todos os elementos de "visited" com false
     for(int i=0; i<getOrder(); i++){
-        visited[i] = 0;
+        *visited[i] = false;
     }
 
     auxDirectTransitiveClosing(id, visited);
 
     //Imprime o índice de todos os elementos com valor true do vetor de visitados
     for(int i=1; i<=getOrder(); i++){
-        if(visited[i]){
+        if(*visited[i]){
             cout << i << " | ";
         }
     }
@@ -419,8 +419,8 @@ void Graph::auxDirectTransitiveClosing(int id, bool *visited[]){
 
     //Realiza a busca em profundidade para visitar todos os nós acessíveis a partir do nó estabelecido
     while(edge->getNextEdge()!= nullptr){
-        if(!visited[edge->getTargetId()]){
-            visited[edge->getTargetId()] = 0;
+        if(!*visited[edge->getTargetId()]){
+            *visited[edge->getTargetId()] = true;
             auxDirectTransitiveClosing(edge->getTargetId(), visited);
         }
         edge = edge->getNextEdge();
