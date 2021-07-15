@@ -396,7 +396,8 @@ void Graph::auxDeepSearch(Node *node, int vet[], int cont, vector<int> *retorno)
 
 void Graph::directTransitiveClosing(int id)
 {
-    auxDirectTransitiveClosing(id);
+    int x = id;
+    auxDirectTransitiveClosing(x);
 }
 
 void Graph::auxDirectTransitiveClosing(int id){ 
