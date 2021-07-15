@@ -414,7 +414,7 @@ void Graph::directTransitiveClosing(int id)
 }
 
 void Graph::auxDirectTransitiveClosing(int id, bool *visited[]){ 
-    Node *node = new Node(id);          
+    Node *node = getNode(id);          
     Edge *edge = node->getFirstEdge(); 
 
     //Realiza a busca em profundidade para visitar todos os nós acessíveis a partir do nó estabelecido
