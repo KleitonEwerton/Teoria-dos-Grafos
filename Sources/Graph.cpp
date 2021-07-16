@@ -396,31 +396,32 @@ void Graph::auxDeepSearch(Node *node, int vet[], int cont, vector<int> *retorno)
 
 void Graph::directTransitiveClosing(int id)
 {
-    bool *visited[getOrder()]; // Cria um vetor de visitados
+    int k = getOrder()-1;
+    int *visited[k]; // Cria um vetor de visitados
 
     // Inicializa todos os elementos de "visited" com false
-    for(int i=0; i<getOrder(); i++){
-        *visited[i] = false;
+    for(int i=0; i<k; i++){
+        *visited[i] = 0;
     }
 
     auxDirectTransitiveClosing(id, visited);
 
     // Imprime o índice de todos os elementos com valor true do vetor de visitados
-    for(int i=1; i<=getOrder(); i++){
-        //if(*visited[i]==true){
+    for(int i=0; i<k; i++){
+        if(*visited[i]==true){
             cout << i << " | ";
-        //}
+        }
     }
 }
 
-void Graph::auxDirectTransitiveClosing(int id, bool *visited[]){ 
+void Graph::auxDirectTransitiveClosing(int id, int *visited[]){ 
     Node *node = getNode(id);          
     Edge *edge = node->getFirstEdge(); 
 
     //Realiza a busca em profundidade para visitar todos os nós acessíveis a partir do nó estabelecido
     while(edge->getNextEdge()!= nullptr){
-        if(*visited[edge->getTargetId()]==false){
-            *visited[edge->getTargetId()] = true;
+        if(*visited[edge->getTargetId()]==0){
+            *visited[edge->getTargetId()] = 1;
             auxDirectTransitiveClosing(edge->getTargetId(), visited);
         }
         edge = edge->getNextEdge();
