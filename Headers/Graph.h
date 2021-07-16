@@ -49,7 +49,7 @@ public:
     void printGraph_Dot_Directed();
     void printGraph_Dot_Not_Directed();
     void directTransitiveClosing(int id);
-    void auxDirectTransitiveClosing(int id, bool *visited[]);
+    void auxDirectTransitiveClosing(int id, int *visited[]);
     void inDirectTransitiveClosing(int id);
     bool findEdge(int vet[], int k, int v);
     void deepSearch(int node);
