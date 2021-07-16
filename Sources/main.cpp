@@ -119,6 +119,7 @@ void selecionar(int selecao, Graph *graph, ofstream &output_file)
 
         cout << "Fecho transitivo direto: ";
         graph->directTransitiveClosing(v);
+        cout << endl;
         break;
         
     case 2: // Fecho Transitivo Indireto;
