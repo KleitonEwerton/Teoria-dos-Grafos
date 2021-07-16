@@ -396,23 +396,20 @@ void Graph::auxDeepSearch(Node *node, int vet[], int cont, vector<int> *retorno)
 
 void Graph::directTransitiveClosing(int id)
 {
-    //bool *visited[getOrder()]; // Cria um vetor de visitados
+    bool *visited[getOrder()]; // Cria um vetor de visitados
 
     // Inicializa todos os elementos de "visited" com false
-    //for(int i=0; i<getOrder(); i++){
-        //*visited[i] = false;
-    //}
+    for(int i=0; i<getOrder(); i++){
+        *visited[i] = false;
+    }
 
-    //auxDirectTransitiveClosing(id, visited);
+    auxDirectTransitiveClosing(id, visited);
 
-    //Imprime o índice de todos os elementos com valor true do vetor de visitados
-    //for(int i=1; i<=getOrder(); i++){
+    // Imprime o índice de todos os elementos com valor true do vetor de visitados
+    for(int i=1; i<=getOrder(); i++){
         //if(*visited[i]==true){
-            //cout << i << " | ";
+            cout << i << " | ";
         //}
-    //}
-    for(int i=0; i<4; i++){
-        cout << i << " ";
     }
 }
 
