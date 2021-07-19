@@ -129,8 +129,8 @@ void selecionar(int selecao, Graph *graph, ofstream &output_file)
             cin >> h;
         }while(!graph->searchNode(h));
 
-        cout << "Fecho transitivo direto: ";
-        graph->directTransitiveClosing(h);
+        cout << "Fecho transitivo indireto: ";
+        graph->indirectTransitiveClosing(h);
         cout << endl;
         break;
         

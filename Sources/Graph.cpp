@@ -434,7 +434,7 @@ void Graph::auxDirectTransitiveClosing(Node *node){
     }
 }
 
-void Graph::inDirectTransitiveClosing(int id){
+void Graph::indirectTransitiveClosing(int id){
 
     Node *target = this->getNode(id); // Nó alvo
     Node *source;                     // Nó através do qual será feita a verificação se target é acessível.
