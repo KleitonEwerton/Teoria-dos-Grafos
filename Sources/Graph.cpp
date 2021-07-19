@@ -397,9 +397,14 @@ void Graph::auxDeepSearch(Node *node, int vet[], int cont, vector<int> *retorno)
 void Graph::directTransitiveClosing(int id)
 {
     vector<int> visited;
+    bool *visit[this->getOrder()];
     Node *node = this->getNode(id);
 
-    auxDirectTransitiveClosing(node, &visited);
+    for(int i=0; i<this->getOrder(); i++){
+        *visit[i] = false;
+    }
+
+    auxDirectTransitiveClosing(node, &visited, visit);
 
     for(int i=0; i<visited.size(); i++){
         cout << visited[i] << " | ";
@@ -407,14 +412,17 @@ void Graph::directTransitiveClosing(int id)
      
 }
 
-void Graph::auxDirectTransitiveClosing(Node *node, vector<int> *visited){ 
+void Graph::auxDirectTransitiveClosing(Node *node, vector<int> *visited, bool *visit[]){ 
     Edge *edge = node->getFirstEdge();
 
     while (edge != nullptr){
-        node = this->getNode(edge->getTargetId());
-        auxDirectTransitiveClosing(node, visited);
-        edge = edge->getNextEdge();
-        visited->push_back(node->getId());
+        if(*visit[node->getId()]==false){
+            node = this->getNode(edge->getTargetId());
+            auxDirectTransitiveClosing(node, visited, visit);
+            *visit[node->getId()]= true;
+            edge = edge->getNextEdge();
+            visited->push_back(node->getId());
+        }
     }
 }
 
