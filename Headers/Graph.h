@@ -50,7 +50,7 @@ public:
     void printGraph_Dot_Not_Directed();
     void directTransitiveClosing(int id);
     void auxDirectTransitiveClosing(Node *node);
-    void inDirectTransitiveClosing(int id);
+    void indirectTransitiveClosing(int id);
     void auxIndirectTransitiveClosing(Node *node);
     bool findEdge(int vet[], int k, int v);
     void deepSearch(int node);
