@@ -61,7 +61,7 @@ public:
     void topologicalSorting();
     void breadthFirstSearch(ofstream &output_file);
     Graph *getVertexInduced(int *listIdNodes);
-    Graph *agmKuskal();
+    Graph *agmKruskal();
     Graph *agmPrim();
     float floydMarshall(int idSource, int idTarget);
     float dijkstra(int idSource, int idTarget);
