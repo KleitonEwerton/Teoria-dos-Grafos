@@ -21,6 +21,7 @@ class Node{
         int degree;
         float weight;
         Node* next_node;
+        bool visited; // Atributo para definir se o nó foi visitado ou não.
 
     public:
         // Constructor
@@ -36,9 +37,11 @@ class Node{
         int getDegree();
         float getWeight();
         Node* getNextNode();
+        bool getVisited(); // Retorna o atributo visited;
         // Setters
         void setNextNode(Node* node);
         void setWeight(float weight);
+        void setVisited(bool visited); // Define se o nó foi visitado ou não.
         // Other methods
         bool searchEdge(int target_id);
         void insertEdge(int target_id, float weight);

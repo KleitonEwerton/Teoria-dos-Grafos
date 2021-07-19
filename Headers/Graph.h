@@ -49,11 +49,13 @@ public:
     void printGraph_Dot_Directed();
     void printGraph_Dot_Not_Directed();
     void directTransitiveClosing(int id);
-    void auxDirectTransitiveClosing(Node *node, vector<int> *visited);
+    void auxDirectTransitiveClosing(Node *node);
     void inDirectTransitiveClosing(int id);
+    void auxIndirectTransitiveClosing(Node *node);
     bool findEdge(int vet[], int k, int v);
     void deepSearch(int node);
     void auxDeepSearch(Node *node, int vet[], int cont, vector<int> *ret);
+    void cleanVisited(); // Define todos os nós como não visitados.
 
     //methods phase1
     void topologicalSorting();
