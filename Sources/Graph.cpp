@@ -529,7 +529,7 @@ Graph *getVertexInduced(int *listIdNodes)
     return nullptr;
 }
 
-Graph *agmKuskal()
+Graph *agmKruskal()
 {
     return nullptr;
 }
