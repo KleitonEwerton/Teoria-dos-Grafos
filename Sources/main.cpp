@@ -143,7 +143,7 @@ void selecionar(int selecao, Graph *graph, ofstream &output_file)
         cin >> sourceD;
         cout << "Digite o node Target"<< endl;
         cin >> targetD;
-        cout << "A distância é: " << graph->dijkstra(sourceD,targetD)<<endl;
+        graph->dijkstra(sourceD,targetD);
             
         }
         catch(const exception& e){ 

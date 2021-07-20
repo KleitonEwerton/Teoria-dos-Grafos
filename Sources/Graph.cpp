@@ -17,7 +17,7 @@
 #include "Node.h"
 #include "Edge.h"
 
-#define INFINITO 9999;
+#define INFINITO 999999;
 
 using namespace std;
 
@@ -484,16 +484,17 @@ float Graph::dijkstra(int idSource, int idTarget)
     if(noSource != nullptr && noTarget != nullptr){
 
         int V = getOrder();
-        int INF = 999999999;
-
+        int INF = INFINITO;
         int *distance = new int[V+1];   //  Vetor para os distâncias
         bool *visited = new bool[V+1];   //  Vetor para os já visitados
 
         //Fila de prioridade para os pares distancia e vertice
         priority_queue<pair<int, int>, vector<pair<int,int>>, greater<pair<int,int>>> fp; 
+
+        list<int>anterior[V+1];
         
         //Inicializador dos vetores visitados e distância
-        for(int i = 0; i < V;i++){distance[i] = INF;visited[i]=false;}
+        for(int i = 0; i < V+1;i++){distance[i] = INF;visited[i]=false;}
         
         distance[idSource] = 0;     //Distância do vertice para ele mesmo
 
@@ -503,7 +504,6 @@ float Graph::dijkstra(int idSource, int idTarget)
 
         
         int ver = 0,c_edge = 0;
-
         while (!fp.empty()){
             
             //Pega o do topo
@@ -512,28 +512,28 @@ float Graph::dijkstra(int idSource, int idTarget)
             int u = p.second;
             //Remove da lista de prioridade
             fp.pop();
-
             if(visited[u] == false){
 
-                visited[u] = true;
+                visited[u] = true;                                      //Marca o vertice como visitado
                 
-                Node *node = getNode(u);
+                Node *node = getNode(u);                                
                 Edge *edge = node->getFirstEdge();
-                
+
                 //Passa por todas as arestas do vertice u
-                while (edge != nullptr)
-                {   
-		    //Para caso não haja pesso a distância será 1 por aresta percorrida
+                while (edge != nullptr){   
+
+		            //Para caso não haja pesso a distância será 1 por aresta percorrida
                     if(edge->getWeight() == 0)c_edge = 1;
                     else c_edge = edge->getWeight();
-                    
+
                     ver = edge->getTargetId();
-                    
 
                     if(distance[ver] > (distance[u]+ c_edge)){
-
-                        distance[ver] = (distance[u]+ c_edge);
-                        fp.push(make_pair(distance[ver], ver));
+                        
+                        if(!anterior->empty())anterior->clear();        //Caso já tenha um anterior ele será apagado
+                        anterior[ver].push_front(u);                    //Armazena o anterior menos custoso de cada vertice
+                        distance[ver] = (distance[u]+ c_edge);          //Atualiza a distância
+                        fp.push(make_pair(distance[ver], ver));         //Adiciona o vertice na fila de prioridade
 
                     }
                     edge = edge->getNextEdge();
@@ -541,24 +541,54 @@ float Graph::dijkstra(int idSource, int idTarget)
                 
             }
             
-
         }
 
-        free(distance);
-        free(visited);
-        return distance[idTarget];
+        //Para imprimir o caminho mais curto entre os vertices requeridos
+        if(distance[idTarget] < INF){
+            
+            int antes;                                                          //Usado para armazenar o vertice anterior
+            list<int>ordemAcesso;                                               //Lista contendo a ordem de acesso dos vertices
+
+            //Armazena na lista da ordem de acesso os vertices anteriores a todos
+            ordemAcesso.push_front(idTarget);
+            antes = anterior[idTarget].front();
+            while (antes != idSource){
+
+                ordemAcesso.push_front(antes);
+                antes = anterior[antes].front();
+
+            }
+
+            //Imprime toda a lista de acesso
+            cout <<"\n" <<idSource;
+            while(!ordemAcesso.empty()){
+
+                cout <<" --> " << ordemAcesso.front();
+                ordemAcesso.pop_front();
+
+            }
+         
+
+        }
+        
+        int aux = distance[idTarget];
+
+        delete [] distance;
+        delete [] visited;
+
+        cout << "\n\nA distância é: " << aux << endl;
+        return aux;
+
 
     }else{
         
-
         if(noSource == nullptr)cout<<"Node source inesistente"<<endl;
         if(noTarget == nullptr)cout <<"Node target inesistente" << endl;
-        return 0;
+        return -1;
     }
     
     
 }
-
 //function that prints a topological sorting
 void topologicalSorting()
 {
