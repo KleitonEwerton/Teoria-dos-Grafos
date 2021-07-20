@@ -486,8 +486,8 @@ float Graph::dijkstra(int idSource, int idTarget)
         int V = getOrder();
         int INF = 999999999;
 
-        int distance[V];   //  Vetor para os distâncias
-        bool visited[V];   //  Vetor para os já visitados
+        int *distance = new int[V+1];   //  Vetor para os distâncias
+        bool *visited = new bool[V+1];   //  Vetor para os já visitados
 
         //Fila de prioridade para os pares distancia e vertice
         priority_queue<pair<int, int>, vector<pair<int,int>>, greater<pair<int,int>>> fp; 
@@ -544,7 +544,8 @@ float Graph::dijkstra(int idSource, int idTarget)
 
         }
 
-    
+        free(distance);
+        free(visited);
         return distance[idTarget];
 
     }else{
