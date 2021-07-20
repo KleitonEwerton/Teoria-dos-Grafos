@@ -123,6 +123,15 @@ void selecionar(int selecao, Graph *graph, ofstream &output_file)
         break;
         
     case 2: // Fecho Transitivo Indireto;
+        int h;
+        do{
+            cout << "Digite o id do nó: ";
+            cin >> h;
+        }while(!graph->searchNode(h));
+
+        cout << "Fecho transitivo indireto: ";
+        graph->indirectTransitiveClosing(h);
+        cout << endl;
         break;
         
     case 3: //Caminho Mínimo entre dois vértices - Dijkstra

@@ -204,6 +204,15 @@ Node *Graph::getNode(int id)
     return node;
 }
 
+void Graph::cleanVisited(){
+    Node *node = this->getFirstNode();
+
+    while(node!=nullptr){
+        node->setVisited(false);
+        node = node->getNextNode();
+    }
+}
+
 void Graph::printGraph()
 {
     cout << "\nImprimindo grafo\n"
@@ -394,34 +403,68 @@ void Graph::auxDeepSearch(Node *node, int vet[], int cont, vector<int> *retorno)
 }
 
 
-void Graph::directTransitiveClosing(int id)
-{
-    vector<int> visited;
+void Graph::directTransitiveClosing(int id){
+
     Node *node = this->getNode(id);
 
-    auxDirectTransitiveClosing(node, &visited);
+    cleanVisited(); // Limpa todos os nós visitados.
 
-    for(int i=0; i<visited.size(); i++){
-        cout << visited[i] << " | ";
+    auxDirectTransitiveClosing(node);
+
+    // Imprime o id de todos os nós visitados.
+    for(node = this->first_node; node!=nullptr; node = node->getNextNode()){
+        if(node->getVisited()){
+            cout << node->getId() << " | ";
+        }
     }
      
 }
 
-void Graph::auxDirectTransitiveClosing(Node *node, vector<int> *visited){ 
+// Auxiliar do Fecho Transitivo Direto.
+void Graph::auxDirectTransitiveClosing(Node *node){ 
     Edge *edge = node->getFirstEdge();
 
     while (edge != nullptr){
-        node = this->getNode(edge->getTargetId());
-        auxDirectTransitiveClosing(node, visited);
-        edge = edge->getNextEdge();
-        visited->push_back(node->getId());
+        if(!this->getNode(edge->getTargetId())->getVisited()){
+            node->setVisited(true);
+            node = this->getNode(edge->getTargetId());
+            auxDirectTransitiveClosing(node);
+            edge = edge->getNextEdge();
+        }
     }
 }
 
-void Graph::inDirectTransitiveClosing(int id)
-{
+void Graph::indirectTransitiveClosing(int id){
 
-}    
+    Node *target = this->getNode(id); // Nó alvo
+    Node *source;                     // Nó através do qual será feita a verificação se target é acessível.
+
+    for(source = this->first_node; source!=nullptr; source = source->getNextNode()){
+        cleanVisited(); // Limpa todos os visitados.
+
+        auxIndirectTransitiveClosing(source);
+
+        // Se terget foi visitado, imprime o id de source.
+        if(target->getVisited()){
+            cout << source->getId() << " | ";
+        }
+    }
+}
+
+// Auxiliar do Fecho Transitivo Indireto.
+void Graph::auxIndirectTransitiveClosing(Node *node){
+    Edge *edge = node->getFirstEdge();
+
+     while (edge != nullptr){
+        if(!this->getNode(edge->getTargetId())->getVisited()){
+            node->setVisited(true);
+            node = this->getNode(edge->getTargetId());
+            auxDirectTransitiveClosing(node);
+            edge = edge->getNextEdge();
+        }
+    }
+}
+
 void Graph::breadthFirstSearch(ofstream &output_file)
 {
 }

@@ -85,6 +85,10 @@ Node* Node::getNextNode(){
 
 }
 
+bool Node::getVisited(){
+    return visited;
+}
+
 // Setters
 
 void Node::setNextNode(Node* next_node){
@@ -97,6 +101,10 @@ void Node::setWeight(float weight){
 
     this->weight = weight;
 
+}
+
+void Node::setVisited(bool v){
+    this->visited = v;
 }
 
 // Other methods
