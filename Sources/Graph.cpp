@@ -469,10 +469,91 @@ void Graph::breadthFirstSearch(ofstream &output_file)
 {
 }
 
-float Graph::floydMarshall(int idSource, int idTarget)
-{
+float Graph::floydMarshall(int idSource, int idTarget){
+    
+    Node *noSource = getNode(idSource);
+    Node *noTarget = getNode(idTarget);
 
-    return 0;
+    if(noSource != nullptr && noTarget != nullptr){
+
+        int V = getOrder() + 1;
+        int INF = INFINITO;
+        int i, j, k;        
+        int **dist = new int*[V];   //Matriz para a distância
+        for(i = 0; i < V;i++)dist[i] = new int[V];
+        Node *node;                              
+        Edge *edge = nullptr;
+        list<int>anterior[V];
+
+        
+        //Colocando o valor de infinito em  todas as posições da matriz
+        for (i = 0; i < V; i++)for (j = 0; j < V; j++)dist[i][j] = INF;
+        for (i = 0; i < V; i++)dist[i][i] = 0;
+
+        //Colocando o peso da arestas na matriz, caso não tenho peso o valor 1 será atribuido
+        for (i = 0; i < V; i++){
+            node = getNode(i);
+
+            if(node != nullptr)edge = node->getFirstEdge();
+
+            while (edge != nullptr){
+
+                if(edge->getWeight() == 0)dist[i][edge->getTargetId()] = 1; //Caso não possua peso na aresta o valor 1 é atribuido
+                else dist[i][edge->getTargetId()] = edge->getWeight();      //Caso possua peso na aresta o atribui nessa possição da matriz
+                edge = edge->getNextEdge();
+            }
+        }
+        for (k = 0; k < V; k++) 
+            for (i = 0; i < V; i++)                               
+                for (j = 0; j < V; j++) {
+                    if (dist[i][j] > (dist[i][k] + dist[k][j]) && (dist[k][j] != INF && dist[i][k] != INF)){
+                        dist[i][j] = dist[i][k] + dist[k][j];
+                        //Armazena o anterior do vertice j em uma lista
+                        if(i == idSource){
+                            if(!anterior->empty())anterior->clear();
+                            anterior[j].push_front(k);}}}
+                 
+        
+    int distancia = dist[idSource][idTarget];
+    
+    //Desalocando a matriz usada
+    for(i = 0;i<V;i++){delete [] dist[i];}
+    delete [] dist;
+    //Caso a distâcia seja infinita o algoritmo se encerra
+    if(distancia >= INF){cout << "A distância é o infinito ";return INF;}
+
+    int noAnterior;
+    list<int>ordemAcesso;  
+
+    //Armazena na lista na ordem de acesso dos vertices, apartir de seus anteriores
+    ordemAcesso.push_front(idTarget);
+    noAnterior = anterior[idTarget].front();
+    
+    while(noAnterior > 0){
+        ordemAcesso.push_front(noAnterior);
+        noAnterior = anterior[noAnterior].front();
+    }
+
+    //Imprime todo a lista na ordem de acesso
+    cout <<"\n" <<idSource;
+    while(!ordemAcesso.empty()){
+
+        cout <<" --> " << ordemAcesso.front();
+        ordemAcesso.pop_front();
+
+    }
+
+    cout << "\n\nDistância é: "<< distancia<<endl;
+    return distancia;
+
+    }else{
+
+        if(noSource == nullptr)cout<<"Source node does not exist"<<endl;
+        if(noTarget == nullptr)cout <<"Target node does not exist" << endl;
+        return -1;
+    }
+
+    
 }
 
 float Graph::dijkstra(int idSource, int idTarget)
@@ -483,18 +564,18 @@ float Graph::dijkstra(int idSource, int idTarget)
 
     if(noSource != nullptr && noTarget != nullptr){
 
-        int V = getOrder();
+        int V = getOrder() + 1;
         int INF = INFINITO;
-        int *distance = new int[V+1];   //  Vetor para os distâncias
-        bool *visited = new bool[V+1];   //  Vetor para os já visitados
+        int *distance = new int[V];   //  Vetor para os distâncias
+        bool *visited = new bool[V];   //  Vetor para os já visitados
 
         //Fila de prioridade para os pares distancia e vertice
         priority_queue<pair<int, int>, vector<pair<int,int>>, greater<pair<int,int>>> fp; 
 
-        list<int>anterior[V+1];
+        list<int>anterior[V];
         
         //Inicializador dos vetores visitados e distância
-        for(int i = 0; i < V+1;i++){distance[i] = INF;visited[i]=false;}
+        for(int i = 0; i < V;i++){distance[i] = INF;visited[i]=false;}
         
         distance[idSource] = 0;     //Distância do vertice para ele mesmo
 
@@ -535,55 +616,45 @@ float Graph::dijkstra(int idSource, int idTarget)
                         distance[ver] = (distance[u]+ c_edge);          //Atualiza a distância
                         fp.push(make_pair(distance[ver], ver));         //Adiciona o vertice na fila de prioridade
 
-                    }
-                    edge = edge->getNextEdge();
-                }
-                
-            }
+                    }edge = edge->getNextEdge();}}}
+
+        int distancia = distance[idTarget];
+
+        //Desalocando os vetores usados
+        delete [] distance;
+        delete [] visited;
+        //Caso a distâcia seja infinita o algoritmo se encerra
+        if(distancia >= INF){cout << "A distância é o infinito "; return INF;}
             
+        int noAnterior;                                                          //Usado para armazenar o vertice anterior
+        list<int>ordemAcesso;                                               //Lista contendo a ordem de acesso dos vertices
+
+        //Armazena na lista na ordem de acesso dos vertices, apartir de seus anteriores
+        ordemAcesso.push_front(idTarget);
+        noAnterior = anterior[idTarget].front();
+
+        while (noAnterior != idSource){
+            ordemAcesso.push_front(noAnterior);
+            noAnterior = anterior[noAnterior].front();
         }
 
-        //Para imprimir o caminho mais curto entre os vertices requeridos
-        if(distance[idTarget] < INF){
-            
-            int antes;                                                          //Usado para armazenar o vertice anterior
-            list<int>ordemAcesso;                                               //Lista contendo a ordem de acesso dos vertices
+        //Imprime todo a lista na ordem de acesso
+        cout <<"\n" <<idSource;
+        while(!ordemAcesso.empty()){
 
-            //Armazena na lista da ordem de acesso os vertices anteriores a todos
-            ordemAcesso.push_front(idTarget);
-            antes = anterior[idTarget].front();
-            while (antes != idSource){
-
-                ordemAcesso.push_front(antes);
-                antes = anterior[antes].front();
-
-            }
-
-            //Imprime toda a lista de acesso
-            cout <<"\n" <<idSource;
-            while(!ordemAcesso.empty()){
-
-                cout <<" --> " << ordemAcesso.front();
-                ordemAcesso.pop_front();
-
-            }
-         
+            cout <<" --> " << ordemAcesso.front();
+            ordemAcesso.pop_front();
 
         }
         
-        int aux = distance[idTarget];
-
-        delete [] distance;
-        delete [] visited;
-
-        cout << "\n\nA distância é: " << aux << endl;
-        return aux;
+    cout << "\n\nA distância é: " << distancia << endl;
+    return distancia;
 
 
     }else{
         
-        if(noSource == nullptr)cout<<"Node source inesistente"<<endl;
-        if(noTarget == nullptr)cout <<"Node target inesistente" << endl;
+        if(noSource == nullptr)cout<<"Source node does not exist"<<endl;
+        if(noTarget == nullptr)cout <<"Target node does not exist" << endl;
         return -1;
     }
     

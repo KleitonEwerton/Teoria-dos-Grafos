@@ -155,6 +155,22 @@ void selecionar(int selecao, Graph *graph, ofstream &output_file)
         break;
         
     case 4: // Caminho Mínimo entre dois vértices - Floyd
+        int sourceF, targetF;
+        try{   
+
+        cout <<"Digite o node Source" << endl;
+        cin >> sourceD;
+        cout << "Digite o node Target"<< endl;
+        cin >> targetD;
+        graph->floydMarshall(sourceD,targetD);
+            
+        }
+        catch(const exception& e){ 
+
+            cout << "Parâmetros inválidos" << endl;
+
+        }
+
         break;
         
     case 5: //Árvore Geradora Mínima sobre subgrafo vertice induzido por X usando algorítmo de Prim
