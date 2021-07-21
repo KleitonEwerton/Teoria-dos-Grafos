@@ -112,73 +112,75 @@ void selecionar(int selecao, Graph *graph, ofstream &output_file)
         break;
     case 1: // Fecho Transitivo Direto;
         int v;
-        do{
+        do
+        {
             cout << "Digite o id do nó: ";
             cin >> v;
-        }while(!graph->searchNode(v));
+        } while (!graph->searchNode(v));
 
         cout << "Fecho transitivo direto: ";
         graph->directTransitiveClosing(v);
         cout << endl;
         break;
-        
+
     case 2: // Fecho Transitivo Indireto;
         int h;
-        do{
+        do
+        {
             cout << "Digite o id do nó: ";
             cin >> h;
-        }while(!graph->searchNode(h));
+        } while (!graph->searchNode(h));
 
         cout << "Fecho transitivo indireto: ";
         graph->indirectTransitiveClosing(h);
         cout << endl;
         break;
-        
+
     case 3: //Caminho Mínimo entre dois vértices - Dijkstra
 
         int sourceD, targetD;
-        try{   
+        try
+        {
 
-        cout <<"Digite o node Source" << endl;
-        cin >> sourceD;
-        cout << "Digite o node Target"<< endl;
-        cin >> targetD;
-        graph->dijkstra(sourceD,targetD);
-            
+            cout << "Digite o node Source" << endl;
+            cin >> sourceD;
+            cout << "Digite o node Target" << endl;
+            cin >> targetD;
+            graph->dijkstra(sourceD, targetD);
         }
-        catch(const exception& e){ 
+        catch (const exception &e)
+        {
 
             cout << "Parâmetros inválidos" << endl;
-
         }
 
         break;
-        
+
     case 4: // Caminho Mínimo entre dois vértices - Floyd
         int sourceF, targetF;
-        try{   
+        try
+        {
 
-        cout <<"Digite o node Source" << endl;
-        cin >> sourceD;
-        cout << "Digite o node Target"<< endl;
-        cin >> targetD;
-        graph->floydMarshall(sourceD,targetD);
-            
+            cout << "Digite o node Source" << endl;
+            cin >> sourceD;
+            cout << "Digite o node Target" << endl;
+            cin >> targetD;
+            graph->floydMarshall(sourceD, targetD);
         }
-        catch(const exception& e){ 
+        catch (const exception &e)
+        {
 
             cout << "Parâmetros inválidos" << endl;
-
         }
 
         break;
-        
+
     case 5: //Árvore Geradora Mínima sobre subgrafo vertice induzido por X usando algorítmo de Prim
         break;
-        
+
     case 6: //Árvore Geradora Mínima sobre subgrafo vertice induzido por X usando algorítmo de Kruskal
         break;
-        
+
     case 7: //Caminhamento Profundidade destacando as Arestas de retorno
         int n;
         cout << "\n --- Caminhamento Profundidade destacando as Arestas de retorno --- \n\n";
@@ -192,6 +194,7 @@ void selecionar(int selecao, Graph *graph, ofstream &output_file)
         break;
 
     case 8: //Ordenação topologica em D ou a informação de que não é um grafo acíclico direcionado
+        graph->topologicalSorting();
         break;
 
     case 9: //Modulo de teste
@@ -205,12 +208,12 @@ void selecionar(int selecao, Graph *graph, ofstream &output_file)
     case 11: //Salvar grafo em arquivo .dot - Direcionado
         graph->printGraph_Dot_Directed();
         break;
-        
+
     default:
         system("clear");
         cout << " Erro!!! Opção invalida." << endl;
     }
-    menu();
+  //  menu();
 }
 
 int mainMenu(ofstream &output_file, Graph *graph)
@@ -223,9 +226,9 @@ int mainMenu(ofstream &output_file, Graph *graph)
         // system("clear");
         selecao = menu();
 
-        if(!selecao)
-        exit(0);
-        
+        // if (!selecao)
+        //     exit(0);
+
         if (output_file.is_open())
             selecionar(selecao, graph, output_file);
         else
