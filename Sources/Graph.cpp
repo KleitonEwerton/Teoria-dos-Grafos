@@ -204,10 +204,12 @@ Node *Graph::getNode(int id)
     return node;
 }
 
-void Graph::cleanVisited(){
+void Graph::cleanVisited()
+{
     Node *node = this->getFirstNode();
 
-    while(node!=nullptr){
+    while (node != nullptr)
+    {
         node->setVisited(false);
         node = node->getNextNode();
     }
@@ -360,7 +362,7 @@ bool Graph::findEdge(int vet[], int cont, int v)
 void Graph::deepSearch(int id)
 {
     vector<int> retorno;
-   
+
     int k = this->getOrder();
     int cont = 0;
     Node *node = this->getNode(id);
@@ -376,10 +378,9 @@ void Graph::deepSearch(int id)
     delete[] vet;
 
     cout << "\n\n -- Arestas de Retorno -- \n\n";
-    for(int i = 0; i < retorno.size(); i++)
-    cout<< retorno[i] << " < ";
+    for (int i = 0; i < retorno.size(); i++)
+        cout << retorno[i] << " < ";
     cout << "\n\n --- \n";
-    
 }
 //Auxiliar da busca em profundidade de um Nó dado
 void Graph::auxDeepSearch(Node *node, int vet[], int cont, vector<int> *retorno)
@@ -391,8 +392,8 @@ void Graph::auxDeepSearch(Node *node, int vet[], int cont, vector<int> *retorno)
         if (!findEdge(vet, this->getOrder(), edge->getTargetId()))
         {
             node = this->getNode(edge->getTargetId());
-            cont++;                     
-            vet[cont] = node->getId(); 
+            cont++;
+            vet[cont] = node->getId();
             auxDeepSearch(node, vet, cont, retorno);
             edge = edge->getNextEdge();
             retorno->push_back(node->getId());
@@ -402,8 +403,8 @@ void Graph::auxDeepSearch(Node *node, int vet[], int cont, vector<int> *retorno)
     }
 }
 
-
-void Graph::directTransitiveClosing(int id){
+void Graph::directTransitiveClosing(int id)
+{
 
     Node *node = this->getNode(id);
 
@@ -412,20 +413,24 @@ void Graph::directTransitiveClosing(int id){
     auxDirectTransitiveClosing(node);
 
     // Imprime o id de todos os nós visitados.
-    for(node = this->first_node; node!=nullptr; node = node->getNextNode()){
-        if(node->getVisited()){
+    for (node = this->first_node; node != nullptr; node = node->getNextNode())
+    {
+        if (node->getVisited())
+        {
             cout << node->getId() << " | ";
         }
     }
-     
 }
 
 // Auxiliar do Fecho Transitivo Direto.
-void Graph::auxDirectTransitiveClosing(Node *node){ 
+void Graph::auxDirectTransitiveClosing(Node *node)
+{
     Edge *edge = node->getFirstEdge();
 
-    while (edge != nullptr){
-        if(!this->getNode(edge->getTargetId())->getVisited()){
+    while (edge != nullptr)
+    {
+        if (!this->getNode(edge->getTargetId())->getVisited())
+        {
             node->setVisited(true);
             node = this->getNode(edge->getTargetId());
             auxDirectTransitiveClosing(node);
@@ -434,29 +439,35 @@ void Graph::auxDirectTransitiveClosing(Node *node){
     }
 }
 
-void Graph::indirectTransitiveClosing(int id){
+void Graph::indirectTransitiveClosing(int id)
+{
 
     Node *target = this->getNode(id); // Nó alvo
     Node *source;                     // Nó através do qual será feita a verificação se target é acessível.
 
-    for(source = this->first_node; source!=nullptr; source = source->getNextNode()){
+    for (source = this->first_node; source != nullptr; source = source->getNextNode())
+    {
         cleanVisited(); // Limpa todos os visitados.
 
         auxIndirectTransitiveClosing(source);
 
         // Se terget foi visitado, imprime o id de source.
-        if(target->getVisited()){
+        if (target->getVisited())
+        {
             cout << source->getId() << " | ";
         }
     }
 }
 
 // Auxiliar do Fecho Transitivo Indireto.
-void Graph::auxIndirectTransitiveClosing(Node *node){
+void Graph::auxIndirectTransitiveClosing(Node *node)
+{
     Edge *edge = node->getFirstEdge();
 
-     while (edge != nullptr){
-        if(!this->getNode(edge->getTargetId())->getVisited()){
+    while (edge != nullptr)
+    {
+        if (!this->getNode(edge->getTargetId())->getVisited())
+        {
             node->setVisited(true);
             node = this->getNode(edge->getTargetId());
             auxDirectTransitiveClosing(node);
@@ -469,91 +480,117 @@ void Graph::breadthFirstSearch(ofstream &output_file)
 {
 }
 
-float Graph::floydMarshall(int idSource, int idTarget){
-    
+float Graph::floydMarshall(int idSource, int idTarget)
+{
+
     Node *noSource = getNode(idSource);
     Node *noTarget = getNode(idTarget);
 
-    if(noSource != nullptr && noTarget != nullptr){
+    if (noSource != nullptr && noTarget != nullptr)
+    {
 
         int V = getOrder() + 1;
         int INF = INFINITO;
-        int i, j, k;        
-        int **dist = new int*[V];   //Matriz para a distância
-        for(i = 0; i < V;i++)dist[i] = new int[V];
-        Node *node;                              
+        int i, j, k;
+        int **dist = new int *[V]; //Matriz para a distância
+        for (i = 0; i < V; i++)
+            dist[i] = new int[V];
+        Node *node;
         Edge *edge = nullptr;
-        list<int>anterior[V];
+        list<int> anterior[V];
 
-        
         //Colocando o valor de infinito em  todas as posições da matriz
-        for (i = 0; i < V; i++)for (j = 0; j < V; j++)dist[i][j] = INF;
-        for (i = 0; i < V; i++)dist[i][i] = 0;
+        for (i = 0; i < V; i++)
+            for (j = 0; j < V; j++)
+                dist[i][j] = INF;
+        for (i = 0; i < V; i++)
+            dist[i][i] = 0;
 
         //Colocando o peso da arestas na matriz, caso não tenho peso o valor 1 será atribuido
-        for (i = 0; i < V; i++){
+        for (i = 0; i < V; i++)
+        {
             node = getNode(i);
 
-            if(node != nullptr)edge = node->getFirstEdge();
+            if (node != nullptr)
+                edge = node->getFirstEdge();
 
-            while (edge != nullptr){
+            while (edge != nullptr)
+            {
 
-                if(edge->getWeight() == 0)dist[i][edge->getTargetId()] = 1; //Caso não possua peso na aresta o valor 1 é atribuido
-                else dist[i][edge->getTargetId()] = edge->getWeight();      //Caso possua peso na aresta o atribui nessa possição da matriz
+                if (edge->getWeight() == 0)
+                    dist[i][edge->getTargetId()] = 1; //Caso não possua peso na aresta o valor 1 é atribuido
+                else
+                    dist[i][edge->getTargetId()] = edge->getWeight(); //Caso possua peso na aresta o atribui nessa possição da matriz
                 edge = edge->getNextEdge();
             }
         }
-        for (k = 0; k < V; k++) 
-            for (i = 0; i < V; i++)                               
-                for (j = 0; j < V; j++) {
-                    if (dist[i][j] > (dist[i][k] + dist[k][j]) && (dist[k][j] != INF && dist[i][k] != INF)){
+        for (k = 0; k < V; k++)
+            for (i = 0; i < V; i++)
+                for (j = 0; j < V; j++)
+                {
+                    if (dist[i][j] > (dist[i][k] + dist[k][j]) && (dist[k][j] != INF && dist[i][k] != INF))
+                    {
                         dist[i][j] = dist[i][k] + dist[k][j];
                         //Armazena o anterior do vertice j em uma lista
-                        if(i == idSource){
-                            if(!anterior->empty())anterior->clear();
-                            anterior[j].push_front(k);}}}
-                 
-        
-    int distancia = dist[idSource][idTarget];
-    
-    //Desalocando a matriz usada
-    for(i = 0;i<V;i++){delete [] dist[i];}
-    delete [] dist;
-    //Caso a distâcia seja infinita o algoritmo se encerra
-    if(distancia >= INF){cout << "A distância é o infinito ";return INF;}
+                        if (i == idSource)
+                        {
+                            if (!anterior->empty())
+                                anterior->clear();
+                            anterior[j].push_front(k);
+                        }
+                    }
+                }
 
-    int noAnterior;
-    list<int>ordemAcesso;  
+        int distancia = dist[idSource][idTarget];
 
-    //Armazena na lista na ordem de acesso dos vertices, apartir de seus anteriores
-    ordemAcesso.push_front(idTarget);
-    noAnterior = anterior[idTarget].front();
-    
-    while(noAnterior > 0){
-        ordemAcesso.push_front(noAnterior);
-        noAnterior = anterior[noAnterior].front();
+        //Desalocando a matriz usada
+        for (i = 0; i < V; i++)
+        {
+            delete[] dist[i];
+        }
+        delete[] dist;
+        //Caso a distâcia seja infinita o algoritmo se encerra
+        if (distancia >= INF)
+        {
+            cout << "A distância é o infinito ";
+            return INF;
+        }
+
+        int noAnterior;
+        list<int> ordemAcesso;
+
+        //Armazena na lista na ordem de acesso dos vertices, apartir de seus anteriores
+        ordemAcesso.push_front(idTarget);
+        noAnterior = anterior[idTarget].front();
+
+        while (noAnterior > 0)
+        {
+            ordemAcesso.push_front(noAnterior);
+            noAnterior = anterior[noAnterior].front();
+        }
+
+        //Imprime todo a lista na ordem de acesso
+        cout << "\n"
+             << idSource;
+        while (!ordemAcesso.empty())
+        {
+
+            cout << " --> " << ordemAcesso.front();
+            ordemAcesso.pop_front();
+        }
+
+        cout << "\n\nDistância é: " << distancia << endl;
+        return distancia;
     }
+    else
+    {
 
-    //Imprime todo a lista na ordem de acesso
-    cout <<"\n" <<idSource;
-    while(!ordemAcesso.empty()){
-
-        cout <<" --> " << ordemAcesso.front();
-        ordemAcesso.pop_front();
-
-    }
-
-    cout << "\n\nDistância é: "<< distancia<<endl;
-    return distancia;
-
-    }else{
-
-        if(noSource == nullptr)cout<<"Source node does not exist"<<endl;
-        if(noTarget == nullptr)cout <<"Target node does not exist" << endl;
+        if (noSource == nullptr)
+            cout << "Source node does not exist" << endl;
+        if (noTarget == nullptr)
+            cout << "Target node does not exist" << endl;
         return -1;
     }
-
-    
 }
 
 float Graph::dijkstra(int idSource, int idTarget)
@@ -562,107 +599,310 @@ float Graph::dijkstra(int idSource, int idTarget)
     Node *noSource = getNode(idSource);
     Node *noTarget = getNode(idTarget);
 
-    if(noSource != nullptr && noTarget != nullptr){
+    if (noSource != nullptr && noTarget != nullptr)
+    {
 
         int V = getOrder() + 1;
         int INF = INFINITO;
-        int *distance = new int[V];   //  Vetor para os distâncias
-        bool *visited = new bool[V];   //  Vetor para os já visitados
+        int *distance = new int[V];  //  Vetor para os distâncias
+        bool *visited = new bool[V]; //  Vetor para os já visitados
 
         //Fila de prioridade para os pares distancia e vertice
-        priority_queue<pair<int, int>, vector<pair<int,int>>, greater<pair<int,int>>> fp; 
+        priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> fp;
 
-        list<int>anterior[V];
-        
+        list<int> anterior[V];
+
         //Inicializador dos vetores visitados e distância
-        for(int i = 0; i < V;i++){distance[i] = INF;visited[i]=false;}
-        
-        distance[idSource] = 0;     //Distância do vertice para ele mesmo
+        for (int i = 0; i < V; i++)
+        {
+            distance[i] = INF;
+            visited[i] = false;
+        }
+
+        distance[idSource] = 0; //Distância do vertice para ele mesmo
 
         fp.push(make_pair(distance[idSource], idSource));
 
         pair<int, int> p = fp.top();
 
-        
-        int ver = 0,c_edge = 0;
-        while (!fp.empty()){
-            
+        int ver = 0, c_edge = 0;
+        while (!fp.empty())
+        {
+
             //Pega o do topo
-            pair<int , int> p = fp.top();
+            pair<int, int> p = fp.top();
             //Obtem o vértice
             int u = p.second;
             //Remove da lista de prioridade
             fp.pop();
-            if(visited[u] == false){
+            if (visited[u] == false)
+            {
 
-                visited[u] = true;                                      //Marca o vertice como visitado
-                
-                Node *node = getNode(u);                                
+                visited[u] = true; //Marca o vertice como visitado
+
+                Node *node = getNode(u);
                 Edge *edge = node->getFirstEdge();
 
                 //Passa por todas as arestas do vertice u
-                while (edge != nullptr){   
+                while (edge != nullptr)
+                {
 
-		            //Para caso não haja pesso a distância será 1 por aresta percorrida
-                    if(edge->getWeight() == 0)c_edge = 1;
-                    else c_edge = edge->getWeight();
+                    //Para caso não haja pesso a distância será 1 por aresta percorrida
+                    if (edge->getWeight() == 0)
+                        c_edge = 1;
+                    else
+                        c_edge = edge->getWeight();
 
                     ver = edge->getTargetId();
 
-                    if(distance[ver] > (distance[u]+ c_edge)){
-                        
-                        if(!anterior->empty())anterior->clear();        //Caso já tenha um anterior ele será apagado
-                        anterior[ver].push_front(u);                    //Armazena o anterior menos custoso de cada vertice
-                        distance[ver] = (distance[u]+ c_edge);          //Atualiza a distância
-                        fp.push(make_pair(distance[ver], ver));         //Adiciona o vertice na fila de prioridade
+                    if (distance[ver] > (distance[u] + c_edge))
+                    {
 
-                    }edge = edge->getNextEdge();}}}
+                        if (!anterior->empty())
+                            anterior->clear();                  //Caso já tenha um anterior ele será apagado
+                        anterior[ver].push_front(u);            //Armazena o anterior menos custoso de cada vertice
+                        distance[ver] = (distance[u] + c_edge); //Atualiza a distância
+                        fp.push(make_pair(distance[ver], ver)); //Adiciona o vertice na fila de prioridade
+                    }
+                    edge = edge->getNextEdge();
+                }
+            }
+        }
 
         int distancia = distance[idTarget];
 
         //Desalocando os vetores usados
-        delete [] distance;
-        delete [] visited;
+        delete[] distance;
+        delete[] visited;
         //Caso a distâcia seja infinita o algoritmo se encerra
-        if(distancia >= INF){cout << "A distância é o infinito "; return INF;}
-            
-        int noAnterior;                                                          //Usado para armazenar o vertice anterior
-        list<int>ordemAcesso;                                               //Lista contendo a ordem de acesso dos vertices
+        if (distancia >= INF)
+        {
+            cout << "A distância é o infinito ";
+            return INF;
+        }
+
+        int noAnterior;        //Usado para armazenar o vertice anterior
+        list<int> ordemAcesso; //Lista contendo a ordem de acesso dos vertices
 
         //Armazena na lista na ordem de acesso dos vertices, apartir de seus anteriores
         ordemAcesso.push_front(idTarget);
         noAnterior = anterior[idTarget].front();
 
-        while (noAnterior != idSource){
+        while (noAnterior != idSource)
+        {
             ordemAcesso.push_front(noAnterior);
             noAnterior = anterior[noAnterior].front();
         }
 
         //Imprime todo a lista na ordem de acesso
-        cout <<"\n" <<idSource;
-        while(!ordemAcesso.empty()){
+        cout << "\n"
+             << idSource;
+        while (!ordemAcesso.empty())
+        {
 
-            cout <<" --> " << ordemAcesso.front();
+            cout << " --> " << ordemAcesso.front();
             ordemAcesso.pop_front();
-
         }
-        
-    cout << "\n\nA distância é: " << distancia << endl;
-    return distancia;
 
+        cout << "\n\nA distância é: " << distancia << endl;
+        return distancia;
+    }
+    else
+    {
 
-    }else{
-        
-        if(noSource == nullptr)cout<<"Source node does not exist"<<endl;
-        if(noTarget == nullptr)cout <<"Target node does not exist" << endl;
+        if (noSource == nullptr)
+            cout << "Source node does not exist" << endl;
+        if (noTarget == nullptr)
+            cout << "Target node does not exist" << endl;
         return -1;
     }
-    
-    
 }
-//function that prints a topological sorting
-void topologicalSorting()
+
+bool Graph::thisIsCyclic()
 {
+    if (this->directed)
+        return this->isCyclicDirected();
+    else
+        return this->isCyclic();
+}
+
+bool Graph::auxIsCyclic(int nodeId, bool isVisited[], int parentId)
+{
+    isVisited[nodeId] = true;
+    Node *p = getNode(nodeId);
+    Edge *e = p->getFirstEdge();
+
+    while (e != nullptr)
+    {
+        if (!isVisited[e->getTargetId()])
+        {
+            if (auxIsCyclic(e->getTargetId(), isVisited, nodeId))
+            {
+                return true;
+            }
+        }
+        else if (e->getTargetId() != parentId)
+        {
+            return true;
+        }
+
+        e = e->getNextEdge();
+    }
+
+    return false;
+}
+
+bool Graph::isCyclic()
+{
+    bool *isVisited = new bool[this->getOrder()];
+    for (int i = 0; i < this->getOrder(); i++)
+    {
+        isVisited[i] = false;
+    }
+
+    Node *p = first_node;
+    while (p != nullptr)
+    {
+        if (!isVisited[p->getId()])
+        {
+            if (auxIsCyclic(p->getId(), isVisited, -1))
+            {
+                return true;
+            }
+        }
+
+        p = p->getNextNode();
+    }
+
+    return false;
+}
+
+bool Graph::auxIsCyclicDirected(int nodeId, bool isVisited[], bool *isContainedRecusirve)
+{
+    Node *p = this->getNode(nodeId);
+    Edge *e = p->getFirstEdge();
+
+    if (!isVisited[nodeId])
+    {
+        isVisited[nodeId] = true;
+        isContainedRecusirve[nodeId] = true;
+
+        while (e != nullptr)
+        {
+            if (!isVisited[e->getTargetId()] && auxIsCyclicDirected(e->getTargetId(), isVisited, isContainedRecusirve))
+            {
+                return true;
+            }
+            else if (isContainedRecusirve[e->getTargetId()])
+            {
+                return true;
+            }
+
+            e = e->getNextEdge();
+        }
+    }
+
+    isContainedRecusirve[nodeId] = false;
+    return false;
+}
+
+bool Graph::isCyclicDirected()
+{
+    bool *isVisited = new bool[this->getOrder()];
+    bool *isContainedRecusirve = new bool[this->getOrder()];
+    Node *p = first_node;
+
+    for (int i = 0; i < this->getOrder(); i++)
+    {
+        isVisited[i] = false;
+        isContainedRecusirve[i] = false;
+    }
+
+    while (p != nullptr)
+    {
+        if (auxIsCyclicDirected(p->getId(), isVisited, isContainedRecusirve))
+        {
+            return true;
+        }
+
+        p = p->getNextNode();
+    }
+
+    return false;
+}
+
+/**
+ * @brief Função recursiva usada por topologicalSort
+ * 
+ * @param v 
+ * @param visited 
+ * @param Stack 
+ */
+void Graph::topologicalSortUtil(Node *node, Edge *edge, int o, bool visited[], stack<int> &Stack)
+{
+    if (node != nullptr)
+    {
+        // Marca o nó atual como visitado.
+        visited[o] = true;
+        node = this->getNode(o);
+        edge = node->getFirstEdge();
+
+        // recursivo para todos o vértices adjacentes a ele
+        while (edge != nullptr)
+        {
+            if (!visited[edge->getTargetId()])
+                topologicalSortUtil(node, edge, edge->getTargetId(), visited, Stack);
+
+            edge = edge->getNextEdge();
+        }
+
+        //Empilha o vértice atual
+        if (node != nullptr)
+            Stack.push(node->getId());
+        // cout << Stack.top() << " : ";
+    }
+}
+
+/**
+ * @brief function that prints a topological sorting 
+ * A função para fazer a classificação topológica.
+ * Ele usa topologicalSortUtil () recursivamente.
+ */
+void Graph::topologicalSorting()
+{
+    if (!this->getDirected() && this->thisIsCyclic())
+    {
+        cout << endl
+             << "Ordenacao Topologica impossivel: grafo nao-direcionado ou ciclico" << endl;
+        return;
+    }
+    else
+    {
+        stack<int> Stack;
+        int ordem = this->getOrder();
+        Node *node = this->first_node;
+        Edge *edge = node->getFirstEdge();
+
+        // Marca todos os vértices como não visitados
+        bool *visited = new bool[ordem];
+        for (int i = 0; i < ordem; i++)
+            visited[i] = false;
+
+        // função auxiliar recursiva para armazenar topológico
+        // Classificar começando por todos vértices um por um
+        for (int i = 1; i <= ordem; i++)
+            if (visited[i] == false) // n vértices
+                topologicalSortUtil(node, edge, i, visited, Stack);
+
+        // Imprime o conteudo da pilha
+        cout << endl;
+        while (!Stack.empty())
+        {
+            cout << Stack.top() << " - ";
+            Stack.pop();
+        }
+        delete[] visited;
+    }
 }
 
 void breadthFirstSearch(ofstream &output_file)
