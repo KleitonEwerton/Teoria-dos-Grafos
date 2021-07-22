@@ -415,7 +415,7 @@ void Graph::directTransitiveClosing(int id)
 
     Node *node = this->getNode(id);
 
-    cleanVisited(); // Limpa todos os nós visitados.
+    this->cleanVisited(); // Limpa todos os nós visitados.
 
     auxDirectTransitiveClosing(node);
 
@@ -432,29 +432,26 @@ void Graph::directTransitiveClosing(int id)
 // Auxiliar do Fecho Transitivo Direto.
 void Graph::auxDirectTransitiveClosing(Node *node)
 {
-    Edge *edge = node->getFirstEdge();
+    node->setVisited(true);
 
-    while (edge != nullptr)
-    {
-        if (!this->getNode(edge->getTargetId())->getVisited())
-        {
-            node->setVisited(true);
-            node = this->getNode(edge->getTargetId());
-            auxDirectTransitiveClosing(node);
-            edge = edge->getNextEdge();
+    for(Edge *edge = node->getFirstEdge(); edge!=nullptr; edge=edge->getNextEdge()){
+        if(!getNode(edge->getTargetId())->getVisited()){
+            auxDirectTransitiveClosing(getNode(edge->getTargetId()));
         }
     }
+
+    
 }
 
 void Graph::indirectTransitiveClosing(int id)
 {
 
     Node *target = this->getNode(id); // Nó alvo
-    Node *source;                     // Nó através do qual será feita a verificação se target é acessível.
+    Node *source = this->getFirstNode();  // Nó através do qual será feita a verificação se target é acessível.
 
-    for (source = this->first_node; source != nullptr; source = source->getNextNode())
-    {
-        cleanVisited(); // Limpa todos os visitados.
+    while(source != nullptr){
+
+        this->cleanVisited(); // Limpa todos os visitados.
 
         auxIndirectTransitiveClosing(source);
 
@@ -463,22 +460,19 @@ void Graph::indirectTransitiveClosing(int id)
         {
             cout << source->getId() << " | ";
         }
+
+        source = source->getNextNode();
     }
 }
 
 // Auxiliar do Fecho Transitivo Indireto.
 void Graph::auxIndirectTransitiveClosing(Node *node)
 {
-    Edge *edge = node->getFirstEdge();
+    node->setVisited(true);
 
-    while (edge != nullptr)
-    {
-        if (!this->getNode(edge->getTargetId())->getVisited())
-        {
-            node->setVisited(true);
-            node = this->getNode(edge->getTargetId());
-            auxDirectTransitiveClosing(node);
-            edge = edge->getNextEdge();
+    for(Edge *edge = node->getFirstEdge(); edge!=nullptr; edge=edge->getNextEdge()){
+        if(!getNode(edge->getTargetId())->getVisited()){
+            auxDirectTransitiveClosing(getNode(edge->getTargetId()));
         }
     }
 }

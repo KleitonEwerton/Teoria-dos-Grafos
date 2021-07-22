@@ -18,7 +18,7 @@ Node::Node(int id){
     this->first_edge = nullptr;
     this->last_edge = nullptr;
     this->next_node = nullptr;
-
+    this->visited = false;
 };
 
 // Destructor
