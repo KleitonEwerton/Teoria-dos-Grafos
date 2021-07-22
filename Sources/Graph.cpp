@@ -927,11 +927,138 @@ Graph *getVertexInduced(int *listIdNodes)
     return nullptr;
 }
 
-Graph *agmKruskal()
+// Estrutura e funções auxiliares para os algoritmos de Árvore Geradora Mínima
+struct SubArvore
 {
-    return nullptr;
+    int pai;
+    int ordem;
+};
+
+// Função para encontrar em qual subárvore está o nó de id n
+int qualSubArvore(SubArvore subarvores[], int n)
+{
+    if (subarvores[n].pai != n)
+        subarvores[n].pai = qualSubArvore(subarvores, subarvores[n].pai);
+ 
+    return subarvores[n].pai;
 }
-Graph *agmPrim()
+
+// Função para unir duas subárvores de dois nós u e v
+void unirSubArvores(SubArvore subarvores[], int u, int v)
+{
+    // Encontrando os índices das subárvores
+    int subU = qualSubArvore(subarvores, u);
+    int subV = qualSubArvore(subarvores, v);
+ 
+    // Unindo a menor com a maior
+    if (subarvores[subU].ordem < subarvores[subV].ordem)
+        subarvores[subU].pai = subV;
+    else if (subarvores[subU].ordem > subarvores[subV].ordem)
+        subarvores[subV].pai = subU;
+
+    else
+    {
+        subarvores[subV].pai = subU;
+        subarvores[subU].ordem += subarvores[subV].ordem;
+    }
+}
+
+// ALGORITMO DE KRUSKAL
+// para encontrar a Árvore Geradora Mínima
+void Graph::agmKruskal()
+{
+    cout << "\nIniciando a execução do algoritmo de Kruskal..." << endl;
+
+    // 1º PASSO: Vector para armazenar as arestas do grafo
+
+    vector<pair<int, pair<int, int>>> arestas; //vector<peso, noOrigem, noDestino>
+    arestas.clear();
+
+    Node *noAux = this->getFirstNode();
+    Edge *arestaAux = noAux->getFirstEdge();
+
+    int u = noAux->getId(); // id do nó de origem
+    int v = arestaAux->getTargetId(); //id do nó destino
+
+    // Percorrer todas as arestas do Grafo
+    while(arestaAux != nullptr)
+    {
+        // Coloca a aresta no vetor de arestas
+        arestas.push_back({arestaAux->getWeight(), {u, v}});
+
+        // Atualiza os auxiliares
+        arestaAux = arestaAux->getNextEdge();
+        u = v;
+        v = arestaAux->getTargetId();
+    }
+
+    // Conferir se o vetor de arestas contém todas as arestas do grafo
+    if(arestas.size() != this->getNumberEdges())
+        {
+            cout << "\nO vector arestas não foi preenchido corretamente" << endl;
+            cout << "arestas.size = " << arestas.size() << " enquanto getNumberEdges = " << this->getNumberEdges() << endl;
+            cout << "Encerrando a execução" << endl;
+            return; 
+        }
+
+    cout << "1º passo concluído com sucesso" << endl;
+
+    // 2º PASSO: Ordenar as arestas por peso do menor para o maior
+
+    sort(arestas.begin(), arestas.end());
+    cout << "2º passo concluído com sucesso" << endl;
+
+    // 3º PASSO: Criar subávores cada uma contendo um nó isolado
+
+    int V = this->getOrder();
+    SubArvore* subarvores = new SubArvore[(V * sizeof(SubArvore))]; // vetor para armazenar todas as subárvores
+
+    for(int i = 0; i < V; i++) 
+    {
+        subarvores[i].pai = i;
+        subarvores[i].ordem = 1;
+    }
+    cout << "3º passo concluído com sucesso" << endl;
+
+    // 4º PASSO: Montar a Árvore Geradora Mínima
+
+    vector<int> agm; // vetor com o índice das arestas da árvore geradora mínima
+    agm.clear();
+
+    // Iterar até atingir condição de parada
+    int cont = 0;
+    int i = arestas.size();
+    while(agm.size() < V - 1 && i != 0)
+    {
+        pair<int, int> proxAresta = arestas[cont].second;
+        i --;
+        int u = proxAresta.first;
+        int v = proxAresta.second;
+
+        // Se u e v não estão na mesma subárvore
+        if(qualSubArvore(subarvores, u) != qualSubArvore(subarvores, v))
+        {
+            agm.push_back(cont);
+            unirSubArvores(subarvores, u, v);
+            cont ++;
+        }
+    }
+    cout << "4º passo concluído com sucesso" << endl;
+
+    // 5º PASSO: Imprimir a Árvore Geradora Mínima
+
+    cout << "\nÁRVORE GERADORA MÍNIMA via Kruskal\n" << endl;
+    cout << "graph {" << endl;
+    for(int i = 0; i < agm.size(); i++)
+    {
+        cout << "  " << arestas[agm[i]].second.first << " -- " << arestas[agm[i]].second.second;
+        cout << " [label = " << arestas[agm[i]].first << endl;
+    }
+    cout << "}" << endl;
+
+    return;
+}
+Graph *Graph::agmPrim()
 {
     return nullptr;
 }
