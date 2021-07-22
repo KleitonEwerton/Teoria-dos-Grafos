@@ -162,10 +162,10 @@ void selecionar(int selecao, Graph *graph, ofstream &output_file)
         {
 
             cout << "Digite o node Source" << endl;
-            cin >> sourceD;
+            cin >> sourceF;
             cout << "Digite o node Target" << endl;
-            cin >> targetD;
-            graph->floydMarshall(sourceD, targetD);
+            cin >> targetF;
+            graph->floydMarshall(sourceF, targetF);
         }
         catch (const exception &e)
         {

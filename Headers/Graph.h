@@ -80,6 +80,10 @@ public:
 
 private:
     //Auxiliar methods
+    int **iniciaAnterioresFloyd(int **anteriores, int tam);
+    int **iniciaDistanciaFloyd(int **anteriores, int tam);
+    void imprimeFloyd(list<int>&antecessor);
+    void imprimeDijkstra(list<int>antecessor[], int idSource, int idTarget);
 };
 
 #endif // GRAPH_H_INCLUDED
