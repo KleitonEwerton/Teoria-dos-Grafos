@@ -33,16 +33,16 @@ Graph *leitura(ifstream &input_file, int directed, int weightedEdge, int weighte
 
     //Leitura de arquivo
 
-    if (!graph->getWeightedEdge() && !graph->getWeightedNode())
+    if (!graph->getWeightedEdge() && !graph->getWeightedNode()) // Sem peso nas arestas e sem peso nos nós
     {
 
         while (input_file >> idNodeSource >> idNodeTarget)
         {
-            cout << "Edge: " << idNodeSource << " - " << idNodeTarget << endl;
+            cout << "Edge: " << idNodeSource << " -- " << idNodeTarget << endl;
             graph->insertEdge(idNodeSource, idNodeTarget, 0);
         }
     }
-    else if (graph->getWeightedEdge() && !graph->getWeightedNode())
+    else if (graph->getWeightedEdge() && !graph->getWeightedNode()) // Com peso nas arestas e sem peso nos nós
     {
         while (input_file >> idNodeSource >> idNodeTarget >> edgeWeight)
         {
@@ -183,13 +183,6 @@ void selecionar(int selecao, Graph *graph, ofstream &output_file)
 
     case 7: //Caminhamento Profundidade destacando as Arestas de retorno
         int n;
-        cout << "\n --- Caminhamento Profundidade destacando as Arestas de retorno --- \n\n";
-        do
-        {
-            cout << "Informe o numero no nó: ";
-            cin >> n;
-        } while (!graph->searchNode(n));
-
         graph->deepSearch(n);
         break;
 
@@ -213,7 +206,7 @@ void selecionar(int selecao, Graph *graph, ofstream &output_file)
         system("clear");
         cout << " Erro!!! Opção invalida." << endl;
     }
-  //  menu();
+    //  menu();
 }
 
 int mainMenu(ofstream &output_file, Graph *graph)
@@ -275,9 +268,9 @@ int main(int argc, char const *argv[])
     else
         cout << "Não foi possível abrir o arquivo! " << argv[1];
 
-    string d = "Sim";
-    string a = "Sim";
-    string v = "Sim";
+    string d, a, v;
+    d = a = v = "Sim";
+
     int o = graph->getDirected();
     int e = graph->getWeightedEdge();
     int n = graph->getWeightedNode();
@@ -289,7 +282,7 @@ int main(int argc, char const *argv[])
     if (!n)
         v = "Não";
 
-    cout << "Criando grafo..." << endl;
+    cout << "\nCriando grafo..." << endl;
     cout << "Ordem: " << graph->getOrder() << endl;
     cout << "Nº Arestas: " << graph->getNumberEdges() << endl;
     cout << "Direcionado? " << d << endl;

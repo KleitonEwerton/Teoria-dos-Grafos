@@ -323,7 +323,7 @@ void Graph::printGraph_Dot_Directed()
         for (int i = 0; i < k; i++)
             vet[i] = 0;
 
-        arqDot << "digraph graph{\n";
+        arqDot << "digraph{\n";
         while (node != nullptr)
         {
             vet[cont] = node->getId();
@@ -361,8 +361,15 @@ bool Graph::findEdge(int vet[], int cont, int v)
 //Busca em profundidade de um Nó dado
 void Graph::deepSearch(int id)
 {
-    vector<int> retorno;
+    int n;
+    cout << "\nCaminhamento Profundidade destacando as Arestas de retorno\n\n";
+    do
+    {
+        cout << "Informe o numero no nó: ";
+        cin >> n;
+    } while (!this->searchNode(n));
 
+    vector<int> retorno;
     int k = this->getOrder();
     int cont = 0;
     Node *node = this->getNode(id);
@@ -729,24 +736,25 @@ bool Graph::thisIsCyclic()
 bool Graph::auxIsCyclic(int nodeId, bool isVisited[], int parentId)
 {
     isVisited[nodeId] = true;
-    Node *p = getNode(nodeId);
-    Edge *e = p->getFirstEdge();
+    Node *node = getNode(nodeId);
+    Edge *edge = node->getFirstEdge();
 
-    while (e != nullptr)
+    while (edge != nullptr)
     {
-        if (!isVisited[e->getTargetId()])
+        if (!isVisited[edge->getTargetId()])
         {
-            if (auxIsCyclic(e->getTargetId(), isVisited, nodeId))
+            if (auxIsCyclic(edge->getTargetId(), isVisited, nodeId))
             {
+                cout << edge->getTargetId() << " - ";
                 return true;
             }
         }
-        else if (e->getTargetId() != parentId)
+        else if (edge->getTargetId() != parentId)
         {
             return true;
         }
 
-        e = e->getNextEdge();
+        edge = edge->getNextEdge();
     }
 
     return false;
@@ -754,24 +762,27 @@ bool Graph::auxIsCyclic(int nodeId, bool isVisited[], int parentId)
 
 bool Graph::isCyclic()
 {
-    bool *isVisited = new bool[this->getOrder()];
-    for (int i = 0; i < this->getOrder(); i++)
+    int order = this->getOrder();
+
+    bool *isVisited = new bool[order];
+
+    for (int i = 0; i < order; i++)
     {
         isVisited[i] = false;
     }
 
-    Node *p = first_node;
-    while (p != nullptr)
+    Node *node = first_node;
+    while (node != nullptr)
     {
-        if (!isVisited[p->getId()])
+        if (!isVisited[node->getId()])
         {
-            if (auxIsCyclic(p->getId(), isVisited, -1))
+            if (auxIsCyclic(node->getId(), isVisited, -1))
             {
                 return true;
             }
         }
 
-        p = p->getNextNode();
+        node = node->getNextNode();
     }
 
     return false;
@@ -779,26 +790,26 @@ bool Graph::isCyclic()
 
 bool Graph::auxIsCyclicDirected(int nodeId, bool isVisited[], bool *isContainedRecusirve)
 {
-    Node *p = this->getNode(nodeId);
-    Edge *e = p->getFirstEdge();
+    Node *node = this->getNode(nodeId);
+    Edge *edge = node->getFirstEdge();
 
     if (!isVisited[nodeId])
     {
         isVisited[nodeId] = true;
         isContainedRecusirve[nodeId] = true;
 
-        while (e != nullptr)
+        while (edge != nullptr)
         {
-            if (!isVisited[e->getTargetId()] && auxIsCyclicDirected(e->getTargetId(), isVisited, isContainedRecusirve))
+            if (!isVisited[edge->getTargetId()] && auxIsCyclicDirected(edge->getTargetId(), isVisited, isContainedRecusirve))
             {
                 return true;
             }
-            else if (isContainedRecusirve[e->getTargetId()])
+            else if (isContainedRecusirve[edge->getTargetId()])
             {
                 return true;
             }
 
-            e = e->getNextEdge();
+            edge = edge->getNextEdge();
         }
     }
 
@@ -810,7 +821,7 @@ bool Graph::isCyclicDirected()
 {
     bool *isVisited = new bool[this->getOrder()];
     bool *isContainedRecusirve = new bool[this->getOrder()];
-    Node *p = first_node;
+    Node *node = first_node;
 
     for (int i = 0; i < this->getOrder(); i++)
     {
@@ -818,14 +829,14 @@ bool Graph::isCyclicDirected()
         isContainedRecusirve[i] = false;
     }
 
-    while (p != nullptr)
+    while (node != nullptr)
     {
-        if (auxIsCyclicDirected(p->getId(), isVisited, isContainedRecusirve))
+        if (auxIsCyclicDirected(node->getId(), isVisited, isContainedRecusirve))
         {
             return true;
         }
 
-        p = p->getNextNode();
+        node = node->getNextNode();
     }
 
     return false;
@@ -834,9 +845,11 @@ bool Graph::isCyclicDirected()
 /**
  * @brief Função recursiva usada por topologicalSort
  * 
- * @param v 
- * @param visited 
- * @param Stack 
+ * @param node      ponteiro para o No
+ * @param edge      ponterio para a Aresta
+ * @param o         ordem do graph
+ * @param visited   vetor de Nos visitados
+ * @param Stack     Pilha de Nós
  */
 void Graph::topologicalSortUtil(Node *node, Edge *edge, int o, bool visited[], stack<int> &Stack)
 {
@@ -870,10 +883,17 @@ void Graph::topologicalSortUtil(Node *node, Edge *edge, int o, bool visited[], s
  */
 void Graph::topologicalSorting()
 {
-    if (!this->getDirected() && this->thisIsCyclic())
+    cout << "\nOrdenação topologica em Grafo Acíclico Direcionado - DAG\n"
+         << endl;
+
+    if (!this->getDirected())
     {
-        cout << endl
-             << "Ordenacao Topologica impossivel: grafo nao-direcionado ou ciclico" << endl;
+        cout << "Ordenacao Topologica impossivel: Grafo nao-direcionado." << endl;
+        return;
+    }
+    else if (this->thisIsCyclic())
+    {
+        cout << "Ordenacao Topologica impossivel: Grafo não acíclico." << endl;
         return;
     }
     else
@@ -895,12 +915,15 @@ void Graph::topologicalSorting()
                 topologicalSortUtil(node, edge, i, visited, Stack);
 
         // Imprime o conteudo da pilha
-        cout << endl;
+
+        cout << "Ordenação: ";
         while (!Stack.empty())
         {
-            cout << Stack.top() << " - ";
+            cout << Stack.top() << "  ";
             Stack.pop();
         }
+        cout << endl
+             << endl;
         delete[] visited;
     }
 }

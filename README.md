@@ -32,8 +32,12 @@ Make clean
 
 ## Gerar o arquivo dot
 
-Comando para criação do gráfico via o programa Grafix
+Comando para instalação do programa Grafix (linux)
 
+```
+sudo apt install graphviz
+```
+Comando para criação do gráfico via o programa Grafix
 ```
 dot -Tpng output.dot -o output.png
 ```
