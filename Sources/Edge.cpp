@@ -8,11 +8,12 @@ using namespace std;
 **************************************************************************************************/
 
 // Constructor
-Edge::Edge(int target_id){
+Edge::Edge(int target_id, int target_position){
 
     this->target_id = target_id;
     this->next_edge = nullptr;
     this->weight = 0;
+    this->target_position = target_position;         //posição padrão do nó target, mudar durante a inserção da aresta
 
 }
 
@@ -32,6 +33,12 @@ int Edge::getTargetId(){
     return this->target_id;
 
 }
+int Edge::getTargetPosition(){
+
+    return this->target_position;
+
+}
+
 
 Edge* Edge::getNextEdge(){
 

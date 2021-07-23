@@ -16,6 +16,7 @@ class Node{
         Edge* first_edge;
         Edge* last_edge;
         int id;
+        int position;                   //para guarda a posição de inserção do no
         unsigned int in_degree;
         unsigned int out_degree;
         int degree;
@@ -44,7 +45,7 @@ class Node{
         void setVisited(bool visited); // Define se o nó foi visitado ou não.
         // Other methods
         bool searchEdge(int target_id);
-        void insertEdge(int target_id, float weight);
+        void insertEdge(int target_id, int target_position,float weight);
         void removeAllEdges();
         int removeEdge(int id, bool directed, Node* target_node);
         void incrementOutDegree();
@@ -53,7 +54,8 @@ class Node{
         void decrementInDegree();
         Edge* hasEdgeBetween(int target_id);
         // Auxiliar methods
-
+        int getPosition();
+        void setPosition(int position);
 };
 
 #endif // NODE_H_INCLUDED

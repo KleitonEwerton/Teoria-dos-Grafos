@@ -54,6 +54,14 @@ int Node::getId(){
     return this->id;
 
 }
+int Node::getPosition(){
+
+    return this->position;
+
+}
+void Node::setPosition(int position){
+    this->position = position;
+}
 
 int Node::getInDegree(){
 
@@ -108,18 +116,18 @@ void Node::setVisited(bool v){
 }
 
 // Other methods
-void Node::insertEdge(int target_id, float weight){
+void Node::insertEdge(int target_id, int target_position ,float weight){
     // Verifica se há pelo menos uma aresta no nó
     if(this->first_edge != nullptr){
         // Alocando a nova aresta e mantendo a integridade da lista de aresta
-        Edge* edge = new Edge(target_id);
+        Edge* edge = new Edge(target_id, target_position);
         edge->setWeight(weight);
         this->last_edge->setNextEdge(edge);
         this->last_edge = edge;
     }
     else{
          // Alocando a nova aresta e mantendo a integridade da lista de aresta
-        this->first_edge = new Edge(target_id);
+        this->first_edge = new Edge(target_id, target_position);
         this->first_edge->setWeight(weight);
         this->last_edge = this->first_edge;
 

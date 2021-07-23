@@ -19,6 +19,9 @@ class Graph
 private:
     int order;
     int number_edges;
+
+    int position;                       //posição de inserção do node
+
     bool directed;
     bool weighted_edge;
     bool weighted_node;
@@ -44,6 +47,7 @@ public:
     void removeNode(int id);
     bool searchNode(int id);
     Node *getNode(int id);
+    Node *getNodePosition(int position);            //Pega um node apartir de sua posição de inserção
     void printGraph();
     void printGraph2();
     void printGraph_Dot_Directed();
@@ -83,7 +87,9 @@ private:
     int **iniciaAnterioresFloyd(int **anteriores, int tam);
     int **iniciaDistanciaFloyd(int **anteriores, int tam);
     void imprimeFloyd(list<int>&antecessor);
-    void imprimeDijkstra(list<int>antecessor[], int idSource, int idTarget);
+    void imprimeDijkstra(int antecessor[], int idSource, int idTarget);
+    
+    
 };
 
 #endif // GRAPH_H_INCLUDED
