@@ -435,6 +435,18 @@ void Graph::auxDeepSearch(Node *node, int vet[], int cont, vector<int> *retorno)
     }
 }
 
+// Auxiliar do caminho em profundidade.
+void Graph::deepPath(Node *node){
+
+    node->setVisited(true);
+
+    for(Edge *edge = node->getFirstEdge(); edge!=nullptr; edge=edge->getNextEdge()){
+        if(!getNode(edge->getTargetId())->getVisited()){
+            deepPath(getNode(edge->getTargetId()));
+        }
+    }
+}
+
 void Graph::directTransitiveClosing(int id)
 {
 
@@ -442,27 +454,20 @@ void Graph::directTransitiveClosing(int id)
 
     this->cleanVisited(); // Limpa todos os nós visitados.
 
-    auxDirectTransitiveClosing(node);
+    if(node!=nullptr){
+        deepPath(node);
 
-    // Imprime o id de todos os nós visitados.
-    for (node = this->first_node; node != nullptr; node = node->getNextNode())
-    {
-        if (node->getVisited())
+        // Imprime o id de todos os nós visitados.
+        for (node = this->first_node; node != nullptr; node = node->getNextNode())
         {
-            cout << node->getId() << " | ";
+            if (node->getVisited())
+            {
+                cout << node->getId() << " | ";
+            }
         }
     }
-}
-
-// Auxiliar do Fecho Transitivo Direto.
-void Graph::auxDirectTransitiveClosing(Node *node)
-{
-    node->setVisited(true);
-
-    for(Edge *edge = node->getFirstEdge(); edge!=nullptr; edge=edge->getNextEdge()){
-        if(!getNode(edge->getTargetId())->getVisited()){
-            auxDirectTransitiveClosing(getNode(edge->getTargetId()));
-        }
+    else{
+        cout << "Erro! Não existe um nó com o id proposto.";
     }
 }
 
@@ -472,31 +477,22 @@ void Graph::indirectTransitiveClosing(int id)
     Node *target = this->getNode(id); // Nó alvo
     Node *source = this->getFirstNode();  // Nó através do qual será feita a verificação se target é acessível.
 
-    while(source != nullptr){
+    if(target!=nullptr){
+        while(source != nullptr){
 
-        this->cleanVisited(); // Limpa todos os visitados.
+            this->cleanVisited(); // Limpa todos os visitados.
 
-        auxIndirectTransitiveClosing(source);
+            deepPath(source);
 
-        // Se terget foi visitado, imprime o id de source.
-        if (target->getVisited())
-        {
-            cout << source->getId() << " | ";
+            // Se terget foi visitado, imprime o id de source.
+            if (target->getVisited()){
+                cout << source->getId() << " | ";
+            }
+            source = source->getNextNode();
         }
-
-        source = source->getNextNode();
     }
-}
-
-// Auxiliar do Fecho Transitivo Indireto.
-void Graph::auxIndirectTransitiveClosing(Node *node)
-{
-    node->setVisited(true);
-
-    for(Edge *edge = node->getFirstEdge(); edge!=nullptr; edge=edge->getNextEdge()){
-        if(!getNode(edge->getTargetId())->getVisited()){
-            auxDirectTransitiveClosing(getNode(edge->getTargetId()));
-        }
+    else{
+        cout << "Erro! Não existe um nó com o id proposto.";
     }
 }
 

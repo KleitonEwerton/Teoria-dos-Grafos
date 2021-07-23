@@ -52,10 +52,9 @@ public:
     void printGraph2();
     void printGraph_Dot_Directed();
     void printGraph_Dot_Not_Directed();
+    void deepPath(Node *node);
     void directTransitiveClosing(int id);
-    void auxDirectTransitiveClosing(Node *node);
     void indirectTransitiveClosing(int id);
-    void auxIndirectTransitiveClosing(Node *node);
     bool findEdge(int vet[], int k, int v);
     void deepSearch(int node);
     void auxDeepSearch(Node *node, int vet[], int cont, vector<int> *ret);

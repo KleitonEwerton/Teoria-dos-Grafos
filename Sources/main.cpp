@@ -112,11 +112,9 @@ void selecionar(int selecao, Graph *graph, ofstream &output_file)
         break;
     case 1: // Fecho Transitivo Direto;
         int v;
-        do
-        {
-            cout << "Digite o id do nó: ";
-            cin >> v;
-        } while (!graph->searchNode(v));
+
+        cout << "Digite o id do nó: ";
+        cin >> v;
 
         cout << "Fecho transitivo direto: ";
         graph->directTransitiveClosing(v);
@@ -125,11 +123,9 @@ void selecionar(int selecao, Graph *graph, ofstream &output_file)
 
     case 2: // Fecho Transitivo Indireto;
         int h;
-        do
-        {
-            cout << "Digite o id do nó: ";
-            cin >> h;
-        } while (!graph->searchNode(h));
+
+        cout << "Digite o id do nó: ";
+        cin >> h;
 
         cout << "Fecho transitivo indireto: ";
         graph->indirectTransitiveClosing(h);
@@ -166,7 +162,6 @@ void selecionar(int selecao, Graph *graph, ofstream &output_file)
             cout << "Digite o node Target" << endl;
             cin >> targetF;
             graph->floydMarshall(sourceF, targetF);
-            
         }
         catch (const exception &e)
         {
