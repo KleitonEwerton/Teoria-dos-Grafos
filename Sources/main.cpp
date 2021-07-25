@@ -179,8 +179,8 @@ void selecionar(int selecao, Graph *graph, ofstream &output_file)
         break;
 
     case 7: //Caminhamento Profundidade destacando as Arestas de retorno
-        int n;
-        graph->deepSearch(n);
+        
+        graph->deepSearch();
         break;
 
     case 8: //Ordenação topologica em D ou a informação de que não é um grafo acíclico direcionado

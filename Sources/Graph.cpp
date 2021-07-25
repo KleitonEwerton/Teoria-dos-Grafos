@@ -384,15 +384,15 @@ bool Graph::findEdge(int vet[], int cont, int v)
 }
 
 //Busca em profundidade de um Nó dado
-void Graph::deepSearch(int id)
+void Graph::deepSearch()
 {
-    int n;
+    int id;
     cout << "\nCaminhamento Profundidade destacando as Arestas de retorno\n\n";
     do
     {
         cout << "Informe o numero no nó: ";
-        cin >> n;
-    } while (!this->searchNode(n));
+        cin >> id;
+    } while (!this->searchNode(id));
 
     vector<int> retorno;
     int k = this->getOrder();
@@ -859,32 +859,28 @@ bool Graph::isCyclicDirected()
  * 
  * @param node      ponteiro para o No
  * @param edge      ponterio para a Aresta
- * @param o         ordem do graph
- * @param visited   vetor de Nos visitados
  * @param Stack     Pilha de Nós
  */
-void Graph::topologicalSortUtil(Node *node, Edge *edge, int o, bool visited[], stack<int> &Stack)
+
+void Graph::topologicalSortUtil(Node *node, Edge *edge, stack<int> &Stack)
 {
     if (node != nullptr)
     {
-        // Marca o nó atual como visitado.
-        visited[o] = true;
-        node = this->getNode(o);
+        node->setVisited(true);                             // Marca o nó atual como visitado.
+        Node *auxNode;                                      // cria nó axiliar
         edge = node->getFirstEdge();
-
-        // recursivo para todos o vértices adjacentes a ele
-        while (edge != nullptr)
+        
+        while (edge != nullptr)                            
         {
-            if (!visited[edge->getTargetId()])
-                topologicalSortUtil(node, edge, edge->getTargetId(), visited, Stack);
+            auxNode = this->getNode(edge->getTargetId());   // Aponta o no auxiliar para edge
+            if(!auxNode->getVisited())
+               topologicalSortUtil(auxNode, edge, Stack);   // recursivo para todos o vértices adjacentes a ele
 
             edge = edge->getNextEdge();
         }
 
-        //Empilha o vértice atual
-        if (node != nullptr)
+        if (node != nullptr)                                 //Empilha o vértice atual
             Stack.push(node->getId());
-        // cout << Stack.top() << " : ";
     }
 }
 
@@ -911,22 +907,17 @@ void Graph::topologicalSorting()
     else
     {
         stack<int> Stack;
-        int ordem = this->getOrder();
         Node *node = this->first_node;
-        Edge *edge = node->getFirstEdge();
+        Edge *edge = node->getFirstEdge();        
+        this->cleanVisited();                   // Marca todos os vértices como não visitados
 
-        // Marca todos os vértices como não visitados
-        bool *visited = new bool[ordem];
-        for (int i = 0; i < ordem; i++)
-            visited[i] = false;
+        while (node != nullptr)
+        {
+            if(!node->getVisited())
+                topologicalSortUtil(node, edge, Stack);
 
-        // função auxiliar recursiva para armazenar topológico
-        // Classificar começando por todos vértices um por um
-        for (int i = 1; i <= ordem; i++)
-            if (visited[i] == false) // n vértices
-                topologicalSortUtil(node, edge, i, visited, Stack);
-
-        // Imprime o conteudo da pilha
+                node = node->getNextNode();
+        }
 
         cout << "Ordenação: ";
         while (!Stack.empty())
@@ -934,9 +925,7 @@ void Graph::topologicalSorting()
             cout << Stack.top() << "  ";
             Stack.pop();
         }
-        cout << endl
-             << endl;
-        delete[] visited;
+        cout <<"\n\n";
     }
 }
 

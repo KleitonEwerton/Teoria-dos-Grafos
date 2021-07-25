@@ -56,11 +56,11 @@ public:
     void directTransitiveClosing(int id);
     void indirectTransitiveClosing(int id);
     bool findEdge(int vet[], int k, int v);
-    void deepSearch(int node);
+    void deepSearch();
     void auxDeepSearch(Node *node, int vet[], int cont, vector<int> *ret);
     void cleanVisited(); // Define todos os nós como não visitados.
 
-    void topologicalSortUtil(Node *node, Edge *edge, int v, bool visited[], stack<int> &Stack);
+    void topologicalSortUtil(Node *node, Edge *edge, stack<int> &Stack);
     bool thisIsCyclic();
     bool isCyclic();
     bool auxIsCyclic(int nodeId, bool isVisited[], int parentId);
