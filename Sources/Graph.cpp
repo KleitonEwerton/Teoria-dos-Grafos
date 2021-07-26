@@ -530,12 +530,12 @@ int **Graph::iniciaDistanciaFloyd(int **distancia, int tam){
 
     Node *node = nullptr;                             
     Edge *edge = nullptr;
-    list<int>anterior[tam];                                                         //Lista de anteriores
+    list<int>*anterior =  new list<int>[tam];                                       //Lista de anteriores
 
     for (int i = 0; i < tam; i++){                                                  //Colocando o peso das arestas na matriz, caso o grafo não seja ponderado o valor 1 será atribuido para cada salto
         node = getNodePosition(i);
-        edge = node->getFirstEdge();
-
+        if(node != nullptr)edge = node->getFirstEdge();
+        else edge = nullptr;
         while (edge != nullptr){
 
             if(!getWeightedEdge())distancia[i][edge->getTargetPosition()] = 1;      //Adiciona 1 para cada salto caso o grafo não seja ponderado
@@ -543,6 +543,7 @@ int **Graph::iniciaDistanciaFloyd(int **distancia, int tam){
             edge = edge->getNextEdge();                                             //Avança a aresta
         }
     }
+    delete [] anterior;
     return distancia;                                                               //Retorna a matriz distância
 }
 void Graph::imprimeFloyd(list<int>&antecessor){
@@ -607,10 +608,10 @@ float Graph::floydMarshall(int idSource, int idTarget){
         for(i = 0;i<V;i++){delete [] pred[i];}                                      //Desalocando a matriz de antecessores
         delete [] pred;
         
-        if(distancia >= INF){cout << "A distância é o infinito "; return INF;}      //Encera caso não possua um caminho minimo
+        if(distancia < INF)imprimeFloyd(ordemAcesso);                               //Para a impressão do caminho minimo 
 
-        imprimeFloyd(ordemAcesso);
-        cout << "\n\nDistância é: "<< distancia<<endl;
+        
+        cout << "\n\nDistância é: "<< distancia <<endl;
         return distancia;
 
     }else{
@@ -667,7 +668,8 @@ float Graph::dijkstra(int idSource, int idTarget){
     
     if(noSource != nullptr && noTarget != nullptr){
 
-        int pSource = noSource->getPosition(), pTarget= noTarget->getPosition(), distancia = INF, V = getOrder();
+        int pSource = noSource->getPosition(), pTarget= noTarget->getPosition(), distancia = INF;
+        int V = getOrder();
         int ver = 0,c_edge = 0, u;
 
         int *distance = new int[V];                                             //Vetor para os distâncias entre a posição do noSorce e os demais
@@ -701,9 +703,8 @@ float Graph::dijkstra(int idSource, int idTarget){
 
                     if(!getWeightedEdge())c_edge = 1;		                    //Para caso não haja pesso a distância será 1 por salto
                     else c_edge = edge->getWeight();
-
+                    
                     ver = edge->getTargetPosition();                            //Pega a posição do no Target dessa aresta    
-
                     if(distance[ver] > (distance[u]+ c_edge)){                  //Verifica se a distância é menor
                         antec[ver] = u;                                         //Atualiza o antecessor
                         distance[ver] = (distance[u]+ c_edge);                  //Atualiza a distância
@@ -713,15 +714,12 @@ float Graph::dijkstra(int idSource, int idTarget){
                 }
             }
         } 
-
         distancia = distance[pTarget];
         
         delete [] distance;                                                      //Desalocando o vetore usado
         delete [] visited;                                                       //Desalocando o vetore usado
-        if(distancia >= INF){cout << "A distância é o infinito ";                //Caso a distância seja infinita o algoritmo se encerra
-            delete [] antec;return INF;}                                         
-        
-        imprimeDijkstra(antec, pSource, pTarget);                                //Imprime todo a lista na ordem de acesso
+                                                   
+        if(distancia < INF)imprimeDijkstra(antec, pSource, pTarget);             //Para a impressão do caminho minimo 
         delete [] antec;
         cout << "\n\nA distância é: " << distancia << endl;
         return distancia;
@@ -736,6 +734,7 @@ float Graph::dijkstra(int idSource, int idTarget){
     
     
 }
+
 
 bool Graph::thisIsCyclic()
 {
