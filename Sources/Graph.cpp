@@ -231,12 +231,18 @@ Node *Graph::getNodePosition(int position)
 
 void Graph::cleanVisited()
 {
-    Node *node = this->getFirstNode();
+    /**
+     * @brief Função para definir todos os nós do grafo como não visitados.
+     * 
+     */
 
+    Node *node = this->getFirstNode();  // Ponteiro que armazena o endereço de memória do primeiro nó do grafo.
+
+    // Realiza a operação para todos os nós do grafo.
     while (node != nullptr)
     {
-        node->setVisited(false);
-        node = node->getNextNode();
+        node->setVisited(false);        // Define o nó como não visitado.
+        node = node->getNextNode();     // Ponteiro passa a apontar para o próximo nó do grafo.
     }
 }
 
@@ -384,15 +390,15 @@ bool Graph::findEdge(int vet[], int cont, int v)
 }
 
 //Busca em profundidade de um Nó dado
-void Graph::deepSearch()
+void Graph::deepSearch(int id)
 {
-    int id;
+    int n;
     cout << "\nCaminhamento Profundidade destacando as Arestas de retorno\n\n";
     do
     {
         cout << "Informe o numero no nó: ";
-        cin >> id;
-    } while (!this->searchNode(id));
+        cin >> n;
+    } while (!this->searchNode(n));
 
     vector<int> retorno;
     int k = this->getOrder();
@@ -435,12 +441,21 @@ void Graph::auxDeepSearch(Node *node, int vet[], int cont, vector<int> *retorno)
     }
 }
 
-// Auxiliar do caminho em profundidade.
 void Graph::deepPath(Node *node){
+    /**
+     * @brief         Função genérica para realizar o caminho em profundidade a partir de um nó.
+     * @param node    Nó através do qual será feito o caminho em profundidade.
+     * 
+     */
 
-    node->setVisited(true);
+    node->setVisited(true);  // Define o nó node como visitado.
 
+    // Operação recursiva para percorrer todos os nós acessíveis a partir de node.
+    // Percorre todas as arestas do nó.
     for(Edge *edge = node->getFirstEdge(); edge!=nullptr; edge=edge->getNextEdge()){
+
+        // Verifica se o nó para o qual a aresta aponta foi visitado.
+        // Caso não tenha sido, deepPath é chamado novamente passando como parâmetro o nó alvo da aresta.
         if(!getNode(edge->getTargetId())->getVisited()){
             deepPath(getNode(edge->getTargetId()));
         }
@@ -449,13 +464,20 @@ void Graph::deepPath(Node *node){
 
 void Graph::directTransitiveClosing(int id)
 {
+    /**
+     * @brief       Função para identificar e exibir o Fecho Transitivo Direto do grafo direcionado.
+     * @param id    Valor que representa o id do nó para o qual será calculado o fecho transitivo direto.
+     * 
+     */
 
-    Node *node = this->getNode(id);
+    Node *node = this->getNode(id);  // Nó para o qual será calculado o fecho transitivo direto.
 
-    this->cleanVisited(); // Limpa todos os nós visitados.
+    this->cleanVisited();            // Chama a função para setar todos os nós do grafo como não visitados.
 
+    // Verifica se o nó node existe.
     if(node!=nullptr){
-        deepPath(node);
+
+        deepPath(node);              // Realiza o caminho em profundidade no grafo a partir do nó node.
 
         // Imprime o id de todos os nós visitados.
         for (node = this->first_node; node != nullptr; node = node->getNextNode())
@@ -466,6 +488,7 @@ void Graph::directTransitiveClosing(int id)
             }
         }
     }
+    // Se node não existe, exibe uma mensagem de erro.
     else{
         cout << "Erro! Não existe um nó com o id proposto.";
     }
@@ -473,24 +496,32 @@ void Graph::directTransitiveClosing(int id)
 
 void Graph::indirectTransitiveClosing(int id)
 {
+    /**
+     * @brief       Função para identificar e exibir o Fecho Transitivo Indireto do grafo direcionado.
+     * @param id    Valor que representa o id do nó para o qual será calculado o fecho transitivo indireto.
+     * 
+     */
 
-    Node *target = this->getNode(id); // Nó alvo
+    Node *target = this->getNode(id);     // Nó alvo que recebe o id passado como parâmetro.
     Node *source = this->getFirstNode();  // Nó através do qual será feita a verificação se target é acessível.
 
+    // Verifica se o nó target existe.
     if(target!=nullptr){
+        // Realiza a busca em profundidade para todos os nós do grafo.
         while(source != nullptr){
 
-            this->cleanVisited(); // Limpa todos os visitados.
+            this->cleanVisited();         // Chama a função para setar todos os nós do grafo como não visitados.
 
-            deepPath(source);
+            deepPath(source);             // Realiza o caminho em profundidade no grafo a partir do nó source.
 
-            // Se terget foi visitado, imprime o id de source.
+            // Se target foi visitado no caminho em profundidade, imprime o id de source.
             if (target->getVisited()){
                 cout << source->getId() << " | ";
             }
             source = source->getNextNode();
         }
     }
+    // Se target não existe, imprime uma mensagem de erro.
     else{
         cout << "Erro! Não existe um nó com o id proposto.";
     }
@@ -530,12 +561,12 @@ int **Graph::iniciaDistanciaFloyd(int **distancia, int tam){
 
     Node *node = nullptr;                             
     Edge *edge = nullptr;
-    list<int>*anterior =  new list<int>[tam];                                       //Lista de anteriores
+    list<int>anterior[tam];                                                         //Lista de anteriores
 
     for (int i = 0; i < tam; i++){                                                  //Colocando o peso das arestas na matriz, caso o grafo não seja ponderado o valor 1 será atribuido para cada salto
         node = getNodePosition(i);
-        if(node != nullptr)edge = node->getFirstEdge();
-        else edge = nullptr;
+        edge = node->getFirstEdge();
+
         while (edge != nullptr){
 
             if(!getWeightedEdge())distancia[i][edge->getTargetPosition()] = 1;      //Adiciona 1 para cada salto caso o grafo não seja ponderado
@@ -543,7 +574,6 @@ int **Graph::iniciaDistanciaFloyd(int **distancia, int tam){
             edge = edge->getNextEdge();                                             //Avança a aresta
         }
     }
-    delete [] anterior;
     return distancia;                                                               //Retorna a matriz distância
 }
 void Graph::imprimeFloyd(list<int>&antecessor){
@@ -608,10 +638,10 @@ float Graph::floydMarshall(int idSource, int idTarget){
         for(i = 0;i<V;i++){delete [] pred[i];}                                      //Desalocando a matriz de antecessores
         delete [] pred;
         
-        if(distancia < INF)imprimeFloyd(ordemAcesso);                               //Para a impressão do caminho minimo 
+        if(distancia >= INF){cout << "A distância é o infinito "; return INF;}      //Encera caso não possua um caminho minimo
 
-        
-        cout << "\n\nDistância é: "<< distancia <<endl;
+        imprimeFloyd(ordemAcesso);
+        cout << "\n\nDistância é: "<< distancia<<endl;
         return distancia;
 
     }else{
@@ -668,8 +698,7 @@ float Graph::dijkstra(int idSource, int idTarget){
     
     if(noSource != nullptr && noTarget != nullptr){
 
-        int pSource = noSource->getPosition(), pTarget= noTarget->getPosition(), distancia = INF;
-        int V = getOrder();
+        int pSource = noSource->getPosition(), pTarget= noTarget->getPosition(), distancia = INF, V = getOrder();
         int ver = 0,c_edge = 0, u;
 
         int *distance = new int[V];                                             //Vetor para os distâncias entre a posição do noSorce e os demais
@@ -703,8 +732,9 @@ float Graph::dijkstra(int idSource, int idTarget){
 
                     if(!getWeightedEdge())c_edge = 1;		                    //Para caso não haja pesso a distância será 1 por salto
                     else c_edge = edge->getWeight();
-                    
+
                     ver = edge->getTargetPosition();                            //Pega a posição do no Target dessa aresta    
+
                     if(distance[ver] > (distance[u]+ c_edge)){                  //Verifica se a distância é menor
                         antec[ver] = u;                                         //Atualiza o antecessor
                         distance[ver] = (distance[u]+ c_edge);                  //Atualiza a distância
@@ -714,12 +744,15 @@ float Graph::dijkstra(int idSource, int idTarget){
                 }
             }
         } 
+
         distancia = distance[pTarget];
         
         delete [] distance;                                                      //Desalocando o vetore usado
         delete [] visited;                                                       //Desalocando o vetore usado
-                                                   
-        if(distancia < INF)imprimeDijkstra(antec, pSource, pTarget);             //Para a impressão do caminho minimo 
+        if(distancia >= INF){cout << "A distância é o infinito ";                //Caso a distância seja infinita o algoritmo se encerra
+            delete [] antec;return INF;}                                         
+        
+        imprimeDijkstra(antec, pSource, pTarget);                                //Imprime todo a lista na ordem de acesso
         delete [] antec;
         cout << "\n\nA distância é: " << distancia << endl;
         return distancia;
@@ -734,7 +767,6 @@ float Graph::dijkstra(int idSource, int idTarget){
     
     
 }
-
 
 bool Graph::thisIsCyclic()
 {
@@ -858,28 +890,32 @@ bool Graph::isCyclicDirected()
  * 
  * @param node      ponteiro para o No
  * @param edge      ponterio para a Aresta
+ * @param o         ordem do graph
+ * @param visited   vetor de Nos visitados
  * @param Stack     Pilha de Nós
  */
-
-void Graph::topologicalSortUtil(Node *node, Edge *edge, stack<int> &Stack)
+void Graph::topologicalSortUtil(Node *node, Edge *edge, int o, bool visited[], stack<int> &Stack)
 {
     if (node != nullptr)
     {
-        node->setVisited(true);                             // Marca o nó atual como visitado.
-        Node *auxNode;                                      // cria nó axiliar
+        // Marca o nó atual como visitado.
+        visited[o] = true;
+        node = this->getNode(o);
         edge = node->getFirstEdge();
-        
-        while (edge != nullptr)                            
+
+        // recursivo para todos o vértices adjacentes a ele
+        while (edge != nullptr)
         {
-            auxNode = this->getNode(edge->getTargetId());   // Aponta o no auxiliar para edge
-            if(!auxNode->getVisited())
-               topologicalSortUtil(auxNode, edge, Stack);   // recursivo para todos o vértices adjacentes a ele
+            if (!visited[edge->getTargetId()])
+                topologicalSortUtil(node, edge, edge->getTargetId(), visited, Stack);
 
             edge = edge->getNextEdge();
         }
 
-        if (node != nullptr)                                 //Empilha o vértice atual
+        //Empilha o vértice atual
+        if (node != nullptr)
             Stack.push(node->getId());
+        // cout << Stack.top() << " : ";
     }
 }
 
@@ -906,17 +942,22 @@ void Graph::topologicalSorting()
     else
     {
         stack<int> Stack;
+        int ordem = this->getOrder();
         Node *node = this->first_node;
-        Edge *edge = node->getFirstEdge();        
-        this->cleanVisited();                   // Marca todos os vértices como não visitados
+        Edge *edge = node->getFirstEdge();
 
-        while (node != nullptr)
-        {
-            if(!node->getVisited())
-                topologicalSortUtil(node, edge, Stack);
+        // Marca todos os vértices como não visitados
+        bool *visited = new bool[ordem];
+        for (int i = 0; i < ordem; i++)
+            visited[i] = false;
 
-                node = node->getNextNode();
-        }
+        // função auxiliar recursiva para armazenar topológico
+        // Classificar começando por todos vértices um por um
+        for (int i = 1; i <= ordem; i++)
+            if (visited[i] == false) // n vértices
+                topologicalSortUtil(node, edge, i, visited, Stack);
+
+        // Imprime o conteudo da pilha
 
         cout << "Ordenação: ";
         while (!Stack.empty())
@@ -924,7 +965,9 @@ void Graph::topologicalSorting()
             cout << Stack.top() << "  ";
             Stack.pop();
         }
-        cout <<"\n\n";
+        cout << endl
+             << endl;
+        delete[] visited;
     }
 }
 
@@ -998,10 +1041,8 @@ void Graph::agmKruskal()
 
         // Atualiza os auxiliares
         arestaAux = arestaAux->getNextEdge();
-        cout << "aq1" << endl;
         u = v;
         v = arestaAux->getTargetId();
-        cout << "aq2" << endl;
     }
 
     // Conferir se o vetor de arestas contém todas as arestas do grafo
@@ -1068,7 +1109,6 @@ void Graph::agmKruskal()
     }
     cout << "}" << endl;
 
-    delete [] subarvores;
     return;
 }
 Graph *Graph::agmPrim()
