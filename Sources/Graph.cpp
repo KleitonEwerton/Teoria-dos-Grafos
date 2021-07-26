@@ -999,8 +999,10 @@ void Graph::agmKruskal()
 
         // Atualiza os auxiliares
         arestaAux = arestaAux->getNextEdge();
+        cout << "aq1" << endl;
         u = v;
         v = arestaAux->getTargetId();
+        cout << "aq2" << endl;
     }
 
     // Conferir se o vetor de arestas contém todas as arestas do grafo
@@ -1067,6 +1069,7 @@ void Graph::agmKruskal()
     }
     cout << "}" << endl;
 
+    delete [] subarvores;
     return;
 }
 Graph *Graph::agmPrim()
