@@ -70,7 +70,7 @@ public:
     //methods phase1
     void topologicalSorting();
     Graph *getVertInduz();
-    void agmKruskal();
+    void agmKruskal(Graph *subgrafo);
     Graph *agmPrim();
     float floydMarshall();
     float dijkstra();

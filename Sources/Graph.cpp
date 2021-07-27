@@ -529,10 +529,6 @@ void Graph::indirectTransitiveClosing(int id)
     }
 }
 
-void Graph::breadthFirstSearch(ofstream &output_file)
-{
-}
-
 int **Graph::iniciaAnterioresFloyd(int **anteriores, int tam){
     /**
      * @brief               Função auxiliar de Floy, para iniciar a matriz dos anteriores
@@ -985,7 +981,7 @@ void Graph::topologicalSorting()
 // Função para gerar um Subgrafo Vértice Induzido
 Graph *Graph::getVertInduz()
 {
-    cout << "\nDigite os IDs dos vértices que irão compor esse subgrafo separados por espaço simples:\n(Exemplo: 5 6 1 8)";
+    cout << "\nDigite os IDs dos vértices que irão compor esse subgrafo separados por ponto-vírgula:\n(Exemplo: 5;6;1;8)" << endl;
     
     // Lendo os vértices do subgrafo
     string aux;
@@ -998,20 +994,37 @@ Graph *Graph::getVertInduz()
     
     // Separando a string
     stringstream ss(aux);
-    while(ss >> aux)
+    cout << aux << endl;
+    while(getline(ss, aux, ';'))
     {
         if(this->searchNode(stoi(aux)))
+        {
             idvertices.push_back(stoi(aux));
+            cout << "entrou" << endl;
+        }
         else
             cout << "O vértice " << aux << " é inválido, pois não está no Grafo" << endl;
     }
     
     // Criar o subgrafo vértice induzido
     Graph *subgrafo = new Graph(idvertices.size(), this->getDirected(), this->getWeightedEdge(), this->getWeightedNode());
+
+    // Inserindo as arestas correspondentes no subgrafo
+    this->cleanVisited();
     for(int i = 0; i < idvertices.size(); i++)
     {
-        
+        for(int j = i+1; j < idvertices.size(); j++)
+            // Verificar se a aresta realmente existe no grafo original
+            if((!this->getNode(idvertices[j])->getVisited()) && this->getNode(idvertices[i])->searchEdge(idvertices[j]))
+            {
+                Edge *aux = this->getNode(idvertices[i])->getEdge(idvertices[j]);
+                subgrafo->insertEdge(idvertices[i], idvertices[j], aux->getWeight());
+            }
+        this->getNode(idvertices[i])->setVisited(true);
     }
+
+    cout << "\nO Subgrafo X foi gerado com sucesso!" << endl;
+    cout << "(Ordem = " << subgrafo->getOrder() << " e Num de Arestas = " << subgrafo->getNumberEdges() << ")" << endl;
     
     return subgrafo;
 }
@@ -1054,7 +1067,7 @@ void unirSubArvores(SubArvore subarvores[], int u, int v)
 
 // ALGORITMO DE KRUSKAL
 // para encontrar a Árvore Geradora Mínima
-void Graph::agmKruskal()
+void Graph::agmKruskal(Graph *subgrafo)
 {
     cout << "\nIniciando a execução do algoritmo de Kruskal..." << endl;
 
@@ -1063,20 +1076,20 @@ void Graph::agmKruskal()
     vector<pair<int, pair<int, int>>> arestas; //vector<peso, noOrigem, noDestino>
     arestas.clear();
 
-    this->cleanVisited();
-    Node *noAux = this->getFirstNode();
+    subgrafo->cleanVisited();
+    Node *noAux = subgrafo->getFirstNode();
     Edge *arestaAux = noAux->getFirstEdge();
 
     int u = noAux->getId(); // id do nó de origem
     int v = arestaAux->getTargetId(); //id do nó destino
 
     // Percorrer todas as arestas do Grafo
-    for(int i = 1; i < this->getOrder(); i++)
+    for(int i = 1; i < subgrafo->getOrder(); i++)
     {
         while(arestaAux != nullptr)
         {
             // Coloca a aresta no vetor de arestas
-            if(!this->getNode(v)->getVisited())
+            if(!subgrafo->getNode(v)->getVisited())
                 arestas.push_back({arestaAux->getWeight(), {u, v}});
             
             // Atualiza os auxiliares se a aresta não for null
@@ -1088,7 +1101,7 @@ void Graph::agmKruskal()
         }
 
         noAux->setVisited(true);
-        noAux = this->getNodePosition(i);
+        noAux = subgrafo->getNodePosition(i);
         arestaAux = noAux->getFirstEdge();
         u = noAux->getId();
         v = arestaAux->getTargetId();
@@ -1102,10 +1115,10 @@ void Graph::agmKruskal()
     */
 
     // Conferir se o vetor de arestas contém todas as arestas do grafo
-    if(arestas.size() != this->getNumberEdges())
+    if(arestas.size() != subgrafo->getNumberEdges())
         {
             cout << "\nO vector arestas não foi preenchido corretamente" << endl;
-            cout << "arestas.size = " << arestas.size() << " enquanto getNumberEdges = " << this->getNumberEdges() << endl;
+            cout << "arestas.size = " << arestas.size() << " enquanto getNumberEdges = " << subgrafo->getNumberEdges() << endl;
             cout << "Encerrando a execução" << endl;
             return; 
         }
@@ -1119,7 +1132,7 @@ void Graph::agmKruskal()
 
     // 3º PASSO: Criar subávores cada uma contendo um nó isolado
 
-    int V = this->getOrder();
+    int V = subgrafo->getOrder();
     SubArvore* subarvores = new SubArvore[(V * sizeof(SubArvore))]; // vetor para armazenar todas as subárvores
 
     for(int i = 0; i < V; i++) 
@@ -1143,10 +1156,10 @@ void Graph::agmKruskal()
         int v = proxAresta.second;
 
         // Se u e v não estão na mesma subárvore
-        if(qualSubArvore(subarvores, this->getNode(u)->getPosition()) != qualSubArvore(subarvores, this->getNode(v)->getPosition()))
+        if(qualSubArvore(subarvores, subgrafo->getNode(u)->getPosition()) != qualSubArvore(subarvores, subgrafo->getNode(v)->getPosition()))
         {
             agm.push_back(cont);
-            unirSubArvores(subarvores, this->getNode(u)->getPosition(), this->getNode(v)->getPosition());
+            unirSubArvores(subarvores, subgrafo->getNode(u)->getPosition(), subgrafo->getNode(v)->getPosition());
         }
         cont ++;
     }

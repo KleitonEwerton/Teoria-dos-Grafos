@@ -147,8 +147,7 @@ void selecionar(int selecao, Graph *graph, ofstream &output_file)
 
     case 6: //Árvore Geradora Mínima sobre subgrafo vertice induzido por X usando algoritmo de Kruskal
         cout << "\nPara rodar o algoritmo de Kruskal, é preciso um subgrafo vértice induzido" << endl;
-        //graph->getVertInduz();
-        graph->agmKruskal();
+        graph->agmKruskal(graph->getVertInduz());
         break;
 
     case 7: //Caminhamento Profundidade destacando as Arestas de retorno

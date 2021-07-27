@@ -52,7 +52,7 @@ class Node{
         void decrementOutDegree();
         void incrementInDegree();
         void decrementInDegree();
-        Edge* hasEdgeBetween(int target_id);
+        Edge* getEdge(int target_id);
         // Auxiliar methods
         int getPosition();
         void setPosition(int position);

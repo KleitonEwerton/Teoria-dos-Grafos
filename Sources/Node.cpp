@@ -239,7 +239,7 @@ void Node::decrementOutDegree(){
 
 }
 
-Edge* Node::hasEdgeBetween(int target_id)
+Edge* Node::getEdge(int target_id)
 {
 
     for(Edge *auxEdge = this->first_edge; auxEdge != nullptr; auxEdge = auxEdge->getNextEdge())
