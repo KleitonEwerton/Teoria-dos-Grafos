@@ -1133,26 +1133,24 @@ void Graph::agmKruskal()
 
     // 4º PASSO: Montar a Árvore Geradora Mínima
 
-    vector<int> agm; // vetor com o índice das arestas da árvore geradora mínima
+    vector<int> agm; // vetor com o índice associado à posição de cada aresta da árvore geradora mínima no vector 'arestas' do subgrafo
     agm.clear();
 
     // Iterar até atingir condição de parada
     int cont = 0;
-    int i = arestas.size();
-    while(agm.size() < V - 1 && i != 0)
+    while(agm.size() < V - 1 && cont < arestas.size())
     {
         pair<int, int> proxAresta = arestas[cont].second;
-        i --;
         int u = proxAresta.first;
         int v = proxAresta.second;
 
         // Se u e v não estão na mesma subárvore
-        if(qualSubArvore(subarvores, u) != qualSubArvore(subarvores, v))
+        if(qualSubArvore(subarvores, this->getNode(u)->getPosition()) != qualSubArvore(subarvores, this->getNode(v)->getPosition()))
         {
             agm.push_back(cont);
-            unirSubArvores(subarvores, u, v);
-            cont ++;
+            unirSubArvores(subarvores, this->getNode(u)->getPosition(), this->getNode(v)->getPosition());
         }
+        cont ++;
     }
     cout << "4º passo concluído com sucesso" << endl;
 
