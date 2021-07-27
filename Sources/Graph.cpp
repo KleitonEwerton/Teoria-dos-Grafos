@@ -592,14 +592,22 @@ void Graph::imprimeFloyd(list<int>&antecessor){
     
 }
 
-float Graph::floydMarshall(int idSource, int idTarget){
+float Graph::floydMarshall(){
     /**
      * @brief               Função de busca de caminho minimo  usando o algoritmo de Floyd-Marshall
-     * @param   idSource    ID do nó de origem
-     * @param   idTarget    ID do nó de destino
-     * 
      */
-    Node *noSource = nullptr, *noTarget = nullptr;
+
+    int idSource,  idTarget;
+    Node *noSource, *noTarget;
+    string idS, idT;       
+    try{                                                                            //Try para verificar se os parâmetros passados são IDs inteiros
+        cout << "Digite o node Source" << endl;
+        cin >> idS;
+        cout << "Digite o node Target" << endl;
+        cin >> idT;
+        idSource = stoi(idS);idTarget = stoi(idT);
+    }
+    catch (const exception &e){cout << "Parâmetros inválidos" << endl;return 0;}
 
     if(idSource == idTarget){cout << "\n\nA distância é: " << 0 << endl;return 0;}
 
@@ -688,16 +696,28 @@ void Graph::imprimeDijkstra(int antecessor[], int idSource, int idTarget){
 }
 
 
-float Graph::dijkstra(int idSource, int idTarget){
+float Graph::dijkstra(){
     /**
      * @brief               Função para buscar o caminho minimo usando o algoritmo de dijkstra
-     * @param idSource      ID do nó de origem
-     * @param idTarget      ID do nó de destino
      */
 
-    if(idSource == idTarget){cout <<"\n\nA distância é: "<< 0 <<endl;return 0;} //Encerá caso seja o mesmo no
-    Node *noSource = getNode(idSource), *noTarget = getNode(idTarget);          //Busca o no
+    int idSource, idTarget;
+    Node *noSource, *noTarget;   
+    string idS, idT;                                  
+    try{                                                                        //Try para verificar se os parâmetros passados são IDs inteiros
+        cout << "Digite o node Source" << endl;
+        cin >> idS;
+        cout << "Digite o node Target" << endl;
+        cin >> idT;
+        idSource = stoi(idS);idTarget = stoi(idT);
+    }
+    catch (const exception &e){cout << "Parâmetros inválidos" << endl;return 0;}
     
+    if(idSource == idTarget){cout <<"\n\nA distância é: "<< 0 <<endl;return 0;} //Encerá caso seja o mesmo no
+
+    noSource = getNode(idSource);                                               //Busca o no
+    noTarget = getNode(idTarget);                                               //Busca o no
+
     if(noSource != nullptr && noTarget != nullptr){
 
         int pSource = noSource->getPosition(), pTarget= noTarget->getPosition(), distancia = INF, V = getOrder();

@@ -73,8 +73,8 @@ public:
     Graph *getVertInduz();
     void agmKruskal();
     Graph *agmPrim();
-    float floydMarshall(int idSource, int idTarget);
-    float dijkstra(int idSource, int idTarget);
+    float floydMarshall();
+    float dijkstra();
 
     //methods phase1
     float greed();
