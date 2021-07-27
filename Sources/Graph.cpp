@@ -981,7 +981,7 @@ void Graph::topologicalSorting()
 // Função para gerar um Subgrafo Vértice Induzido
 Graph *Graph::getVertInduz()
 {
-    cout << "\nDigite os IDs dos vértices que irão compor esse subgrafo separados por ponto-vírgula:\n(Exemplo: 5;6;1;8)" << endl;
+    cout << "\nDigite os IDs dos vértices que irão compor esse subgrafo separados por ponto-vírgula (Exemplo: 5;6;1;8):" << endl;
     
     // Lendo os vértices do subgrafo
     string aux;
@@ -994,14 +994,10 @@ Graph *Graph::getVertInduz()
     
     // Separando a string
     stringstream ss(aux);
-    cout << aux << endl;
     while(getline(ss, aux, ';'))
     {
         if(this->searchNode(stoi(aux)))
-        {
             idvertices.push_back(stoi(aux));
-            cout << "entrou" << endl;
-        }
         else
             cout << "O vértice " << aux << " é inválido, pois não está no Grafo" << endl;
     }
@@ -1023,7 +1019,7 @@ Graph *Graph::getVertInduz()
         this->getNode(idvertices[i])->setVisited(true);
     }
 
-    cout << "\nO Subgrafo X foi gerado com sucesso!" << endl;
+    cout << "\nO Subgrafo X foi gerado com sucesso! ";
     cout << "(Ordem = " << subgrafo->getOrder() << " e Num de Arestas = " << subgrafo->getNumberEdges() << ")" << endl;
     
     return subgrafo;
@@ -1178,6 +1174,7 @@ void Graph::agmKruskal(Graph *subgrafo)
     }
     cout << "}" << endl;
     cout << "\nPeso da AGM: " << peso << endl;
+    cout << "\nKruskal concluído com sucesso!" << endl;
     
     delete [] subarvores;
     return;
