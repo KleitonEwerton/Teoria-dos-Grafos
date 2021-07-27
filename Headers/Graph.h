@@ -60,7 +60,7 @@ public:
     void auxDeepSearch(Node *node, int vet[], int cont, vector<int> *ret);
     void cleanVisited(); // Define todos os nós como não visitados.
 
-    void topologicalSortUtil(Node *node, Edge *edge, int o, bool visited[], stack<int> &Stack);
+    void topologicalSortUtil(Node *node, Edge *edge, stack<int> &Stack);
     bool thisIsCyclic();
     bool isCyclic();
     bool auxIsCyclic(int nodeId, bool isVisited[], int parentId);
