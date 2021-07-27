@@ -12,6 +12,8 @@
 #include <climits>
 #include <math.h>
 #include <float.h>
+#include <string>
+#include <sstream>
 
 #include "Graph.h"
 #include "Node.h"
@@ -390,15 +392,15 @@ bool Graph::findEdge(int vet[], int cont, int v)
 }
 
 //Busca em profundidade de um Nó dado
-void Graph::deepSearch(int id)
+void Graph::deepSearch()
 {
-    int n;
+    int id;
     cout << "\nCaminhamento Profundidade destacando as Arestas de retorno\n\n";
     do
     {
         cout << "Informe o numero no nó: ";
-        cin >> n;
-    } while (!this->searchNode(n));
+        cin >> id;
+    } while (!this->searchNode(id));
 
     vector<int> retorno;
     int k = this->getOrder();
@@ -974,9 +976,36 @@ void Graph::topologicalSorting()
 void breadthFirstSearch(ofstream &output_file)
 {
 }
-Graph *getVertexInduced(int *listIdNodes)
+Graph *Graph::getVertInduz()
 {
+    cout << "\nDigite os IDs dos vértices que irão compor esse subgrafo separados por espaço simples:\n(Exemplo: 5 6 1 8)";
+    
+    // Lendo os vértices do subgrafo
+    string aux;
+    cout << "Vértices: ";
+    cin >> aux;
 
+    // Vector para armazenar os ids dos vértices do subgrafo
+    vector<int> idvertices;
+    idvertices.clear();
+    
+    // Separando a string
+    stringstream ss(aux);
+    while(ss >> aux)
+    {
+        if(this->searchNode(stoi(aux)))
+            idvertices.push_back(stoi(aux));
+        else
+            cout << "O vértice " << aux << " é inválido, pois não está no Grafo" << endl;
+    }
+    
+    // Criar o subgrafo vértice induzido
+    Graph *subgrafo = new Graph(idvertices.size(), this->getDirected(), this->getWeightedEdge(), this->getWeightedNode());
+    for(int i = 0; i < idvertices.size(); i++)
+    {
+
+    }
+    
     return nullptr;
 }
 
@@ -1034,15 +1063,34 @@ void Graph::agmKruskal()
     int v = arestaAux->getTargetId(); //id do nó destino
 
     // Percorrer todas as arestas do Grafo
-    while(arestaAux != nullptr)
+    for(int i = 1; i < this->getOrder(); i++)
     {
-        // Coloca a aresta no vetor de arestas
-        arestas.push_back({arestaAux->getWeight(), {u, v}});
+        cout << "id" << i << ": " << this->getNodePosition(i)->getId() << endl;
 
-        // Atualiza os auxiliares
-        arestaAux = arestaAux->getNextEdge();
-        u = v;
+        while(arestaAux != nullptr)
+        {
+            // Coloca a aresta no vetor de arestas
+            arestas.push_back({arestaAux->getWeight(), {u, v}});
+
+            // Atualiza os auxiliares se a aresta não for null
+            arestaAux = arestaAux->getNextEdge();
+            if(arestaAux != nullptr)
+            {
+                v = arestaAux->getTargetId();
+            }
+        }
+
+        noAux = this->getNodePosition(i);
+        arestaAux = noAux->getFirstEdge();
+        u = noAux->getId();
         v = arestaAux->getTargetId();
+    }
+
+    for(int j = 0; j < arestas.size(); j++)
+    {
+        cout << "arestas" << j << "peso: " << arestas[j].first << endl;
+        cout << "arestas" << j << "par: " << arestas[j].second.first << " -- " << arestas[j].second.second << endl;
+
     }
 
     // Conferir se o vetor de arestas contém todas as arestas do grafo

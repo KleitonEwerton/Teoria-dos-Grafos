@@ -171,10 +171,12 @@ void selecionar(int selecao, Graph *graph, ofstream &output_file)
 
         break;
 
-    case 5: //Árvore Geradora Mínima sobre subgrafo vertice induzido por X usando algorítmo de Prim
+    case 5: //Árvore Geradora Mínima sobre subgrafo vertice induzido por X usando algoritmo de Prim
         break;
 
-    case 6: //Árvore Geradora Mínima sobre subgrafo vertice induzido por X usando algorítmo de Kruskal
+    case 6: //Árvore Geradora Mínima sobre subgrafo vertice induzido por X usando algoritmo de Kruskal
+        cout << "\nPara rodar o algoritmo de Kruskal, é preciso um subgrafo vértice induzido" << endl;
+        //graph->getVertInduz();
         graph->agmKruskal();
         break;
 

@@ -60,7 +60,7 @@ public:
     void auxDeepSearch(Node *node, int vet[], int cont, vector<int> *ret);
     void cleanVisited(); // Define todos os nós como não visitados.
 
-    void topologicalSortUtil(Node *node, Edge *edge, stack<int> &Stack);
+    void topologicalSortUtil(Node *node, Edge *edge, int o, bool visited[], stack<int> &Stack);
     bool thisIsCyclic();
     bool isCyclic();
     bool auxIsCyclic(int nodeId, bool isVisited[], int parentId);
@@ -70,7 +70,7 @@ public:
     //methods phase1
     void topologicalSorting();
     void breadthFirstSearch(ofstream &output_file);
-    Graph *getVertexInduced(int *listIdNodes);
+    Graph *getVertInduz();
     void agmKruskal();
     Graph *agmPrim();
     float floydMarshall(int idSource, int idTarget);
