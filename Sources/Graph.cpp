@@ -982,9 +982,7 @@ void Graph::topologicalSorting()
     }
 }
 
-void breadthFirstSearch(ofstream &output_file)
-{
-}
+// Função para gerar um Subgrafo Vértice Induzido
 Graph *Graph::getVertInduz()
 {
     cout << "\nDigite os IDs dos vértices que irão compor esse subgrafo separados por espaço simples:\n(Exemplo: 5 6 1 8)";
@@ -1012,13 +1010,13 @@ Graph *Graph::getVertInduz()
     Graph *subgrafo = new Graph(idvertices.size(), this->getDirected(), this->getWeightedEdge(), this->getWeightedNode());
     for(int i = 0; i < idvertices.size(); i++)
     {
-
+        
     }
     
-    return nullptr;
+    return subgrafo;
 }
 
-// Estrutura e funções auxiliares para os algoritmos de Árvore Geradora Mínima
+// Estrutura e funções auxiliares para o algoritmo de Kruskal
 struct SubArvore
 {
     int pai;
@@ -1096,7 +1094,7 @@ void Graph::agmKruskal()
         v = arestaAux->getTargetId();
     }
 
-    /* TESTES
+    /* PARA TESTES
     for(int j = 0; j < arestas.size(); j++)
     {
         cout << "arestas" << j+1 << "par: " << arestas[j].second.first << " -- " << arestas[j].second.second << " [" << arestas[j].first << "]" << endl;

@@ -69,7 +69,6 @@ public:
 
     //methods phase1
     void topologicalSorting();
-    void breadthFirstSearch(ofstream &output_file);
     Graph *getVertInduz();
     void agmKruskal();
     Graph *agmPrim();
