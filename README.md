@@ -8,7 +8,7 @@
 - [ ] Árvore Geradora Mínima sobre subgrafo vertice induzido por X usando algorítmo de Prim
 - [ ] Árvore Geradora Mínima sobre subgrafo vertice induzido por X usando algorítmo de Kruskal
 - [x] Caminhamento Profundidade destacando as Arestas de retorno
-- [ ] Ordenação topologica em D ou a informação de que não é um grafo acíclico direcionado
+- [x] Ordenação topologica em D ou a informação de que não é um grafo acíclico direcionado
 - [x] Modulo de teste
 - [x] Salvar grafo em arquivo .dot - Não direcionado
 - [x] Salvar grafo em arquivo .dot - Direcionado
