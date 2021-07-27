@@ -1065,6 +1065,7 @@ void Graph::agmKruskal()
     vector<pair<int, pair<int, int>>> arestas; //vector<peso, noOrigem, noDestino>
     arestas.clear();
 
+    this->cleanVisited();
     Node *noAux = this->getFirstNode();
     Edge *arestaAux = noAux->getFirstEdge();
 
@@ -1074,13 +1075,12 @@ void Graph::agmKruskal()
     // Percorrer todas as arestas do Grafo
     for(int i = 1; i < this->getOrder(); i++)
     {
-        cout << "id" << i << ": " << this->getNodePosition(i)->getId() << endl;
-
         while(arestaAux != nullptr)
         {
             // Coloca a aresta no vetor de arestas
-            arestas.push_back({arestaAux->getWeight(), {u, v}});
-
+            if(!this->getNode(v)->getVisited())
+                arestas.push_back({arestaAux->getWeight(), {u, v}});
+            
             // Atualiza os auxiliares se a aresta não for null
             arestaAux = arestaAux->getNextEdge();
             if(arestaAux != nullptr)
@@ -1089,18 +1089,19 @@ void Graph::agmKruskal()
             }
         }
 
+        noAux->setVisited(true);
         noAux = this->getNodePosition(i);
         arestaAux = noAux->getFirstEdge();
         u = noAux->getId();
         v = arestaAux->getTargetId();
     }
 
+    /* TESTES
     for(int j = 0; j < arestas.size(); j++)
     {
-        cout << "arestas" << j << "peso: " << arestas[j].first << endl;
-        cout << "arestas" << j << "par: " << arestas[j].second.first << " -- " << arestas[j].second.second << endl;
-
+        cout << "arestas" << j+1 << "par: " << arestas[j].second.first << " -- " << arestas[j].second.second << " [" << arestas[j].first << "]" << endl;
     }
+    */
 
     // Conferir se o vetor de arestas contém todas as arestas do grafo
     if(arestas.size() != this->getNumberEdges())
@@ -1155,17 +1156,21 @@ void Graph::agmKruskal()
     }
     cout << "4º passo concluído com sucesso" << endl;
 
-    // 5º PASSO: Imprimir a Árvore Geradora Mínima
+    // 5º PASSO: Imprimir a Árvore Geradora Mínima e seu peso
 
+    int peso = 0;
     cout << "\nÁRVORE GERADORA MÍNIMA via Kruskal\n" << endl;
     cout << "graph {" << endl;
     for(int i = 0; i < agm.size(); i++)
     {
         cout << "  " << arestas[agm[i]].second.first << " -- " << arestas[agm[i]].second.second;
-        cout << " [label = " << arestas[agm[i]].first << endl;
+        cout << " [label = " << arestas[agm[i]].first << "]" << endl;
+        peso += arestas[agm[i]].first;
     }
     cout << "}" << endl;
-
+    cout << "\nPeso da AGM: " << peso << endl;
+    
+    delete [] subarvores;
     return;
 }
 Graph *Graph::agmPrim()
