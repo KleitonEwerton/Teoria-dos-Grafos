@@ -1208,6 +1208,23 @@ void Graph::agmKruskal(Graph *subgrafo)
 
 void Graph::agmPrim(Graph *subgrafo)
 {
+    cout << "\nIniciando a execução do algoritmo de Prim..." << endl;
+
+    // 1º PASSO: Organizar os nós com o custo mais baixo da vizinhança e seus indíces
+
+    //Vector para armazenar os nós do grafo. pair<custoViz, id>
+    vector<pair<int, int>> vertices;
+    vertices.clear();
+
+    subgrafo->cleanVisited();
+    Node *noAux = subgrafo->getFirstNode();
+    Edge *arestaAux = noAux->getFirstEdge();
+
+    int u = noAux->getId(); // id do nó de origem
+    int v = arestaAux->getTargetId(); //id do nó destino
+
     
+
+
     return;
 }
