@@ -479,16 +479,32 @@ void Graph::directTransitiveClosing(int id)
     // Verifica se o nó node existe.
     if(node!=nullptr){
 
+        fstream arqDot;
+        arqDot.open("directTransitiveClosing.dot", ios::out | ios::trunc);
+
         deepPath(node);              // Realiza o caminho em profundidade no grafo a partir do nó node.
+
+        arqDot << "directTransitiveClosing{\n";
 
         // Imprime o id de todos os nós visitados.
         for (node = this->first_node; node != nullptr; node = node->getNextNode())
         {
+            Edge *edge = node->getFirstEdge();
+
             if (node->getVisited())
             {
                 cout << node->getId() << " | ";
+
+                // Imprime no arquivo .dot a árvore do fecho transitivo direto.
+                while(edge!=nullptr){
+                    int id = edge->getTargetId();
+                    arqDot << node->getId() << "->" << edge->getTargetId() << ";\n";
+                    edge = edge->getNextEdge();
+                }
             }
         }
+
+        arqDot << "}\n";
     }
     // Se node não existe, exibe uma mensagem de erro.
     else{
@@ -504,24 +520,34 @@ void Graph::indirectTransitiveClosing(int id)
      * 
      */
 
-    Node *target = this->getNode(id);     // Nó alvo que recebe o id passado como parâmetro.
-    Node *source = this->getFirstNode();  // Nó através do qual será feita a verificação se target é acessível.
+    Node *target = this->getNode(id);               // Nó alvo que recebe o id passado como parâmetro.
+    Node *source = this->getFirstNode();            // Nó através do qual será feita a verificação se target é acessível.
 
     // Verifica se o nó target existe.
     if(target!=nullptr){
+
+        fstream arqDot;
+        arqDot.open("indirectTransitiveClosing.dot", ios::out | ios::trunc);
+
+        arqDot << "indirectTransitiveClosing{\n";
+
         // Realiza a busca em profundidade para todos os nós do grafo.
         while(source != nullptr){
 
-            this->cleanVisited();         // Chama a função para setar todos os nós do grafo como não visitados.
+            this->cleanVisited();                   // Chama a função para setar todos os nós do grafo como não visitados.
 
-            deepPath(source);             // Realiza o caminho em profundidade no grafo a partir do nó source.
+            deepPath(source);                       // Realiza o caminho em profundidade no grafo a partir do nó source.
 
             // Se target foi visitado no caminho em profundidade, imprime o id de source.
             if (target->getVisited()){
                 cout << source->getId() << " | ";
+
+                arqDot << source->getId() << ";\n"; // Imprime no arquivo .dot o id do nó source.
             }
             source = source->getNextNode();
         }
+
+        arqDot << "}\n";
     }
     // Se target não existe, imprime uma mensagem de erro.
     else{
