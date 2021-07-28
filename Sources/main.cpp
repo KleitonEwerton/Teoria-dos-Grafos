@@ -87,8 +87,8 @@ int menu()
     cout << "[2] Fecho Transitivo Indireto" << endl;
     cout << "[3] Caminho Mínimo entre dois vértices - Dijkstra" << endl;
     cout << "[4] Caminho Mínimo entre dois vértices - Floyd" << endl;
-    cout << "[5] Árvore Geradora Mínima sobre subgrafo vertice induzido por X usando algorítmo de Prim" << endl;
-    cout << "[6] Árvore Geradora Mínima sobre subgrafo vertice induzido por X usando algorítmo de Kruskal" << endl;
+    cout << "[5] Árvore Geradora Mínima sobre subgrafo vertice induzido por X usando algoritmo de Prim" << endl;
+    cout << "[6] Árvore Geradora Mínima sobre subgrafo vertice induzido por X usando algoritmo de Kruskal" << endl;
     cout << "[7] Caminhamento Profundidade destacando as Arestas de retorno" << endl;
     cout << "[8] Ordenação topologica em D ou a informação de que não é um grafo acíclico direcionado" << endl;
     cout << "[9] Modulo de teste" << endl;
@@ -143,6 +143,8 @@ void selecionar(int selecao, Graph *graph, ofstream &output_file)
         break;
 
     case 5: //Árvore Geradora Mínima sobre subgrafo vertice induzido por X usando algoritmo de Prim
+        cout << "\nPara rodar o algoritmo de Prim, é preciso um subgrafo vértice induzido" << endl;
+        graph->agmPrim(graph->getVertInduz());
         break;
 
     case 6: //Árvore Geradora Mínima sobre subgrafo vertice induzido por X usando algoritmo de Kruskal

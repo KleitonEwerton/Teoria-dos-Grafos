@@ -71,7 +71,7 @@ public:
     void topologicalSorting();
     Graph *getVertInduz();
     void agmKruskal(Graph *subgrafo);
-    Graph *agmPrim();
+    void agmPrim(Graph *subgrafo);
     float floydMarshall();
     float dijkstra();
 

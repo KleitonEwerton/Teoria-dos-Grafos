@@ -1205,7 +1205,9 @@ void Graph::agmKruskal(Graph *subgrafo)
     delete [] subarvores;
     return;
 }
-Graph *Graph::agmPrim()
+
+void Graph::agmPrim(Graph *subgrafo)
 {
-    return nullptr;
+    
+    return;
 }
