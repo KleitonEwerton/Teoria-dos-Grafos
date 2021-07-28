@@ -520,8 +520,8 @@ void Graph::indirectTransitiveClosing(int id)
      * 
      */
 
-    Node *target = this->getNode(id);               // Nó alvo que recebe o id passado como parâmetro.
-    Node *source = this->getFirstNode();            // Nó através do qual será feita a verificação se target é acessível.
+    Node *target = this->getNode(id);                // Nó alvo que recebe o id passado como parâmetro.
+    Node *source = this->getFirstNode();             // Nó através do qual será feita a verificação se target é acessível.
 
     // Verifica se o nó target existe.
     if(target!=nullptr){
@@ -534,15 +534,15 @@ void Graph::indirectTransitiveClosing(int id)
         // Realiza a busca em profundidade para todos os nós do grafo.
         while(source != nullptr){
 
-            this->cleanVisited();                   // Chama a função para setar todos os nós do grafo como não visitados.
+            this->cleanVisited();                    // Chama a função para setar todos os nós do grafo como não visitados.
 
-            deepPath(source);                       // Realiza o caminho em profundidade no grafo a partir do nó source.
+            deepPath(source);                        // Realiza o caminho em profundidade no grafo a partir do nó source.
 
             // Se target foi visitado no caminho em profundidade, imprime o id de source.
             if (target->getVisited()){
                 cout << source->getId() << " | ";
 
-                arqDot << source->getId() << ";\n"; // Imprime no arquivo .dot o id do nó source.
+                arqDot << source->getId() << ";\n";  // Imprime no arquivo .dot o id do nó source.
             }
             source = source->getNextNode();
         }
