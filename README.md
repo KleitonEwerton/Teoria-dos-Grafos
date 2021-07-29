@@ -3,8 +3,8 @@
 
 - [ ] Fecho Transitivo Direto
 - [ ] Fecho Transitivo Indireto
-- [ ] Caminho Mínimo entre dois vértices - Dijkstra
-- [ ] Caminho Mínimo entre dois vértices - Floyd
+- [x] Caminho Mínimo entre dois vértices - Dijkstra
+- [x] Caminho Mínimo entre dois vértices - Floyd
 - [ ] Árvore Geradora Mínima sobre subgrafo vertice induzido por X usando algorítmo de Prim
 - [ ] Árvore Geradora Mínima sobre subgrafo vertice induzido por X usando algorítmo de Kruskal
 - [x] Caminhamento Profundidade destacando as Arestas de retorno

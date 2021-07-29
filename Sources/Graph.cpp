@@ -585,7 +585,6 @@ int **Graph::iniciaDistanciaFloyd(int **distancia, int tam){
 
     Node *node = nullptr;                             
     Edge *edge = nullptr;
-    list<int>anterior[tam];                                                         //Lista de anteriores
 
     for (int i = 0; i < tam; i++){                                                  //Colocando o peso das arestas na matriz, caso o grafo não seja ponderado o valor 1 será atribuido para cada salto
         node = getNodePosition(i);
@@ -601,18 +600,41 @@ int **Graph::iniciaDistanciaFloyd(int **distancia, int tam){
     return distancia;                                                               //Retorna a matriz distância
 }
 void Graph::imprimeFloyd(list<int>&antecessor){
+    /**
+     * @brief               Função auxiliar de floyd para imprimir e salvar em arquivo dot o caminho mínimo
+     * @param   antecessor  Lista contendo os antecessores do caminho minimo, representa a ordem de acesso
+     */
+    int primeiro = antecessor.front(), tNode, sNode;                        //Usado para armazenar o primeiro vertice, e auxiliar na escrita no arquivo dot
+    ofstream outFile("floydMarshall.dot");                                  //Arquivo dot que será escrito o caminho minimo
+    if(getDirected())
+        outFile<< "digraph{ \n";
+    else outFile<< "graph{ \n";
+    Node *no = getNodePosition(primeiro);sNode = no->getId();
 
-    int primeiro = antecessor.front();
-    Node *no = nullptr;
+    
+    while (!antecessor.empty()){                                            //Passa por toda a lista de ordem de acesso em buscando o ID
+        no = getNodePosition(primeiro);
+        tNode = no->getId();
 
-    while (!antecessor.empty())
-    {   no = getNodePosition(primeiro);
-        cout << no->getId() << " --> ";
+        if(tNode != sNode)                                                  //Para escrever no arquivo dot o caminho
+            if(getDirected())
+                outFile << sNode << " -> " << tNode<<"\n";
+            else 
+                outFile << sNode << " -- " << tNode<<"\n";
+        
+        sNode = tNode;
+
+        if(getDirected())                                                   //Imprime para o Usuário
+            cout << no->getId() << " -> ";
+        else 
+            cout << no->getId() << " -- ";
+        
         antecessor.pop_front();
         primeiro = antecessor.front();
     }
-    
-}
+    outFile << "}";
+    outFile.close();
+}   
 
 float Graph::floydMarshall(){
     /**
@@ -690,30 +712,50 @@ void Graph::imprimeDijkstra(int antecessor[], int idSource, int idTarget){
      * @brief               Função auxiliar de disjkstra para imprimir o caminho
      * @param   antecessor  Vetor contendo o antecessor de cada posição
      * @param   idSource    ID do nó de origem
-     * @param idTarget      ID do nó de destino   
+     * @param   idTarget    ID do nó de destino   
      */
 
-    int noAnterior,primeiro;                                                        //Usado para armazenar o vertice anterior
+    int noAnterior,primeiro,tNode, sNode;                                           //Usado para armazenar o vertice anterior, e auxiliar na escrita no arquivo dot
+    ofstream outFile("dijkstra.dot");                                               //Arquivo dot que será escrito o caminho minimo
+    if(getDirected())
+        outFile<< "digraph{ \n";
+    else 
+        outFile<< "graph{ \n";
     list<int>ordemAcesso;                                                           //Lista contendo a ordem de acesso dos vertices
 
-    ordemAcesso.push_front(idTarget);                                               //Armazena na lista na ordem de acesso dos vertices, apartir de seus anteriores
-
-    noAnterior = antecessor[idTarget];                                              
+    ordemAcesso.push_front(idTarget);                                               //Armazena na lista na ordem de acesso dos vertices, 
+    noAnterior = antecessor[idTarget];                                              //apartir de seus anteriores, começando pelo nó target
 
     while (noAnterior != idSource){
         ordemAcesso.push_front(noAnterior);
         noAnterior = antecessor[noAnterior];
     }
-    ordemAcesso.push_front(idSource);
-    
+    ordemAcesso.push_front(idSource);                                               //Insere o nó Source como o primeiro a ser acessado 
     primeiro = ordemAcesso.front();
-    Node *no = getNodePosition(primeiro);
-    while (!ordemAcesso.empty())
-    {   no = getNodePosition(primeiro);
-        cout << no->getId() << " --> ";
-        ordemAcesso.pop_front();
-        primeiro = ordemAcesso.front();
-    }
+
+    Node *no = getNodePosition(primeiro);sNode = no->getId();                       //Inicia buscando o ID do primeiro vertice a ser acessado
+    while (!ordemAcesso.empty()){                                                   //Passa por toda a lista de ordem de acesso em buscando o ID
+        no = getNodePosition(primeiro);
+        tNode = no->getId();
+
+        if(tNode != sNode)                                                          //Faz a escrita no arquivo dot
+            if(getDirected())
+                outFile << sNode << " -> " << tNode<<"\n";
+            else 
+                outFile << sNode << " -- " << tNode<<"\n";
+        
+        sNode = tNode;
+
+        if(getDirected())                                                           //Imprime o caminho para o usuário
+            cout << no->getId() << " -> ";  
+        else 
+            cout << no->getId() << " -- ";
+        
+        ordemAcesso.pop_front();                                                    //Remove o elemento já busca da lista
+        primeiro = ordemAcesso.front();                                             //Atualiza qual o elemento a ser buscado
+    }   
+    outFile << "}";
+    outFile.close();
     
 }
 
