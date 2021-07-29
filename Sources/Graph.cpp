@@ -484,7 +484,7 @@ void Graph::directTransitiveClosing(int id)
 
         deepPath(node);              // Realiza o caminho em profundidade no grafo a partir do nó node.
 
-        arqDot << "directTransitiveClosing{\n";
+        arqDot << "digraph{\n";
 
         // Imprime o id de todos os nós visitados.
         for (node = this->first_node; node != nullptr; node = node->getNextNode())
@@ -529,7 +529,7 @@ void Graph::indirectTransitiveClosing(int id)
         fstream arqDot;
         arqDot.open("indirectTransitiveClosing.dot", ios::out | ios::trunc);
 
-        arqDot << "indirectTransitiveClosing{\n";
+        arqDot << "digraph{\n";
 
         // Realiza a busca em profundidade para todos os nós do grafo.
         while(source != nullptr){
