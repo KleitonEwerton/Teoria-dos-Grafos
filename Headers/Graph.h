@@ -84,9 +84,9 @@ private:
     //Auxiliar methods
     int **iniciaAnterioresFloyd(int **anteriores, int tam);
     int **iniciaDistanciaFloyd(int **anteriores, int tam);
-    void imprimeFloyd(list<int>&antecessor);
-    void imprimeDijkstra(int antecessor[], int idSource, int idTarget);
-    
+    void saidaFloyd(int **pred, Node *noSource, Node *nodeTarget);
+    void saidaDijkstra(int antecessor[], int idSource, int idTarget);
+    void caminhoMinimo(list<int>&antecessor, ofstream& outFile);
     
 };
 
