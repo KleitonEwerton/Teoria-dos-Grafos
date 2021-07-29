@@ -1248,25 +1248,105 @@ void Graph::agmKruskal(Graph *subgrafo)
     return;
 }
 
+
+// Função para auxiliar o algoritmo de Prim. Retorna a posição do nó com menor custo de vizinhança que não esteja na agm
+int posicaoMenor(vector<int> &custoViz, vector<bool> &naAGM)
+{
+    int min = INF;
+    int pos;
+    for(int i = 0; i < custoViz.size(); i++)
+    {
+        if(custoViz[i] < min && naAGM[i] == false)
+        {
+            min = custoViz[i];
+            pos = i;
+        }
+    }
+    return pos;
+}
+
+// ALGORITMO DE PRIM
+// para encontrar a Árvore Geradora Mínima
 void Graph::agmPrim(Graph *subgrafo)
 {
     cout << "\nIniciando a execução do algoritmo de Prim..." << endl;
 
-    // 1º PASSO: Organizar os nós com o custo mais baixo da vizinhança e seus indíces
+    // 1º PASSO: Organizar os custos das vizinhanças dos nós em um vector
 
-    //Vector para armazenar os nós do grafo. pair<custoViz, id>
-    vector<pair<int, int>> vertices;
-    vertices.clear();
+    // Vector para armazenar os custoViz dos nós do subgrafo. O índice no vector é compatível com a posição do nó no subgrafo
+    vector<int> custoViz;
+    custoViz.clear();
 
-    subgrafo->cleanVisited();
-    Node *noAux = subgrafo->getFirstNode();
-    Edge *arestaAux = noAux->getFirstEdge();
-
-    int u = noAux->getId(); // id do nó de origem
-    int v = arestaAux->getTargetId(); //id do nó destino
-
+    // Vector para checar se o nó já foi inserido na agm
+    vector<bool> naAGM(subgrafo->getOrder(), false);
     
+    // O primeiro nó do vector será inicializado com custoViz = 0
+    custoViz.push_back(0);
 
+    // Os demais nós serão inicializados com custoViz = INFINITO
+    for(int i = 1; i < subgrafo->getOrder(); i++)
+        custoViz.push_back(INF);
+        
+    cout << "1º passo concluído com sucesso" << endl;
 
+    // 2º PASSO: Criar Arvore Geradora Minima -> vetor com os pais de cada nó da agm
+    
+    // Os índices da agm corresponderão à posição do nó no subgrafo
+    // A raiz da agm, indice 0, será o primeiro nó do subgrafo, portanto não terá pai
+    int *agm = new int[subgrafo->getOrder() * sizeof(int)];
+
+    cout << "2º passo concluído com sucesso" << endl;
+
+    // 3º PASSO: Iterar pelos vértices verificando o custoViz e inserindo na agm
+
+    int cont = 0;
+    while(cont < subgrafo->getOrder())
+    {
+        // Pega o nó com menor custoViz que ainda não está na agm
+        int pos_menor = posicaoMenor(custoViz, naAGM); // Posição do nó
+        int u = subgrafo->getNodePosition(pos_menor)->getId(); // ID do nó
+        // Atualiza naAGM, pois, nessa iteração, u será colocado na agm
+        naAGM[pos_menor] = true;
+
+        // Iterar pelos nós v adjacentes a u e verificar se o peso da aresta entre eles é menor que o seu custoViz 
+        Edge *aux = subgrafo->getNode(u)->getFirstEdge();
+        while(aux != nullptr)
+        {
+            int v = aux->getTargetId(); // ID de v
+            int pos_v = subgrafo->getNode(v)->getPosition(); // posição de v
+            if(!naAGM[pos_v]) // executa caso o nó v ainda não esteja na agm
+            {
+                // Se o peso da aresta (u, v) for menor que o custoViz de v, atualiza o custoViz com o valor do peso
+                if(aux->getWeight() < custoViz[pos_v])
+                {
+                    custoViz[pos_v] = aux->getWeight();
+                    // Atualiza o pai de v na agm
+                    agm[pos_v] = u;
+                }
+            }
+            aux = aux->getNextEdge();
+        }
+        cont ++;
+    }  
+
+    cout << "3º passo concluído com sucesso" << endl;
+
+    // 4º PASSO: Imprimir a Árvore Geradora Mínima e seu peso
+
+    int peso = 0;
+    cout << "\nÁRVORE GERADORA MÍNIMA via Prim\n" << endl;
+    cout << "graph {" << endl;
+    for(int i = 1; i < subgrafo->getOrder(); i++)
+    {
+        int id_destino = subgrafo->getNodePosition(i)->getId();
+        cout << "  " << agm[i] << " -- " << id_destino;
+        cout << " [label = " << subgrafo->getNode(agm[i])->getEdge(id_destino)->getWeight() << "]" << endl;
+        peso += subgrafo->getNode(agm[i])->getEdge(id_destino)->getWeight();
+    }
+    cout << "}" << endl;
+    cout << "\nPeso da AGM: " << peso << endl;
+    cout << "\nPrim concluído com sucesso!" << endl;
+
+    delete [] agm;
     return;
 }
