@@ -149,7 +149,6 @@ void Graph::insertEdge(int id, int target_id, float weight)
             {
                 //insere a aresta de volta
                 aux->insertEdge(id, node->getPosition(), weight);
-                // this->number_edges++;           ***** ESTÁ DOBRANDO O NUMERO DE ARESTAS
             }
         }
     }
@@ -250,149 +249,6 @@ void Graph::cleanVisited()
     }
 }
 
-void Graph::printGraph()
-{
-    cout << "\nImprimindo grafo\n"
-         << "Num Edge: " << this->number_edges << endl
-         << "Num Edge: " << this->last_node << endl
-         << "Num Edge: " << this->number_edges << endl;
-
-    cout << "Ordem: " << this->getOrder() << endl;
-
-    Node *node = first_node;
-    while (node != nullptr)
-    {
-        cout << node->getId() << ": ";
-        Edge *edge = node->getFirstEdge();
-        while (edge != nullptr)
-        {
-            cout << "-> " << edge->getTargetId() << " ";
-            edge = edge->getNextEdge();
-        }
-        cout << "\t Grau: " << node->getDegree() << endl;
-        node = node->getNextNode();
-    }
-
-    return;
-}
-
-void Graph::printGraph2()
-{
-    cout << "\nImprimindo grafo\n";
-
-    cout << "Ordem: " << this->getOrder() << endl;
-
-    Node *node = first_node;
-    while (node != nullptr)
-    {
-        cout << "No - " << node->getId();
-        Edge *edge = node->getFirstEdge();
-        while (edge != nullptr)
-        {
-            cout << " -> " << edge->getTargetId();
-            edge = edge->getNextEdge();
-        }
-        cout << endl;
-        node = node->getNextNode();
-    }
-}
-
-void Graph::printGraph_Dot_Not_Directed()
-{
-    fstream arqDot;
-    arqDot.open("output.dot", ios::out | ios::trunc);
-    if (!arqDot.is_open())
-    {
-        arqDot << "\nErro ao abrir o arquivo dot\n";
-        exit(1);
-    }
-    else
-    {
-        int k = this->getOrder();
-        int cont = 0;
-        Node *node = first_node;
-        int *vet = new int[k];
-
-        for (int i = 0; i < k; i++)
-            vet[i] = 0;
-
-        arqDot << "graph{\n";
-        while (node != nullptr)
-        {
-            vet[cont] = node->getId();
-            Edge *edge = node->getFirstEdge();
-            while (edge != nullptr)
-            {
-                int v = edge->getTargetId();
-                if (!findEdge(vet, cont, v))
-                    arqDot << node->getId() << "--" << edge->getTargetId() << "\n";
-
-                edge = edge->getNextEdge();
-            }
-            node = node->getNextNode();
-            cont++;
-        }
-        arqDot << "}\n";
-        delete[] vet;
-    }
-
-    arqDot.close();
-}
-
-void Graph::printGraph_Dot_Directed()
-{
-    fstream arqDot;
-    arqDot.open("output.dot", ios::out | ios::trunc);
-    if (!arqDot.is_open())
-    {
-        arqDot << "\nErro ao abrir o arquivo dot\n";
-        exit(1);
-    }
-    else
-    {
-        int k = this->getOrder();
-        int cont = 0;
-        Node *node = first_node;
-        int *vet = new int[k];
-
-        for (int i = 0; i < k; i++)
-            vet[i] = 0;
-
-        arqDot << "digraph{\n";
-        while (node != nullptr)
-        {
-            vet[cont] = node->getId();
-            Edge *edge = node->getFirstEdge();
-            while (edge != nullptr)
-            {
-                int v = edge->getTargetId();
-                if (!findEdge(vet, cont, v))
-                    arqDot << node->getId() << "->" << edge->getTargetId() << ";\n";
-
-                edge = edge->getNextEdge();
-            }
-            node = node->getNextNode();
-            cont++;
-        }
-        arqDot << "}\n";
-        delete[] vet;
-    }
-
-    arqDot.close();
-}
-
-bool Graph::findEdge(int vet[], int cont, int v)
-{
-    for (int i = 0; i < cont; i++)
-    {
-        if (vet[i] == v)
-        {
-            return true;
-        }
-    }
-    return false;
-}
-
 /**
  * @brief Busca em profundidade de um Nó dado
  * 
@@ -417,7 +273,6 @@ void Graph::deepSearch()
     Node *node = this->getNode(id);
 
     auxDeepSearch(node, &findG, &retorno);
-   // this->printGraph_Dot_Not_Directed();
 
     for (int i = 0; i < findG.size(); i++)
         cout << findG[i] << " < ";
@@ -699,10 +554,10 @@ void Graph::saidaFloyd(int **pred, Node *noSource, Node *noTarget)
     outFile.close();
 }
 
-float Graph::floydMarshall()
+float Graph::floydWarshall()
 {
     /**
-     * @brief               Função de busca de caminho minimo  usando o algoritmo de Floyd-Marshall
+     * @brief               Função de busca de caminho minimo usando o algoritmo de Floyd-Warshall
      */
 
     int idSource, idTarget;
@@ -1151,6 +1006,7 @@ Graph *Graph::getVertInduz()
     for (int i = 0; i < idvertices.size(); i++)
     {
         for (int j = i + 1; j < idvertices.size(); j++)
+
             // Verificar se a aresta realmente existe no grafo original
             if ((!this->getNode(idvertices[j])->getVisited()) && this->getNode(idvertices[i])->searchEdge(idvertices[j]))
             {
@@ -1243,13 +1099,6 @@ void Graph::agmKruskal(Graph *subgrafo)
         u = noAux->getId();
         v = arestaAux->getTargetId();
     }
-
-    /* PARA TESTES
-    for(int j = 0; j < arestas.size(); j++)
-    {
-        cout << "arestas" << j+1 << "par: " << arestas[j].second.first << " -- " << arestas[j].second.second << " [" << arestas[j].first << "]" << endl;
-    }
-    */
 
     // Conferir se o vetor de arestas contém todas as arestas do grafo
     if (arestas.size() != subgrafo->getNumberEdges())

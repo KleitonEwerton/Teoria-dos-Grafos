@@ -23,22 +23,21 @@ Graph *leitura(ifstream &input_file, int directed, int weightedEdge, int weighte
     float edgeWeight;
 
     //Pegando a ordem do grafo
-    input_file >> order >> numEdges;
+    input_file >> order;
 
     cout << "\nLendo o arquivo input.txt..." << endl;
-    cout << "Ordem: " << order << " - Arestas: " << numEdges << endl;
+    cout << "Ordem: " << order << endl;
 
     //Criando objeto grafo: Ordem - direcionado - peso Aresta - peso Nó
     Graph *graph = new Graph(order, directed, weightedEdge, weightedNode);
 
     //Leitura de arquivo
-
     if (!graph->getWeightedEdge() && !graph->getWeightedNode()) // Sem peso nas arestas e sem peso nos nós
     {
 
         while (input_file >> idNodeSource >> idNodeTarget)
         {
-            cout << "Edge: " << idNodeSource << " -- " << idNodeTarget << endl;
+            //cout << "Edge: " << idNodeSource << " -- " << idNodeTarget << endl;
             graph->insertEdge(idNodeSource, idNodeTarget, 0);
         }
     }
@@ -46,13 +45,12 @@ Graph *leitura(ifstream &input_file, int directed, int weightedEdge, int weighte
     {
         while (input_file >> idNodeSource >> idNodeTarget >> edgeWeight)
         {
-            cout << "Edge: " << idNodeSource << " - " << idNodeTarget << " - " << edgeWeight << endl;
+            //cout << "Edge: " << idNodeSource << " - " << idNodeTarget << " - " << edgeWeight << endl;
             graph->insertEdge(idNodeSource, idNodeTarget, edgeWeight);
         }
     }
-    else if (graph->getWeightedNode() && !graph->getWeightedEdge())
+    else if (graph->getWeightedNode() && !graph->getWeightedEdge()) // Com peso no nó e sem peso na aresta
     {
-
         float nodeSourceWeight, nodeTargetWeight;
 
         while (input_file >> idNodeSource >> nodeSourceWeight >> idNodeTarget >> nodeTargetWeight)
@@ -62,7 +60,7 @@ Graph *leitura(ifstream &input_file, int directed, int weightedEdge, int weighte
             graph->getNode(idNodeTarget)->setWeight(nodeTargetWeight);
         }
     }
-    else if (graph->getWeightedNode() && graph->getWeightedEdge())
+    else if (graph->getWeightedNode() && graph->getWeightedEdge()) // Com peso no nó e com peso na aresta
     {
 
         float nodeSourceWeight, nodeTargetWeight, edgeWeight;
@@ -91,11 +89,9 @@ int menu()
     cout << "[6] Árvore Geradora Mínima sobre subgrafo vertice induzido por X usando algoritmo de Kruskal" << endl;
     cout << "[7] Caminhamento Profundidade destacando as Arestas de retorno" << endl;
     cout << "[8] Ordenação topologica em D ou a informação de que não é um grafo acíclico direcionado" << endl;
-    cout << "[9] Modulo de teste" << endl;
-    cout << "[10] Salvar grafo em arquivo .dot - Não direcionado" << endl;
-    cout << "[11] Salvar grafo em arquivo .dot - Direcionado" << endl;
     cout << "[0] Sair" << endl;
 
+    cout << "\nSua opção: ";
     cin >> selecao;
 
     return selecao;
@@ -138,46 +134,33 @@ void selecionar(int selecao, Graph *graph, ofstream &output_file)
         break;
 
     case 4: // Caminho Mínimo entre dois vértices - Floyd
-        graph->floydMarshall();
+        graph->floydWarshall();
         
         break;
 
-    case 5: //Árvore Geradora Mínima sobre subgrafo vertice induzido por X usando algoritmo de Prim
+    case 5: // Árvore Geradora Mínima sobre subgrafo vertice induzido por X usando algoritmo de Prim
         cout << "\nPara rodar o algoritmo de Prim, é preciso um subgrafo vértice induzido" << endl;
         graph->agmPrim(graph->getVertInduz());
         break;
 
-    case 6: //Árvore Geradora Mínima sobre subgrafo vertice induzido por X usando algoritmo de Kruskal
+    case 6: // Árvore Geradora Mínima sobre subgrafo vertice induzido por X usando algoritmo de Kruskal
         cout << "\nPara rodar o algoritmo de Kruskal, é preciso um subgrafo vértice induzido" << endl;
         graph->agmKruskal(graph->getVertInduz());
         break;
 
-    case 7: //Caminhamento Profundidade destacando as Arestas de retorno
+    case 7: // Caminhamento Profundidade destacando as Arestas de retorno
         
         graph->deepSearch();
         break;
 
-    case 8: //Ordenação topologica em D ou a informação de que não é um grafo acíclico direcionado
+    case 8: // Ordenação topologica em D ou a informação de que não é um grafo acíclico direcionado
         graph->topologicalSorting();
-        break;
-
-    case 9: //Modulo de teste
-        graph->printGraph2();
-        break;
-
-    case 10: //Salvar grafo em arquivo .dot - Não direcionado
-        graph->printGraph_Dot_Not_Directed();
-        break;
-
-    case 11: //Salvar grafo em arquivo .dot - Direcionado
-        graph->printGraph_Dot_Directed();
         break;
 
     default:
         system("clear");
         cout << " Erro!!! Opção invalida." << endl;
     }
-    //  menu();
 }
 
 int mainMenu(ofstream &output_file, Graph *graph)
@@ -187,11 +170,7 @@ int mainMenu(ofstream &output_file, Graph *graph)
 
     while (selecao != 0)
     {
-        // system("clear");
         selecao = menu();
-
-        // if (!selecao)
-        //     exit(0);
 
         if (output_file.is_open())
             selecionar(selecao, graph, output_file);
@@ -232,8 +211,6 @@ int main(int argc, char const *argv[])
 
     if (input_file.is_open())
     {
-
-        //graph = leituraInstancia(input_file, atoi(argv[3]), atoi(argv[4]), atoi(argv[5]));
         graph = leitura(input_file, atoi(argv[3]), atoi(argv[4]), atoi(argv[5]));
     }
     else
