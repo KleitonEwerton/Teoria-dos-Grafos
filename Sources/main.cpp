@@ -113,7 +113,7 @@ void selecionar(int selecao, Graph *graph, ofstream &output_file)
         cin >> v;
 
         cout << "Fecho transitivo direto: ";
-        graph->directTransitiveClosing(v);
+        graph->directTransitiveClosing(v, output_file);
         cout << endl;
         break;
 
@@ -124,33 +124,33 @@ void selecionar(int selecao, Graph *graph, ofstream &output_file)
         cin >> h;
 
         cout << "Fecho transitivo indireto: ";
-        graph->indirectTransitiveClosing(h);
+        graph->indirectTransitiveClosing(h, output_file);
         cout << endl;
         break;
 
     case 3: //Caminho Mínimo entre dois vértices - Dijkstra
-        graph->dijkstra();
+        graph->dijkstra(output_file);
 
         break;
 
     case 4: // Caminho Mínimo entre dois vértices - Floyd
-        graph->floydWarshall();
+        graph->floydWarshall(output_file);
         
         break;
 
     case 5: // Árvore Geradora Mínima sobre subgrafo vertice induzido por X usando algoritmo de Prim
         cout << "\nPara rodar o algoritmo de Prim, é preciso um subgrafo vértice induzido" << endl;
-        graph->agmPrim(graph->getVertInduz());
+        graph->agmPrim(graph->getVertInduz(), output_file);
         break;
 
     case 6: // Árvore Geradora Mínima sobre subgrafo vertice induzido por X usando algoritmo de Kruskal
         cout << "\nPara rodar o algoritmo de Kruskal, é preciso um subgrafo vértice induzido" << endl;
-        graph->agmKruskal(graph->getVertInduz());
+        graph->agmKruskal(graph->getVertInduz(), output_file);
         break;
 
     case 7: // Caminhamento Profundidade destacando as Arestas de retorno
         
-        graph->deepSearch();
+        graph->deepSearch(output_file);
         break;
 
     case 8: // Ordenação topologica em D ou a informação de que não é um grafo acíclico direcionado
