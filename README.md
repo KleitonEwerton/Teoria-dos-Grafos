@@ -1,12 +1,12 @@
 # Trabalho de Grafos
 ## Parte 1:
 
-- [ ] Fecho Transitivo Direto
-- [ ] Fecho Transitivo Indireto
+- [x] Fecho Transitivo Direto
+- [x] Fecho Transitivo Indireto
 - [x] Caminho Mínimo entre dois vértices - Dijkstra
 - [x] Caminho Mínimo entre dois vértices - Floyd
-- [ ] Árvore Geradora Mínima sobre subgrafo vertice induzido por X usando algorítmo de Prim
-- [ ] Árvore Geradora Mínima sobre subgrafo vertice induzido por X usando algorítmo de Kruskal
+- [x] Árvore Geradora Mínima sobre subgrafo vertice induzido por X usando algorítmo de Prim
+- [x] Árvore Geradora Mínima sobre subgrafo vertice induzido por X usando algorítmo de Kruskal
 - [x] Caminhamento Profundidade destacando as Arestas de retorno
 - [x] Ordenação topologica em D ou a informação de que não é um grafo acíclico direcionado
 - [x] Modulo de teste
