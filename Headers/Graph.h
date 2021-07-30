@@ -20,7 +20,7 @@ private:
     int order;
     int number_edges;
 
-    int position;                       //posição de inserção do node
+    int position; //posição de inserção do node
 
     bool directed;
     bool weighted_edge;
@@ -47,7 +47,7 @@ public:
     void removeNode(int id);
     bool searchNode(int id);
     Node *getNode(int id);
-    Node *getNodePosition(int position);            //Pega um node apartir de sua posição de inserção
+    Node *getNodePosition(int position); //Pega um node apartir de sua posição de inserção
     void printGraph();
     void printGraph2();
     void printGraph_Dot_Directed();
@@ -57,9 +57,8 @@ public:
     void indirectTransitiveClosing(int id);
     bool findEdge(int vet[], int k, int v);
     void deepSearch();
-    void auxDeepSearch(Node *node, int vet[], int cont, vector<int> *ret);
     void cleanVisited(); // Define todos os nós como não visitados.
-
+    void auxDeepSearch(Node *node, vector<int> *finG, vector<int> *retorno);
     void topologicalSortUtil(Node *node, Edge *edge, stack<int> &Stack);
     bool thisIsCyclic();
     bool isCyclic();
@@ -86,8 +85,7 @@ private:
     int **iniciaDistanciaFloyd(int **anteriores, int tam);
     void saidaFloyd(int **pred, Node *noSource, Node *nodeTarget);
     void saidaDijkstra(int antecessor[], int idSource, int idTarget);
-    void caminhoMinimo(list<int>&antecessor, ofstream& outFile);
-    
+    void caminhoMinimo(list<int> &antecessor, ofstream &outFile);
 };
 
 #endif // GRAPH_H_INCLUDED

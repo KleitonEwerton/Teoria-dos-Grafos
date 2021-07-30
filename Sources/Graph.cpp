@@ -23,11 +23,11 @@ int INF = 99999999;
 
 using namespace std;
 
-/**************************************************************************************************
- * Defining the Graph's methods
-**************************************************************************************************/
+//**************************************************************************************************
+//! * Defining the Graph's methods
+//**************************************************************************************************/
 
-// Constructor
+//! Constructor
 Graph::Graph(int order, bool directed, bool weighted_edge, bool weighted_node)
 {
     this->order = order;
@@ -39,7 +39,7 @@ Graph::Graph(int order, bool directed, bool weighted_edge, bool weighted_node)
     this->position = 0;
 }
 
-// Destructor
+//! Destructor
 Graph::~Graph()
 {
     Node *next_node = this->first_node;
@@ -89,7 +89,7 @@ Node *Graph::getLastNode()
     return this->last_node;
 }
 
-// Other methods
+//! Other methods
 /*
     The outdegree attribute of nodes is used as a counter for the number of edges in the graph.
     This allows the correct updating of the numbers of edges in the graph being directed or not.
@@ -121,12 +121,14 @@ void Graph::insertEdge(int id, int target_id, float weight)
     //cria um ponteiro para o node desejado e o um auxiliar para o node alvo da aresta
     Node *node = getNode(id);
     Node *aux = getNode(target_id);
-    
-    if(node == nullptr){
+
+    if (node == nullptr)
+    {
         this->insertNode(id);
         node = last_node;
     }
-    if(aux == nullptr){
+    if (aux == nullptr)
+    {
         this->insertNode(target_id);
         aux = last_node;
     }
@@ -139,14 +141,14 @@ void Graph::insertEdge(int id, int target_id, float weight)
         {
             //caso o node exista mas a aresta nao, insere a aresta
             node->insertEdge(target_id, aux->getPosition(), weight);
-            
+
             this->number_edges++;
 
             // se o grafo for nao-direcionado e nao houver aresta de volta
             if (this->directed == 0 && !aux->searchEdge(id))
             {
                 //insere a aresta de volta
-                aux->insertEdge(id, node->getPosition(),weight);
+                aux->insertEdge(id, node->getPosition(), weight);
                 // this->number_edges++;           ***** ESTÁ DOBRANDO O NUMERO DE ARESTAS
             }
         }
@@ -238,13 +240,13 @@ void Graph::cleanVisited()
      * 
      */
 
-    Node *node = this->getFirstNode();  // Ponteiro que armazena o endereço de memória do primeiro nó do grafo.
+    Node *node = this->getFirstNode(); // Ponteiro que armazena o endereço de memória do primeiro nó do grafo.
 
     // Realiza a operação para todos os nós do grafo.
     while (node != nullptr)
     {
-        node->setVisited(false);        // Define o nó como não visitado.
-        node = node->getNextNode();     // Ponteiro passa a apontar para o próximo nó do grafo.
+        node->setVisited(false);    // Define o nó como não visitado.
+        node = node->getNextNode(); // Ponteiro passa a apontar para o próximo nó do grafo.
     }
 }
 
@@ -391,7 +393,12 @@ bool Graph::findEdge(int vet[], int cont, int v)
     return false;
 }
 
-//Busca em profundidade de um Nó dado
+/**
+ * @brief Busca em profundidade de um Nó dado
+ * 
+ */
+/*!
+*/
 void Graph::deepSearch()
 {
     int id;
@@ -402,63 +409,64 @@ void Graph::deepSearch()
         cin >> id;
     } while (!this->searchNode(id));
 
-    vector<int> retorno;
-    int k = this->getOrder();
-    int cont = 0;
-    Node *node = this->getNode(id);
-    int *vet = new int[k];
-
-    for (int i = 0; i < k; i++)
-        vet[i] = 0;
-
-    vet[0] = id;
     cout << "\n -- Árvore em Profundidade -- \n\n";
-    auxDeepSearch(node, vet, cont, &retorno);
-    this->printGraph_Dot_Not_Directed();
-    delete[] vet;
+
+    vector<int> retorno;
+    vector<int> findG;
+    int k = this->getOrder();
+    Node *node = this->getNode(id);
+
+    auxDeepSearch(node, &findG, &retorno);
+   // this->printGraph_Dot_Not_Directed();
+
+    for (int i = 0; i < findG.size(); i++)
+        cout << findG[i] << " < ";
 
     cout << "\n\n -- Arestas de Retorno -- \n\n";
+
     for (int i = 0; i < retorno.size(); i++)
         cout << retorno[i] << " < ";
     cout << "\n\n --- \n";
 }
-//Auxiliar da busca em profundidade de um Nó dado
-void Graph::auxDeepSearch(Node *node, int vet[], int cont, vector<int> *retorno)
+
+
+/**
+ * @brief Auxiliar da busca em profundidade de um Nó dado
+ * 
+ * @param node 
+ * @param findG 
+ * @param retorno 
+ */
+void Graph::auxDeepSearch(Node *node, vector<int> *findG, vector<int> *retorno)
 {
-    cout << node->getId() << " > ";
-    Edge *edge = node->getFirstEdge();
-    while (edge != nullptr)
-    {
-        if (!findEdge(vet, this->getOrder(), edge->getTargetId()))
-        {
-            node = this->getNode(edge->getTargetId());
-            cont++;
-            vet[cont] = node->getId();
-            auxDeepSearch(node, vet, cont, retorno);
-            edge = edge->getNextEdge();
-            retorno->push_back(node->getId());
-        }
-        else
-            edge = edge->getNextEdge();
-    }
+    findG->push_back(node->getId());
+    node->setVisited(true);             
+    for (Edge *edge = node->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge())
+        if (!getNode(edge->getTargetId())->getVisited())
+            auxDeepSearch(getNode(edge->getTargetId()), findG, retorno);
+        
+    retorno->push_back(node->getId());
 }
 
-void Graph::deepPath(Node *node){
+void Graph::deepPath(Node *node)
+{
     /**
      * @brief         Função genérica para realizar o caminho em profundidade a partir de um nó.
      * @param node    Nó através do qual será feito o caminho em profundidade.
      * 
      */
 
-    node->setVisited(true);  // Define o nó node como visitado.
+    node->setVisited(true); // Define o nó node como visitado.
 
     // Operação recursiva para percorrer todos os nós acessíveis a partir de node.
     // Percorre todas as arestas do nó.
-    for(Edge *edge = node->getFirstEdge(); edge!=nullptr; edge=edge->getNextEdge()){
+    for (Edge *edge = node->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge())
+    {
 
         // Verifica se o nó para o qual a aresta aponta foi visitado.
         // Caso não tenha sido, deepPath é chamado novamente passando como parâmetro o nó alvo da aresta.
-        if(!getNode(edge->getTargetId())->getVisited()){
+        if (!getNode(edge->getTargetId())->getVisited())
+        {
             deepPath(getNode(edge->getTargetId()));
         }
     }
@@ -472,17 +480,18 @@ void Graph::directTransitiveClosing(int id)
      * 
      */
 
-    Node *node = this->getNode(id);  // Nó para o qual será calculado o fecho transitivo direto.
+    Node *node = this->getNode(id); // Nó para o qual será calculado o fecho transitivo direto.
 
-    this->cleanVisited();            // Chama a função para setar todos os nós do grafo como não visitados.
+    this->cleanVisited(); // Chama a função para setar todos os nós do grafo como não visitados.
 
     // Verifica se o nó node existe.
-    if(node!=nullptr){
+    if (node != nullptr)
+    {
 
         fstream arqDot;
         arqDot.open("directTransitiveClosing.dot", ios::out | ios::trunc);
 
-        deepPath(node);              // Realiza o caminho em profundidade no grafo a partir do nó node.
+        deepPath(node); // Realiza o caminho em profundidade no grafo a partir do nó node.
 
         arqDot << "digraph{\n";
 
@@ -496,7 +505,8 @@ void Graph::directTransitiveClosing(int id)
                 cout << node->getId() << " | ";
 
                 // Imprime no arquivo .dot a árvore do fecho transitivo direto.
-                while(edge!=nullptr){
+                while (edge != nullptr)
+                {
                     int id = edge->getTargetId();
                     arqDot << node->getId() << "->" << edge->getTargetId() << ";\n";
                     edge = edge->getNextEdge();
@@ -507,7 +517,8 @@ void Graph::directTransitiveClosing(int id)
         arqDot << "}\n";
     }
     // Se node não existe, exibe uma mensagem de erro.
-    else{
+    else
+    {
         cout << "Erro! Não existe um nó com o id proposto.";
     }
 }
@@ -520,11 +531,12 @@ void Graph::indirectTransitiveClosing(int id)
      * 
      */
 
-    Node *target = this->getNode(id);                // Nó alvo que recebe o id passado como parâmetro.
-    Node *source = this->getFirstNode();             // Nó através do qual será feita a verificação se target é acessível.
+    Node *target = this->getNode(id);    // Nó alvo que recebe o id passado como parâmetro.
+    Node *source = this->getFirstNode(); // Nó através do qual será feita a verificação se target é acessível.
 
     // Verifica se o nó target existe.
-    if(target!=nullptr){
+    if (target != nullptr)
+    {
 
         fstream arqDot;
         arqDot.open("indirectTransitiveClosing.dot", ios::out | ios::trunc);
@@ -532,17 +544,19 @@ void Graph::indirectTransitiveClosing(int id)
         arqDot << "digraph{\n";
 
         // Realiza a busca em profundidade para todos os nós do grafo.
-        while(source != nullptr){
+        while (source != nullptr)
+        {
 
-            this->cleanVisited();                    // Chama a função para setar todos os nós do grafo como não visitados.
+            this->cleanVisited(); // Chama a função para setar todos os nós do grafo como não visitados.
 
-            deepPath(source);                        // Realiza o caminho em profundidade no grafo a partir do nó source.
+            deepPath(source); // Realiza o caminho em profundidade no grafo a partir do nó source.
 
             // Se target foi visitado no caminho em profundidade, imprime o id de source.
-            if (target->getVisited()){
+            if (target->getVisited())
+            {
                 cout << source->getId() << " | ";
 
-                arqDot << source->getId() << ";\n";  // Imprime no arquivo .dot o id do nó source.
+                arqDot << source->getId() << ";\n"; // Imprime no arquivo .dot o id do nó source.
             }
             source = source->getNextNode();
         }
@@ -550,54 +564,62 @@ void Graph::indirectTransitiveClosing(int id)
         arqDot << "}\n";
     }
     // Se target não existe, imprime uma mensagem de erro.
-    else{
+    else
+    {
         cout << "Erro! Não existe um nó com o id proposto.";
     }
 }
-void Graph::caminhoMinimo(list<int>&antecessor, ofstream& outFile){
+void Graph::caminhoMinimo(list<int> &antecessor, ofstream &outFile)
+{
     /**
      * @brief               Função auxiliar para as saidas dos algoritmos de caminho minimo
      * @param   antecessor  Lista contendo os antecessores do caminho minimo, representa a ordem de acesso
      * @param   outFile     Arquivo de saída
      */
-    string arco;                                                            //Para a escrita no outFile, se for arco '->' se for aresta '--'
-    int primeiro = antecessor.front(), tNode, sNode;                        //Usado para armazenar o primeiro vertice, e auxiliar na escrita no arquivo dot
-    
-    if(getDirected()){
-        outFile<< "digraph{ \n";
+    string arco;                                     //Para a escrita no outFile, se for arco '->' se for aresta '--'
+    int primeiro = antecessor.front(), tNode, sNode; //Usado para armazenar o primeiro vertice, e auxiliar na escrita no arquivo dot
+
+    if (getDirected())
+    {
+        outFile << "digraph{ \n";
         arco = " -> ";
     }
-    else{
-        outFile<< "graph{ \n";
+    else
+    {
+        outFile << "graph{ \n";
         arco = " -- ";
-    } 
-    Node *no = getNodePosition(primeiro);sNode = no->getId();
-    Node *noAux = nullptr;                                                  //No auxiliar
-    Edge *edge = nullptr;                                                   //Edge auxiliar para pegar o peso
-    
-    while (!antecessor.empty()){                                            //Passa por toda a lista de ordem de acesso em buscando o ID
-        no = getNodePosition(primeiro);                                     //no recebe o node que é o primeiro no caminho minimo
+    }
+    Node *no = getNodePosition(primeiro);
+    sNode = no->getId();
+    Node *noAux = nullptr; //No auxiliar
+    Edge *edge = nullptr;  //Edge auxiliar para pegar o peso
+
+    while (!antecessor.empty())
+    {                                   //Passa por toda a lista de ordem de acesso em buscando o ID
+        no = getNodePosition(primeiro); //no recebe o node que é o primeiro no caminho minimo
         tNode = no->getId();
-        
-        if(tNode != sNode)                                                  //Para escrever no arquivo dot o caminho, caso possua peso busca esse peso
-            if(getWeightedEdge()){
-                edge = noAux->getEdge(tNode);                               //Busca a aresta para pegar o seu peso
-                outFile << sNode << arco << tNode<<"[label="<<edge->getWeight()<<"]\n";
-            }else
-                outFile << sNode << arco << tNode<<"\n";
 
-        sNode = tNode;                                                      //Atualiza o valor do sNode
+        if (tNode != sNode) //Para escrever no arquivo dot o caminho, caso possua peso busca esse peso
+            if (getWeightedEdge())
+            {
+                edge = noAux->getEdge(tNode); //Busca a aresta para pegar o seu peso
+                outFile << sNode << arco << tNode << "[label=" << edge->getWeight() << "]\n";
+            }
+            else
+                outFile << sNode << arco << tNode << "\n";
 
-        cout << no->getId() << arco;                                        //Imprime para o usuário
-        antecessor.pop_front();                                             //Remove o primeiro elemento da lista dos antecessor
-        primeiro = antecessor.front();                                      //Atualiza o valor do primeiro
-        noAux = no;                                                         //Atualiza o valor do noAux
-        
+        sNode = tNode; //Atualiza o valor do sNode
+
+        cout << no->getId() << arco;   //Imprime para o usuário
+        antecessor.pop_front();        //Remove o primeiro elemento da lista dos antecessor
+        primeiro = antecessor.front(); //Atualiza o valor do primeiro
+        noAux = no;                    //Atualiza o valor do noAux
     }
     outFile << "}";
-}   
+}
 
-int **Graph::iniciaAnterioresFloyd(int **anteriores, int tam){
+int **Graph::iniciaAnterioresFloyd(int **anteriores, int tam)
+{
     /**
      * @brief               Função auxiliar de Floy, para iniciar a matriz dos anteriores
      * @param anteriores    Matriz dos anteriores que será inicializada
@@ -605,125 +627,161 @@ int **Graph::iniciaAnterioresFloyd(int **anteriores, int tam){
      * 
      */
 
-    anteriores = new int*[tam];                                                     //Aloca a matriz dos anteriores
-    for(int i = 0; i < tam;i++)anteriores[i] = new int[tam];                        //Aloca cada posição da matriz anteriores
-    for (int i = 0; i < tam; i++)for (int j = 0; j < tam; j++)anteriores[i][j] = i; //Coloca um valor em cada posição da matriz anteriores
+    anteriores = new int *[tam]; //Aloca a matriz dos anteriores
+    for (int i = 0; i < tam; i++)
+        anteriores[i] = new int[tam]; //Aloca cada posição da matriz anteriores
+    for (int i = 0; i < tam; i++)
+        for (int j = 0; j < tam; j++)
+            anteriores[i][j] = i; //Coloca um valor em cada posição da matriz anteriores
 
-    return anteriores;                                                              //Retorna a matriz anteriores
+    return anteriores; //Retorna a matriz anteriores
 }
-int **Graph::iniciaDistanciaFloyd(int **distancia, int tam){
+int **Graph::iniciaDistanciaFloyd(int **distancia, int tam)
+{
     /**
      * @brief               Função auxiliar de Floyd, para iniciar a posição da matriz de distância contendo os pesos
      * @param   distancia   Vetor de distância a ser inicializado
      * @param   tam         Tamanho da matriz quadratica, recebe a ordem do grafo
      * 
      */
-    distancia = new int*[tam];                                                      //Alocando a matriz distância
-    for(int i = 0; i < tam;i++)distancia[i] = new int[tam];                         //Aloca cada posição da matriz distância
-    for (int i = 0; i < tam; i++)for (int j = 0; j < tam; j++)distancia[i][j] = INF;//Atribuindo a distância de infinito para todas a posições
-    for(int i = 0; i < tam;i++)distancia[i][i] = 0;                                 //Atribuindo a distância de 0 do vertice para ele mesmo
+    distancia = new int *[tam]; //Alocando a matriz distância
+    for (int i = 0; i < tam; i++)
+        distancia[i] = new int[tam]; //Aloca cada posição da matriz distância
+    for (int i = 0; i < tam; i++)
+        for (int j = 0; j < tam; j++)
+            distancia[i][j] = INF; //Atribuindo a distância de infinito para todas a posições
+    for (int i = 0; i < tam; i++)
+        distancia[i][i] = 0; //Atribuindo a distância de 0 do vertice para ele mesmo
 
-    Node *node = nullptr;                             
+    Node *node = nullptr;
     Edge *edge = nullptr;
 
-    for (int i = 0; i < tam; i++){                                                  //Colocando o peso das arestas na matriz, caso o grafo não seja ponderado o valor 1 será atribuido para cada salto
+    for (int i = 0; i < tam; i++)
+    { //Colocando o peso das arestas na matriz, caso o grafo não seja ponderado o valor 1 será atribuido para cada salto
         node = getNodePosition(i);
         edge = node->getFirstEdge();
 
-        while (edge != nullptr){
+        while (edge != nullptr)
+        {
 
-            if(!getWeightedEdge())distancia[i][edge->getTargetPosition()] = 1;      //Adiciona 1 para cada salto caso o grafo não seja ponderado
-            else distancia[i][edge->getTargetPosition()] = edge->getWeight();       //Adiciona o peso nessa posição da matriz
-            edge = edge->getNextEdge();                                             //Avança a aresta
+            if (!getWeightedEdge())
+                distancia[i][edge->getTargetPosition()] = 1; //Adiciona 1 para cada salto caso o grafo não seja ponderado
+            else
+                distancia[i][edge->getTargetPosition()] = edge->getWeight(); //Adiciona o peso nessa posição da matriz
+            edge = edge->getNextEdge();                                      //Avança a aresta
         }
     }
-    return distancia;                                                               //Retorna a matriz distância
+    return distancia; //Retorna a matriz distância
 }
 
-void Graph::saidaFloyd(int **pred, Node *noSource, Node *noTarget){
+void Graph::saidaFloyd(int **pred, Node *noSource, Node *noTarget)
+{
     /**
      * @brief               Função auxiliar de floyd para imprimir e salvar em arquivo dot o caminho mínimo
      * @param   antecessor  Lista contendo os antecessores do caminho minimo, representa a ordem de acesso
      */
 
-    list<int>ordemAcesso;                                                       //Lista para conteer a ordem de acesso dos vertices, de trás para frente
+    list<int> ordemAcesso; //Lista para conteer a ordem de acesso dos vertices, de trás para frente
     int ant;
 
-    ordemAcesso.push_front(noTarget->getPosition());                            //Adiciona a posição do no Target na filha
-    ant =  pred[noSource->getPosition()][noTarget->getPosition()];              //Pega a possição do antercessor ao no Source e Target
-    
-    while(ant != noSource->getPosition()){                                      //Loop que adciona na lista todas as posições dos nos do menor caminho
+    ordemAcesso.push_front(noTarget->getPosition());              //Adiciona a posição do no Target na filha
+    ant = pred[noSource->getPosition()][noTarget->getPosition()]; //Pega a possição do antercessor ao no Source e Target
+
+    while (ant != noSource->getPosition())
+    { //Loop que adciona na lista todas as posições dos nos do menor caminho
         ordemAcesso.push_front(ant);
         ant = pred[noSource->getPosition()][ant];
     }
-    ordemAcesso.push_front(noSource->getPosition());   
-    
-    ofstream outFile("floydMarshall.dot");                                      //Arquivo dot que será escrito o caminho minimo
+    ordemAcesso.push_front(noSource->getPosition());
+
+    ofstream outFile("floydMarshall.dot"); //Arquivo dot que será escrito o caminho minimo
     caminhoMinimo(ordemAcesso, outFile);
     outFile.close();
-}   
+}
 
-float Graph::floydMarshall(){
+float Graph::floydMarshall()
+{
     /**
      * @brief               Função de busca de caminho minimo  usando o algoritmo de Floyd-Marshall
      */
 
-    int idSource,  idTarget;
+    int idSource, idTarget;
     Node *noSource, *noTarget;
-    string idS, idT;       
-    try{                                                                            //Try para verificar se os parâmetros passados são IDs inteiros
+    string idS, idT;
+    try
+    { //Try para verificar se os parâmetros passados são IDs inteiros
         cout << "Digite o node Source" << endl;
         cin >> idS;
         cout << "Digite o node Target" << endl;
         cin >> idT;
-        idSource = stoi(idS);idTarget = stoi(idT);
+        idSource = stoi(idS);
+        idTarget = stoi(idT);
     }
-    catch (const exception &e){cout << "Parâmetros inválidos" << endl;return 0;}
+    catch (const exception &e)
+    {
+        cout << "Parâmetros inválidos" << endl;
+        return 0;
+    }
 
-    if(idSource == idTarget){cout << "\n\nA distância é: " << 0 << endl;return 0;}
+    if (idSource == idTarget)
+    {
+        cout << "\n\nA distância é: " << 0 << endl;
+        return 0;
+    }
 
-    noSource = getNode(idSource);                                                   //Busca o no Sorce
-    noTarget = getNode(idTarget);                                                   //Busca o no Target
+    noSource = getNode(idSource); //Busca o no Sorce
+    noTarget = getNode(idTarget); //Busca o no Target
 
-    if(noSource != nullptr && noTarget != nullptr){
+    if (noSource != nullptr && noTarget != nullptr)
+    {
 
-        int V = getOrder(),i, j, k, distancia;
+        int V = getOrder(), i, j, k, distancia;
         int **dist, **pred;
 
-        dist = iniciaDistanciaFloyd(dist, V);                                       //Inicia a matriz de distância
-        pred = iniciaAnterioresFloyd(pred, V);                                      //Inicia a matriz de anteriores
+        dist = iniciaDistanciaFloyd(dist, V);  //Inicia a matriz de distância
+        pred = iniciaAnterioresFloyd(pred, V); //Inicia a matriz de anteriores
 
-        for (k = 0; k < V; k++)                                                     //Calculando a distância de todas as posições
-            for (i = 0; i < V; i++)                               
+        for (k = 0; k < V; k++) //Calculando a distância de todas as posições
+            for (i = 0; i < V; i++)
                 for (j = 0; j < V; j++)
-                    if (dist[i][j] > (dist[i][k] + dist[k][j])){
+                    if (dist[i][j] > (dist[i][k] + dist[k][j]))
+                    {
                         dist[i][j] = dist[i][k] + dist[k][j];
-                        pred[i][j] = pred[k][j];                                    //Atualiza a posição do no antercessor dos nos na posição i e j
+                        pred[i][j] = pred[k][j]; //Atualiza a posição do no antercessor dos nos na posição i e j
                     }
-        distancia = dist[noSource->getPosition()][noTarget->getPosition()];         //Armazena a distância minima entre os dois nós
-        
-        for(i = 0;i<V;i++){delete [] dist[i];}delete [] dist;                       //Desalocando a matriz distancia usada
-        
-        
-        
-        
-        if(distancia < INF)saidaFloyd(pred, noSource, noTarget);    
+        distancia = dist[noSource->getPosition()][noTarget->getPosition()]; //Armazena a distância minima entre os dois nós
 
-        for(i = 0;i<V;i++){delete [] pred[i];}                                      //Desalocando a matriz de antecessores
-        delete [] pred;
+        for (i = 0; i < V; i++)
+        {
+            delete[] dist[i];
+        }
+        delete[] dist; //Desalocando a matriz distancia usada
 
-        cout << "\n\nDistância é: "<< distancia<<endl;
+        if (distancia < INF)
+            saidaFloyd(pred, noSource, noTarget);
+
+        for (i = 0; i < V; i++)
+        {
+            delete[] pred[i];
+        } //Desalocando a matriz de antecessores
+        delete[] pred;
+
+        cout << "\n\nDistância é: " << distancia << endl;
         return distancia;
+    }
+    else
+    {
 
-    }else{
-
-        if(noSource == nullptr)cout<<"Source node não existe nesse grafo"<<endl;
-        if(noTarget == nullptr)cout <<"Target node não existe nesse grafo" << endl;
+        if (noSource == nullptr)
+            cout << "Source node não existe nesse grafo" << endl;
+        if (noTarget == nullptr)
+            cout << "Target node não existe nesse grafo" << endl;
         return -1;
     }
 }
 
-void Graph::saidaDijkstra(int antecessor[], int idSource, int idTarget){
+void Graph::saidaDijkstra(int antecessor[], int idSource, int idTarget)
+{
 
     /**
      * @brief               Função auxiliar de disjkstra para imprimir o caminho
@@ -732,119 +790,141 @@ void Graph::saidaDijkstra(int antecessor[], int idSource, int idTarget){
      * @param   idTarget    ID do nó de destino   
      */
     string arco;
-    int noAnterior,primeiro,tNode, sNode;                                           //Usado para armazenar o vertice anterior, e auxiliar na escrita no arquivo dot
-        
-    list<int>ordemAcesso;                                                           //Lista contendo a ordem de acesso dos vertices
+    int noAnterior, primeiro, tNode, sNode; //Usado para armazenar o vertice anterior, e auxiliar na escrita no arquivo dot
 
-    ordemAcesso.push_front(idTarget);                                               //Armazena na lista na ordem de acesso dos vertices, 
-    noAnterior = antecessor[idTarget];                                              //apartir de seus anteriores, começando pelo nó target
+    list<int> ordemAcesso; //Lista contendo a ordem de acesso dos vertices
 
-    while (noAnterior != idSource){
+    ordemAcesso.push_front(idTarget);  //Armazena na lista na ordem de acesso dos vertices,
+    noAnterior = antecessor[idTarget]; //apartir de seus anteriores, começando pelo nó target
+
+    while (noAnterior != idSource)
+    {
         ordemAcesso.push_front(noAnterior);
         noAnterior = antecessor[noAnterior];
     }
-    ordemAcesso.push_front(idSource);                                               //Insere o nó Source como o primeiro a ser acessado 
+    ordemAcesso.push_front(idSource); //Insere o nó Source como o primeiro a ser acessado
     primeiro = ordemAcesso.front();
-    
-    ofstream outFile("dijkstra.dot");  
+
+    ofstream outFile("dijkstra.dot");
     caminhoMinimo(ordemAcesso, outFile);
     outFile.close();
-    
 }
 
-
-float Graph::dijkstra(){
+float Graph::dijkstra()
+{
     /**
      * @brief               Função para buscar o caminho minimo usando o algoritmo de dijkstra
      */
 
     int idSource, idTarget;
-    Node *noSource, *noTarget;   
-    string idS, idT;                                  
-    try{                                                                        //Try para verificar se os parâmetros passados são IDs inteiros
+    Node *noSource, *noTarget;
+    string idS, idT;
+    try
+    { //Try para verificar se os parâmetros passados são IDs inteiros
         cout << "Digite o node Source" << endl;
         cin >> idS;
         cout << "Digite o node Target" << endl;
         cin >> idT;
-        idSource = stoi(idS);idTarget = stoi(idT);
+        idSource = stoi(idS);
+        idTarget = stoi(idT);
     }
-    catch (const exception &e){cout << "Parâmetros inválidos" << endl;return 0;}
-    
-    if(idSource == idTarget){cout <<"\n\nA distância é: "<< 0 <<endl;return 0;} //Encerá caso seja o mesmo no
+    catch (const exception &e)
+    {
+        cout << "Parâmetros inválidos" << endl;
+        return 0;
+    }
 
-    noSource = getNode(idSource);                                               //Busca o no
-    noTarget = getNode(idTarget);                                               //Busca o no
+    if (idSource == idTarget)
+    {
+        cout << "\n\nA distância é: " << 0 << endl;
+        return 0;
+    } //Encerá caso seja o mesmo no
 
-    if(noSource != nullptr && noTarget != nullptr){
+    noSource = getNode(idSource); //Busca o no
+    noTarget = getNode(idTarget); //Busca o no
 
-        int pSource = noSource->getPosition(), pTarget= noTarget->getPosition(), distancia = INF, V = getOrder();
-        int ver = 0,c_edge = 0, u;
+    if (noSource != nullptr && noTarget != nullptr)
+    {
 
-        int *distance = new int[V];                                             //Vetor para os distâncias entre a posição do noSorce e os demais
-        int *antec = new int [V];                                               //Vetor para os antecessores
-        bool *visited = new bool[V];                                            //Vetor para as posições já visitadas
-        for(int i = 0; i < V;i++){distance[i] = INF;visited[i]=false;}          //Inicializador dos vetores visitados e distância
-        distance[pSource] = 0;                                                  //Distância do vertice para ele mesmo
+        int pSource = noSource->getPosition(), pTarget = noTarget->getPosition(), distancia = INF, V = getOrder();
+        int ver = 0, c_edge = 0, u;
 
-        priority_queue<pair<int, int>, vector<pair<int,int>>, greater<pair<int,int>>> fp; //Fila de prioridade para os pares distancia e vertice
+        int *distance = new int[V];  //Vetor para os distâncias entre a posição do noSorce e os demais
+        int *antec = new int[V];     //Vetor para os antecessores
+        bool *visited = new bool[V]; //Vetor para as posições já visitadas
+        for (int i = 0; i < V; i++)
+        {
+            distance[i] = INF;
+            visited[i] = false;
+        }                      //Inicializador dos vetores visitados e distância
+        distance[pSource] = 0; //Distância do vertice para ele mesmo
 
-        fp.push(make_pair(distance[pSource], pSource));                         //Adiciona o par vetor distância e  
+        priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> fp; //Fila de prioridade para os pares distancia e vertice
 
-        pair<int, int> p = fp.top();                                            //Adiciona o p na fila de prioridade
+        fp.push(make_pair(distance[pSource], pSource)); //Adiciona o par vetor distância e
+
+        pair<int, int> p = fp.top(); //Adiciona o p na fila de prioridade
 
         Node *node = nullptr;
-        Edge *edge = nullptr;  
+        Edge *edge = nullptr;
 
-        while (!fp.empty()){
-            
-            pair<int , int> p = fp.top();                                       //Pega o do topo
-            u = p.second;                                                       //Obtem o vértice
-            fp.pop();                                                           //Remove da lista de prioridade
-            if(visited[u] == false){                                            
-                visited[u] = true;                                              //Marca o vertice como visitado
+        while (!fp.empty())
+        {
+
+            pair<int, int> p = fp.top(); //Pega o do topo
+            u = p.second;                //Obtem o vértice
+            fp.pop();                    //Remove da lista de prioridade
+            if (visited[u] == false)
+            {
+                visited[u] = true; //Marca o vertice como visitado
                 node = getNodePosition(u);
-                if(node != nullptr)                                             //Busca o no pela posição
-                    edge = node->getFirstEdge();    
-                else edge = nullptr;                                            //Pega a primeira aresta do no
+                if (node != nullptr) //Busca o no pela posição
+                    edge = node->getFirstEdge();
+                else
+                    edge = nullptr; //Pega a primeira aresta do no
 
-                while (edge != nullptr){                                        //Passa por todas as arestas do vertice u
+                while (edge != nullptr)
+                { //Passa por todas as arestas do vertice u
 
-                    if(!getWeightedEdge())c_edge = 1;		                    //Para caso não haja pesso a distância será 1 por salto
-                    else c_edge = edge->getWeight();
+                    if (!getWeightedEdge())
+                        c_edge = 1; //Para caso não haja pesso a distância será 1 por salto
+                    else
+                        c_edge = edge->getWeight();
 
-                    ver = edge->getTargetPosition();                            //Pega a posição do no Target dessa aresta    
+                    ver = edge->getTargetPosition(); //Pega a posição do no Target dessa aresta
 
-                    if(distance[ver] > (distance[u]+ c_edge)){                  //Verifica se a distância é menor
-                        antec[ver] = u;                                         //Atualiza o antecessor
-                        distance[ver] = (distance[u]+ c_edge);                  //Atualiza a distância
-                        fp.push(make_pair(distance[ver], ver));                 //Adiciona o vertice na fila de prioridade
-
-                    }edge = edge->getNextEdge();                                //Avança para o a proxima aresta do vertice
+                    if (distance[ver] > (distance[u] + c_edge))
+                    {                                           //Verifica se a distância é menor
+                        antec[ver] = u;                         //Atualiza o antecessor
+                        distance[ver] = (distance[u] + c_edge); //Atualiza a distância
+                        fp.push(make_pair(distance[ver], ver)); //Adiciona o vertice na fila de prioridade
+                    }
+                    edge = edge->getNextEdge(); //Avança para o a proxima aresta do vertice
                 }
             }
-        } 
+        }
 
         distancia = distance[pTarget];
-        
-        delete [] distance;                                                      //Desalocando o vetore usado
-        delete [] visited;                                                       //Desalocando o vetore usado
 
-        if(distancia < INF)                                        
-            saidaDijkstra(antec, pSource, pTarget);                                //Imprime todo a lista na ordem de acesso
-            
-        delete [] antec;
+        delete[] distance; //Desalocando o vetore usado
+        delete[] visited;  //Desalocando o vetore usado
+
+        if (distancia < INF)
+            saidaDijkstra(antec, pSource, pTarget); //Imprime todo a lista na ordem de acesso
+
+        delete[] antec;
         cout << "\n\nA distância é: " << distancia << endl;
         return distancia;
+    }
+    else
+    {
 
-
-    }else{
-        
-        if(noSource == nullptr)cout<<"Source node não existe nesse grafo"<<endl;
-        if(noTarget == nullptr)cout <<"Target node não existe nesse grafo" << endl;
+        if (noSource == nullptr)
+            cout << "Source node não existe nesse grafo" << endl;
+        if (noTarget == nullptr)
+            cout << "Target node não existe nesse grafo" << endl;
         return -1;
     }
-    
-    
 }
 
 bool Graph::thisIsCyclic()
@@ -976,20 +1056,20 @@ void Graph::topologicalSortUtil(Node *node, Edge *edge, stack<int> &Stack)
 {
     if (node != nullptr)
     {
-        node->setVisited(true);                             // Marca o nó atual como visitado.
-        Node *auxNode;                                      // cria nó axiliar
+        node->setVisited(true); // Marca o nó atual como visitado.
+        Node *auxNode;          // cria nó axiliar
         edge = node->getFirstEdge();
-        
-        while (edge != nullptr)                            
+
+        while (edge != nullptr)
         {
-            auxNode = this->getNode(edge->getTargetId());   // Aponta o no auxiliar para edge
-            if(!auxNode->getVisited())
-               topologicalSortUtil(auxNode, edge, Stack);   // recursivo para todos o vértices adjacentes a ele
+            auxNode = this->getNode(edge->getTargetId()); // Aponta o no auxiliar para edge
+            if (!auxNode->getVisited())
+                topologicalSortUtil(auxNode, edge, Stack); // recursivo para todos o vértices adjacentes a ele
 
             edge = edge->getNextEdge();
         }
 
-        if (node != nullptr)                                 //Empilha o vértice atual
+        if (node != nullptr) //Empilha o vértice atual
             Stack.push(node->getId());
     }
 }
@@ -1018,15 +1098,15 @@ void Graph::topologicalSorting()
     {
         stack<int> Stack;
         Node *node = this->first_node;
-        Edge *edge = node->getFirstEdge();        
-        this->cleanVisited();                   // Marca todos os vértices como não visitados
+        Edge *edge = node->getFirstEdge();
+        this->cleanVisited(); // Marca todos os vértices como não visitados
 
         while (node != nullptr)
         {
-            if(!node->getVisited())
+            if (!node->getVisited())
                 topologicalSortUtil(node, edge, Stack);
 
-                node = node->getNextNode();
+            node = node->getNextNode();
         }
 
         cout << "Ordenação: ";
@@ -1035,7 +1115,7 @@ void Graph::topologicalSorting()
             cout << Stack.top() << "  ";
             Stack.pop();
         }
-        cout <<"\n\n";
+        cout << "\n\n";
     }
 }
 
@@ -1043,7 +1123,7 @@ void Graph::topologicalSorting()
 Graph *Graph::getVertInduz()
 {
     cout << "\nDigite os IDs dos vértices que irão compor esse subgrafo separados por ponto-vírgula (Exemplo: 5;6;1;8):" << endl;
-    
+
     // Lendo os vértices do subgrafo
     string aux;
     cout << "Vértices: ";
@@ -1052,27 +1132,27 @@ Graph *Graph::getVertInduz()
     // Vector para armazenar os ids dos vértices do subgrafo
     vector<int> idvertices;
     idvertices.clear();
-    
+
     // Separando a string
     stringstream ss(aux);
-    while(getline(ss, aux, ';'))
+    while (getline(ss, aux, ';'))
     {
-        if(this->searchNode(stoi(aux)))
+        if (this->searchNode(stoi(aux)))
             idvertices.push_back(stoi(aux));
         else
             cout << "O vértice " << aux << " é inválido, pois não está no Grafo" << endl;
     }
-    
+
     // Criar o subgrafo vértice induzido
     Graph *subgrafo = new Graph(idvertices.size(), this->getDirected(), this->getWeightedEdge(), this->getWeightedNode());
 
     // Inserindo as arestas correspondentes no subgrafo
     this->cleanVisited();
-    for(int i = 0; i < idvertices.size(); i++)
+    for (int i = 0; i < idvertices.size(); i++)
     {
-        for(int j = i+1; j < idvertices.size(); j++)
+        for (int j = i + 1; j < idvertices.size(); j++)
             // Verificar se a aresta realmente existe no grafo original
-            if((!this->getNode(idvertices[j])->getVisited()) && this->getNode(idvertices[i])->searchEdge(idvertices[j]))
+            if ((!this->getNode(idvertices[j])->getVisited()) && this->getNode(idvertices[i])->searchEdge(idvertices[j]))
             {
                 Edge *aux = this->getNode(idvertices[i])->getEdge(idvertices[j]);
                 subgrafo->insertEdge(idvertices[i], idvertices[j], aux->getWeight());
@@ -1082,7 +1162,7 @@ Graph *Graph::getVertInduz()
 
     cout << "\nO Subgrafo X foi gerado com sucesso! ";
     cout << "(Ordem = " << subgrafo->getOrder() << " e Num de Arestas = " << subgrafo->getNumberEdges() << ")" << endl;
-    
+
     return subgrafo;
 }
 
@@ -1098,7 +1178,7 @@ int qualSubArvore(SubArvore subarvores[], int n)
 {
     if (subarvores[n].pai != n)
         subarvores[n].pai = qualSubArvore(subarvores, subarvores[n].pai);
- 
+
     return subarvores[n].pai;
 }
 
@@ -1108,7 +1188,7 @@ void unirSubArvores(SubArvore subarvores[], int u, int v)
     // Encontrando os índices das subárvores
     int subU = qualSubArvore(subarvores, u);
     int subV = qualSubArvore(subarvores, v);
- 
+
     // Unindo a menor com a maior
     if (subarvores[subU].ordem < subarvores[subV].ordem)
         subarvores[subU].pai = subV;
@@ -1137,21 +1217,21 @@ void Graph::agmKruskal(Graph *subgrafo)
     Node *noAux = subgrafo->getFirstNode();
     Edge *arestaAux = noAux->getFirstEdge();
 
-    int u = noAux->getId(); // id do nó de origem
+    int u = noAux->getId();           // id do nó de origem
     int v = arestaAux->getTargetId(); //id do nó destino
 
     // Percorrer todas as arestas do Grafo
-    for(int i = 1; i < subgrafo->getOrder(); i++)
+    for (int i = 1; i < subgrafo->getOrder(); i++)
     {
-        while(arestaAux != nullptr)
+        while (arestaAux != nullptr)
         {
             // Coloca a aresta no vetor de arestas
-            if(!subgrafo->getNode(v)->getVisited())
+            if (!subgrafo->getNode(v)->getVisited())
                 arestas.push_back({arestaAux->getWeight(), {u, v}});
-            
+
             // Atualiza os auxiliares se a aresta não for null
             arestaAux = arestaAux->getNextEdge();
-            if(arestaAux != nullptr)
+            if (arestaAux != nullptr)
             {
                 v = arestaAux->getTargetId();
             }
@@ -1172,13 +1252,13 @@ void Graph::agmKruskal(Graph *subgrafo)
     */
 
     // Conferir se o vetor de arestas contém todas as arestas do grafo
-    if(arestas.size() != subgrafo->getNumberEdges())
-        {
-            cout << "\nO vector arestas não foi preenchido corretamente" << endl;
-            cout << "arestas.size = " << arestas.size() << " enquanto getNumberEdges = " << subgrafo->getNumberEdges() << endl;
-            cout << "Encerrando a execução" << endl;
-            return; 
-        }
+    if (arestas.size() != subgrafo->getNumberEdges())
+    {
+        cout << "\nO vector arestas não foi preenchido corretamente" << endl;
+        cout << "arestas.size = " << arestas.size() << " enquanto getNumberEdges = " << subgrafo->getNumberEdges() << endl;
+        cout << "Encerrando a execução" << endl;
+        return;
+    }
 
     cout << "1º passo concluído com sucesso" << endl;
 
@@ -1190,9 +1270,9 @@ void Graph::agmKruskal(Graph *subgrafo)
     // 3º PASSO: Criar subávores cada uma contendo um nó isolado
 
     int V = subgrafo->getOrder();
-    SubArvore* subarvores = new SubArvore[(V * sizeof(SubArvore))]; // vetor para armazenar todas as subárvores
+    SubArvore *subarvores = new SubArvore[(V * sizeof(SubArvore))]; // vetor para armazenar todas as subárvores
 
-    for(int i = 0; i < V; i++) 
+    for (int i = 0; i < V; i++)
     {
         subarvores[i].pai = i;
         subarvores[i].ordem = 1;
@@ -1206,28 +1286,29 @@ void Graph::agmKruskal(Graph *subgrafo)
 
     // Iterar até atingir condição de parada
     int cont = 0;
-    while(agm.size() < V - 1 && cont < arestas.size())
+    while (agm.size() < V - 1 && cont < arestas.size())
     {
         pair<int, int> proxAresta = arestas[cont].second;
         int u = proxAresta.first;
         int v = proxAresta.second;
 
         // Se u e v não estão na mesma subárvore
-        if(qualSubArvore(subarvores, subgrafo->getNode(u)->getPosition()) != qualSubArvore(subarvores, subgrafo->getNode(v)->getPosition()))
+        if (qualSubArvore(subarvores, subgrafo->getNode(u)->getPosition()) != qualSubArvore(subarvores, subgrafo->getNode(v)->getPosition()))
         {
             agm.push_back(cont);
             unirSubArvores(subarvores, subgrafo->getNode(u)->getPosition(), subgrafo->getNode(v)->getPosition());
         }
-        cont ++;
+        cont++;
     }
     cout << "4º passo concluído com sucesso" << endl;
 
     // 5º PASSO: Imprimir a Árvore Geradora Mínima e seu peso
 
     int peso = 0;
-    cout << "\nÁRVORE GERADORA MÍNIMA via Kruskal\n" << endl;
+    cout << "\nÁRVORE GERADORA MÍNIMA via Kruskal\n"
+         << endl;
     cout << "graph {" << endl;
-    for(int i = 0; i < agm.size(); i++)
+    for (int i = 0; i < agm.size(); i++)
     {
         cout << "  " << arestas[agm[i]].second.first << " -- " << arestas[agm[i]].second.second;
         cout << " [label = " << arestas[agm[i]].first << "]" << endl;
@@ -1236,20 +1317,19 @@ void Graph::agmKruskal(Graph *subgrafo)
     cout << "}" << endl;
     cout << "\nPeso da AGM: " << peso << endl;
     cout << "\nKruskal concluído com sucesso!" << endl;
-    
-    delete [] subarvores;
+
+    delete[] subarvores;
     return;
 }
-
 
 // Função para auxiliar o algoritmo de Prim. Retorna a posição do nó com menor custo de vizinhança que não esteja na agm
 int posicaoMenor(vector<int> &custoViz, vector<bool> &naAGM)
 {
     int min = INF;
     int pos;
-    for(int i = 0; i < custoViz.size(); i++)
+    for (int i = 0; i < custoViz.size(); i++)
     {
-        if(custoViz[i] < min && naAGM[i] == false)
+        if (custoViz[i] < min && naAGM[i] == false)
         {
             min = custoViz[i];
             pos = i;
@@ -1272,18 +1352,18 @@ void Graph::agmPrim(Graph *subgrafo)
 
     // Vector para checar se o nó já foi inserido na agm
     vector<bool> naAGM(subgrafo->getOrder(), false);
-    
+
     // O primeiro nó do vector será inicializado com custoViz = 0
     custoViz.push_back(0);
 
     // Os demais nós serão inicializados com custoViz = INFINITO
-    for(int i = 1; i < subgrafo->getOrder(); i++)
+    for (int i = 1; i < subgrafo->getOrder(); i++)
         custoViz.push_back(INF);
-        
+
     cout << "1º passo concluído com sucesso" << endl;
 
     // 2º PASSO: Criar Arvore Geradora Minima -> vetor com os pais de cada nó da agm
-    
+
     // Os índices da agm corresponderão à posição do nó no subgrafo
     // A raiz da agm, indice 0, será o primeiro nó do subgrafo, portanto não terá pai
     int *agm = new int[subgrafo->getOrder() * sizeof(int)];
@@ -1293,24 +1373,24 @@ void Graph::agmPrim(Graph *subgrafo)
     // 3º PASSO: Iterar pelos vértices verificando o custoViz e inserindo na agm
 
     int cont = 0;
-    while(cont < subgrafo->getOrder())
+    while (cont < subgrafo->getOrder())
     {
         // Pega o nó com menor custoViz que ainda não está na agm
-        int pos_menor = posicaoMenor(custoViz, naAGM); // Posição do nó
+        int pos_menor = posicaoMenor(custoViz, naAGM);         // Posição do nó
         int u = subgrafo->getNodePosition(pos_menor)->getId(); // ID do nó
         // Atualiza naAGM, pois, nessa iteração, u será colocado na agm
         naAGM[pos_menor] = true;
 
-        // Iterar pelos nós v adjacentes a u e verificar se o peso da aresta entre eles é menor que o seu custoViz 
+        // Iterar pelos nós v adjacentes a u e verificar se o peso da aresta entre eles é menor que o seu custoViz
         Edge *aux = subgrafo->getNode(u)->getFirstEdge();
-        while(aux != nullptr)
+        while (aux != nullptr)
         {
-            int v = aux->getTargetId(); // ID de v
+            int v = aux->getTargetId();                      // ID de v
             int pos_v = subgrafo->getNode(v)->getPosition(); // posição de v
-            if(!naAGM[pos_v]) // executa caso o nó v ainda não esteja na agm
+            if (!naAGM[pos_v])                               // executa caso o nó v ainda não esteja na agm
             {
                 // Se o peso da aresta (u, v) for menor que o custoViz de v, atualiza o custoViz com o valor do peso
-                if(aux->getWeight() < custoViz[pos_v])
+                if (aux->getWeight() < custoViz[pos_v])
                 {
                     custoViz[pos_v] = aux->getWeight();
                     // Atualiza o pai de v na agm
@@ -1319,17 +1399,18 @@ void Graph::agmPrim(Graph *subgrafo)
             }
             aux = aux->getNextEdge();
         }
-        cont ++;
-    }  
+        cont++;
+    }
 
     cout << "3º passo concluído com sucesso" << endl;
 
     // 4º PASSO: Imprimir a Árvore Geradora Mínima e seu peso
 
     int peso = 0;
-    cout << "\nÁRVORE GERADORA MÍNIMA via Prim\n" << endl;
+    cout << "\nÁRVORE GERADORA MÍNIMA via Prim\n"
+         << endl;
     cout << "graph {" << endl;
-    for(int i = 1; i < subgrafo->getOrder(); i++)
+    for (int i = 1; i < subgrafo->getOrder(); i++)
     {
         int id_destino = subgrafo->getNodePosition(i)->getId();
         cout << "  " << agm[i] << " -- " << id_destino;
@@ -1340,6 +1421,6 @@ void Graph::agmPrim(Graph *subgrafo)
     cout << "\nPeso da AGM: " << peso << endl;
     cout << "\nPrim concluído com sucesso!" << endl;
 
-    delete [] agm;
+    delete[] agm;
     return;
 }
