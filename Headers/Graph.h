@@ -74,8 +74,8 @@ private:
     void caminhoMinimo(list<int> &antecessor, ofstream &outFile);
     int **iniciaAnterioresFloyd(int **anteriores, int tam);
     int **iniciaDistanciaFloyd(int **anteriores, int tam);
-    void saidaFloyd(int **pred, Node *noSource, Node *nodeTarget);
-    void saidaDijkstra(int antecessor[], int idSource, int idTarget);
+    void saidaFloyd(int **pred, Node *noSource, Node *noTarget,ofstream &outFile);
+    void saidaDijkstra(int antecessor[], int idSource, int idTarget,ofstream &outFile);
     bool thisIsCyclic();
     bool auxIsCyclic(int nodeId, bool isVisited[], int parentId);
     bool isCyclic();

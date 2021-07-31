@@ -457,11 +457,11 @@ void Graph::indirectTransitiveClosing(int id, ofstream &outFile)
     }
 }
 
+/**
+ * @brief               Função para buscar o caminho minimo usando o algoritmo de dijkstra
+ */
 float Graph::dijkstra(ofstream &outFile)
 {
-    /**
-     * @brief               Função para buscar o caminho minimo usando o algoritmo de dijkstra
-     */
 
     int idSource, idTarget;
     Node *noSource, *noTarget;
@@ -557,7 +557,7 @@ float Graph::dijkstra(ofstream &outFile)
         delete[] visited;  //Desalocando o vetore usado
 
         if (distancia < INF)
-            saidaDijkstra(antec, pSource, pTarget); //Imprime todo a lista na ordem de acesso
+            saidaDijkstra(antec, pSource, pTarget,outFile); //Imprime todo a lista na ordem de acesso
 
         delete[] antec;
         cout << "\n\nA distância é: " << distancia << endl;
@@ -574,12 +574,11 @@ float Graph::dijkstra(ofstream &outFile)
     }
 }
 
+/**
+ * @brief               Função de busca de caminho minimo usando o algoritmo de Floyd-Warshall
+ */
 float Graph::floydWarshall(ofstream &outFile)
 {
-    /**
-     * @brief               Função de busca de caminho minimo usando o algoritmo de Floyd-Warshall
-     */
-
     int idSource, idTarget;
     Node *noSource, *noTarget;
     string idS, idT;
@@ -633,7 +632,7 @@ float Graph::floydWarshall(ofstream &outFile)
         delete[] dist; //Desalocando a matriz distancia usada
 
         if (distancia < INF)
-            saidaFloyd(pred, noSource, noTarget);
+            saidaFloyd(pred, noSource, noTarget,outFile);
 
         for (i = 0; i < V; i++)
         {
@@ -978,37 +977,40 @@ void Graph::auxDeepSearch(Node *node, vector<int> *findG, vector<int> *retorno)
     retorno->push_back(node->getId());
 }
 
+/**
+ * @brief               Função auxiliar para as saidas dos algoritmos de caminho minimo, imprimindo e salvando no arquivo
+ * @param   antecessor  Lista contendo os antecessores do caminho minimo, representa a ordem de acesso
+ * @param   outFile     Arquivo de saída
+ */
 void Graph::caminhoMinimo(list<int> &antecessor, ofstream &outFile)
 {
-    /**
-     * @brief               Função auxiliar para as saidas dos algoritmos de caminho minimo
-     * @param   antecessor  Lista contendo os antecessores do caminho minimo, representa a ordem de acesso
-     * @param   outFile     Arquivo de saída
-     */
-    string arco;                                     //Para a escrita no outFile, se for arco '->' se for aresta '--'
+    string arco, entrada;                            //Para a escrita no outFile, se for arco '->' se for aresta '--'
     int primeiro = antecessor.front(), tNode, sNode; //Usado para armazenar o primeiro vertice, e auxiliar na escrita no arquivo dot
-
+    
+    cout << "\nDeseja salvar a saída?\n1 para sim.\nQualquer outra opção para não"<<endl;
+    cout << "Sua opção: ";
+    cin >> entrada;
     if (getDirected())
     {
-        outFile << "digraph{ \n";
+        if(entrada=="1")outFile << "\ndigraph{ \n";
         arco = " -> ";
     }
     else
     {
-        outFile << "graph{ \n";
+        if(entrada=="1")outFile << "\ngraph{ \n";
         arco = " -- ";
     }
     Node *no = getNodePosition(primeiro);
     sNode = no->getId();
     Node *noAux = nullptr; //No auxiliar
     Edge *edge = nullptr;  //Edge auxiliar para pegar o peso
-
+    cout << "\nCAMINHO MINIMO\n"<<endl;
     while (!antecessor.empty())
     {                                   //Passa por toda a lista de ordem de acesso em buscando o ID
         no = getNodePosition(primeiro); //no recebe o node que é o primeiro no caminho minimo
         tNode = no->getId();
 
-        if (tNode != sNode) //Para escrever no arquivo dot o caminho, caso possua peso busca esse peso
+        if (tNode != sNode && entrada == "1") //Para escrever no arquivo dot o caminho, caso possua peso busca esse peso
             if (getWeightedEdge())
             {
                 edge = noAux->getEdge(tNode); //Busca a aresta para pegar o seu peso
@@ -1024,18 +1026,17 @@ void Graph::caminhoMinimo(list<int> &antecessor, ofstream &outFile)
         primeiro = antecessor.front(); //Atualiza o valor do primeiro
         noAux = no;                    //Atualiza o valor do noAux
     }
-    outFile << "}";
+    if(entrada=="1")outFile << "}";
 }
 
+/**
+ * @brief               Função auxiliar de Floy, para iniciar a matriz dos anteriores
+ * @param anteriores    Matriz dos anteriores que será inicializada
+ * @param tam           Tamanho da matriz quadratica, recebe um valor i para cada posição
+ * 
+ */
 int **Graph::iniciaAnterioresFloyd(int **anteriores, int tam)
 {
-    /**
-     * @brief               Função auxiliar de Floy, para iniciar a matriz dos anteriores
-     * @param anteriores    Matriz dos anteriores que será inicializada
-     * @param tam           Tamanho da matriz quadratica, recebe um valor i para cada posição
-     * 
-     */
-
     anteriores = new int *[tam]; //Aloca a matriz dos anteriores
     for (int i = 0; i < tam; i++)
         anteriores[i] = new int[tam]; //Aloca cada posição da matriz anteriores
@@ -1046,14 +1047,14 @@ int **Graph::iniciaAnterioresFloyd(int **anteriores, int tam)
     return anteriores; //Retorna a matriz anteriores
 }
 
+/**
+ * @brief               Função auxiliar de Floyd, para iniciar a posição da matriz de distância contendo os pesos
+ * @param   distancia   Vetor de distância a ser inicializado
+ * @param   tam         Tamanho da matriz quadratica, recebe a ordem do grafo
+ * 
+ */
 int **Graph::iniciaDistanciaFloyd(int **distancia, int tam)
 {
-    /**
-     * @brief               Função auxiliar de Floyd, para iniciar a posição da matriz de distância contendo os pesos
-     * @param   distancia   Vetor de distância a ser inicializado
-     * @param   tam         Tamanho da matriz quadratica, recebe a ordem do grafo
-     * 
-     */
     distancia = new int *[tam]; //Alocando a matriz distância
     for (int i = 0; i < tam; i++)
         distancia[i] = new int[tam]; //Aloca cada posição da matriz distância
@@ -1084,12 +1085,12 @@ int **Graph::iniciaDistanciaFloyd(int **distancia, int tam)
     return distancia; //Retorna a matriz distância
 }
 
-void Graph::saidaFloyd(int **pred, Node *noSource, Node *noTarget)
+/**
+ * @brief               Função auxiliar de floyd para imprimir e salvar em arquivo dot o caminho mínimo
+ * @param   antecessor  Lista contendo os antecessores do caminho minimo, representa a ordem de acesso
+ */
+void Graph::saidaFloyd(int **pred, Node *noSource, Node *noTarget,ofstream &outFile)
 {
-    /**
-     * @brief               Função auxiliar de floyd para imprimir e salvar em arquivo dot o caminho mínimo
-     * @param   antecessor  Lista contendo os antecessores do caminho minimo, representa a ordem de acesso
-     */
 
     list<int> ordemAcesso; //Lista para conteer a ordem de acesso dos vertices, de trás para frente
     int ant;
@@ -1104,20 +1105,19 @@ void Graph::saidaFloyd(int **pred, Node *noSource, Node *noTarget)
     }
     ordemAcesso.push_front(noSource->getPosition());
 
-    ofstream outFile("floydMarshall.dot"); //Arquivo dot que será escrito o caminho minimo
     caminhoMinimo(ordemAcesso, outFile);
-    outFile.close();
+    
 }
 
-void Graph::saidaDijkstra(int antecessor[], int idSource, int idTarget)
+/**
+ * @brief               Função auxiliar de disjkstra para imprimir o caminho
+ * @param   antecessor  Vetor contendo o antecessor de cada posição
+ * @param   idSource    ID do nó de origem
+ * @param   idTarget    ID do nó de destino   
+ */
+void Graph::saidaDijkstra(int antecessor[], int idSource, int idTarget,ofstream &outFile)
 {
 
-    /**
-     * @brief               Função auxiliar de disjkstra para imprimir o caminho
-     * @param   antecessor  Vetor contendo o antecessor de cada posição
-     * @param   idSource    ID do nó de origem
-     * @param   idTarget    ID do nó de destino   
-     */
     string arco;
     int noAnterior, primeiro, tNode, sNode; //Usado para armazenar o vertice anterior, e auxiliar na escrita no arquivo dot
 
@@ -1134,9 +1134,8 @@ void Graph::saidaDijkstra(int antecessor[], int idSource, int idTarget)
     ordemAcesso.push_front(idSource); //Insere o nó Source como o primeiro a ser acessado
     primeiro = ordemAcesso.front();
 
-    ofstream outFile("dijkstra.dot");
     caminhoMinimo(ordemAcesso, outFile);
-    outFile.close();
+    
 }
 
 bool Graph::thisIsCyclic()
