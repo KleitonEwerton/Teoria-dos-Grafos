@@ -359,28 +359,36 @@ int posicaoMenor(vector<int> &custoViz, vector<bool> &naAGM)
 
 // FUNCIONALIDADES --------------------------------------------------------------------------------------------
 
-void Graph::directTransitiveClosing(int id, ofstream &outFile)
-{
-    /**
-     * @brief       Função para identificar e exibir o Fecho Transitivo Direto do grafo direcionado.
-     * @param id    Valor que representa o id do nó para o qual será calculado o fecho transitivo direto.
+/**
+     * @brief          Função para identificar e exibir o Fecho Transitivo Direto do grafo direcionado.
+     * @param id       Valor que representa o id do nó para o qual será calculado o fecho transitivo direto.
+     * @param outFile  Arquivo de saída em .dot.
      * 
      */
+void Graph::directTransitiveClosing(int id, ofstream &outFile)
+{
 
     Node *node = this->getNode(id); // Nó para o qual será calculado o fecho transitivo direto.
 
     this->cleanVisited(); // Chama a função para setar todos os nós do grafo como não visitados.
 
     // Verifica se o nó node existe.
-    if (node != nullptr)
-    {
+    if (node != nullptr){
+        
+        int entrada;
+        
+        cout << "Deseja salvar o resultado em um arquivo de saída? " << endl;
+        cout << "Digite: \n1 - Sim\n2 - Não" << endl;
+        cout << "Entrada: ";
+        cin >> entrada;
 
-        fstream arqDot;
-        arqDot.open("directTransitiveClosing.dot", ios::out | ios::trunc);
+        if(entrada == 1){
+            outFile << "digraph{\n";
+        }
+
+        cout << "Fecho transitivo direto: ";
 
         deepPath(node); // Realiza o caminho em profundidade no grafo a partir do nó node.
-
-        arqDot << "digraph{\n";
 
         // Imprime o id de todos os nós visitados.
         for (node = this->first_node; node != nullptr; node = node->getNextNode())
@@ -392,16 +400,20 @@ void Graph::directTransitiveClosing(int id, ofstream &outFile)
                 cout << node->getId() << " | ";
 
                 // Imprime no arquivo .dot a árvore do fecho transitivo direto.
-                while (edge != nullptr)
-                {
-                    int id = edge->getTargetId();
-                    arqDot << node->getId() << "->" << edge->getTargetId() << ";\n";
-                    edge = edge->getNextEdge();
+                if(entrada == 1){
+                    while (edge != nullptr){
+
+                        int id = edge->getTargetId();
+                        outFile << node->getId() << "->" << edge->getTargetId() << ";\n";
+                        edge = edge->getNextEdge();
+                    }
                 }
             }
         }
 
-        arqDot << "}\n";
+        if(entrada == 1){
+            outFile << "}\n";
+        }
     }
     // Se node não existe, exibe uma mensagem de erro.
     else
@@ -410,25 +422,32 @@ void Graph::directTransitiveClosing(int id, ofstream &outFile)
     }
 }
 
-void Graph::indirectTransitiveClosing(int id, ofstream &outFile)
-{
-    /**
-     * @brief       Função para identificar e exibir o Fecho Transitivo Indireto do grafo direcionado.
-     * @param id    Valor que representa o id do nó para o qual será calculado o fecho transitivo indireto.
+/**
+     * @brief          Função para identificar e exibir o Fecho Transitivo Indireto do grafo direcionado.
+     * @param id       Valor que representa o id do nó para o qual será calculado o fecho transitivo indireto.
+     * @param outFile  Arquivo de saída em .dot.
      * 
      */
+void Graph::indirectTransitiveClosing(int id, ofstream &outFile){
 
     Node *target = this->getNode(id);    // Nó alvo que recebe o id passado como parâmetro.
     Node *source = this->getFirstNode(); // Nó através do qual será feita a verificação se target é acessível.
 
     // Verifica se o nó target existe.
-    if (target != nullptr)
-    {
+    if (target != nullptr){
 
-        fstream arqDot;
-        arqDot.open("indirectTransitiveClosing.dot", ios::out | ios::trunc);
+        int entrada;
+        
+        cout << "Deseja salvar o resultado em um arquivo de saída? " << endl;
+        cout << "Digite: \n1 - Sim\n2 - Não" << endl;
+        cout << "Entrada: ";
+        cin >> entrada;
 
-        arqDot << "digraph{\n";
+        if(entrada == 1){
+            outFile << "digraph{\n";
+        }
+
+        cout << "Fecho transitivo indireto: ";
 
         // Realiza a busca em profundidade para todos os nós do grafo.
         while (source != nullptr)
@@ -439,16 +458,20 @@ void Graph::indirectTransitiveClosing(int id, ofstream &outFile)
             deepPath(source); // Realiza o caminho em profundidade no grafo a partir do nó source.
 
             // Se target foi visitado no caminho em profundidade, imprime o id de source.
-            if (target->getVisited())
-            {
+            if (target->getVisited()){
+
                 cout << source->getId() << " | ";
 
-                arqDot << source->getId() << ";\n"; // Imprime no arquivo .dot o id do nó source.
+                if(entrada == 1){
+                    outFile << source->getId() << ";\n"; // Imprime no arquivo .dot o id do nó source.
+                }
             }
             source = source->getNextNode();
         }
 
-        arqDot << "}\n";
+        if(entrada == 1){
+            outFile << "}\n";
+        }
     }
     // Se target não existe, imprime uma mensagem de erro.
     else
@@ -943,25 +966,23 @@ void Graph::topologicalSorting()
 
 //! AUXILIAR METHODS --------------------------------------------------------------------------------------------
 
-void Graph::deepPath(Node *node)
-{
-    /**
-     * @brief         Função genérica para realizar o caminho em profundidade a partir de um nó.
-     * @param node    Nó através do qual será feito o caminho em profundidade.
-     * 
-     */
+/**
+ *  @brief         Função genérica para realizar o caminho em profundidade a partir de um nó.
+ *  @param node    Nó através do qual será feito o caminho em profundidade.
+ *  
+ */
+void Graph::deepPath(Node *node){
 
     node->setVisited(true); // Define o nó node como visitado.
 
     // Operação recursiva para percorrer todos os nós acessíveis a partir de node.
     // Percorre todas as arestas do nó.
-    for (Edge *edge = node->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge())
-    {
+    for (Edge *edge = node->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge()){
 
         // Verifica se o nó para o qual a aresta aponta foi visitado.
         // Caso não tenha sido, deepPath é chamado novamente passando como parâmetro o nó alvo da aresta.
-        if (!getNode(edge->getTargetId())->getVisited())
-        {
+        if (!getNode(edge->getTargetId())->getVisited()){
+            
             deepPath(getNode(edge->getTargetId()));
         }
     }

@@ -112,7 +112,6 @@ void selecionar(int selecao, Graph *graph, ofstream &output_file)
         cout << "Digite o id do nó: ";
         cin >> v;
 
-        cout << "Fecho transitivo direto: ";
         graph->directTransitiveClosing(v, output_file);
         cout << endl;
         break;
@@ -123,7 +122,6 @@ void selecionar(int selecao, Graph *graph, ofstream &output_file)
         cout << "Digite o id do nó: ";
         cin >> h;
 
-        cout << "Fecho transitivo indireto: ";
         graph->indirectTransitiveClosing(h, output_file);
         cout << endl;
         break;
