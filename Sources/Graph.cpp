@@ -356,6 +356,83 @@ int posicaoMenor(vector<int> &custoViz, vector<bool> &naAGM)
     return pos;
 }
 
+// Função para imprimir a AGM via Prim
+void imprimirPrim(Graph *subgrafo, vector<int> &agm, ofstream &outFile)
+{
+    int peso = 0;
+    cout << "\nÁRVORE GERADORA MÍNIMA via Prim\n"
+         << endl;
+    cout << "graph {" << endl;
+    for (int i = 1; i < subgrafo->getOrder(); i++)
+    {
+        int id_destino = subgrafo->getNodePosition(i)->getId();
+        cout << "  " << agm[i] << " -- " << id_destino;
+        cout << " [label = " << subgrafo->getNode(agm[i])->getEdge(id_destino)->getWeight() << "]" << endl;
+        peso += subgrafo->getNode(agm[i])->getEdge(id_destino)->getWeight();
+    }
+    cout << "}" << endl;
+    cout << "\nPeso da AGM: " << peso << endl;
+    cout << "\nPrim concluído com sucesso!" << endl;
+
+    cout << "\nDeseja imprimir essa AGM no arquivo de saída? (1 - Sim ou 0 - Não)" << endl;
+    int op;
+    do
+    {
+        cout << "Sua opção: ";
+        cin >> op;
+    } while(op != 1 && op != 0);
+
+    if(op == 1)
+    {
+        outFile << "graph {" << endl;
+        for (int i = 1; i < subgrafo->getOrder(); i++)
+        {
+            int id_destino = subgrafo->getNodePosition(i)->getId();
+            outFile << "  " << agm[i] << " -- " << id_destino;
+            outFile << " [label = " << subgrafo->getNode(agm[i])->getEdge(id_destino)->getWeight() << "]" << endl;
+        }
+        outFile << "}" << endl;
+        cout << "\nImpressão concluída! Cheque o arquivo de saída" << endl;
+    }
+}
+
+// Função para imprimir a AGM via Kruskal
+void imprimirKruskal(vector<pair<int, pair<int, int>>> &arestas, vector<int> &agm, ofstream &outFile)
+{
+    int peso = 0;
+    cout << "\nÁRVORE GERADORA MÍNIMA via Kruskal\n"
+         << endl;
+    cout << "graph {" << endl;
+    for (int i = 0; i < agm.size(); i++)
+    {
+        cout << "  " << arestas[agm[i]].second.first << " -- " << arestas[agm[i]].second.second;
+        cout << " [label = " << arestas[agm[i]].first << "]" << endl;
+        peso += arestas[agm[i]].first;
+    }
+    cout << "}" << endl;
+    cout << "\nPeso da AGM: " << peso << endl;
+    cout << "\nKruskal concluído com sucesso!" << endl;
+
+    cout << "\nDeseja imprimir essa AGM no arquivo de saída? (1 - Sim ou 0 - Não)" << endl;
+    int op;
+    do
+    {
+        cout << "Sua opção: ";
+        cin >> op;
+    } while(op != 1 && op != 0);
+
+    if(op == 1)
+    {
+        outFile << "graph {" << endl;
+        for (int i = 0; i < agm.size(); i++)
+        {
+            outFile << "  " << arestas[agm[i]].second.first << " -- " << arestas[agm[i]].second.second;
+            outFile << " [label = " << arestas[agm[i]].first << "]" << endl;
+        }
+        outFile << "}" << endl;
+        cout << "\nImpressão concluída! Cheque o arquivo de saída" << endl;
+    }
+}
 
 // FUNCIONALIDADES --------------------------------------------------------------------------------------------
 
@@ -713,7 +790,7 @@ void Graph::agmPrim(Graph *subgrafo, ofstream &outFile)
 
     // Os índices da agm corresponderão à posição do nó no subgrafo
     // A raiz da agm, indice 0, será o primeiro nó do subgrafo, portanto não terá pai
-    int *agm = new int[subgrafo->getOrder() * sizeof(int)];
+    vector<int> agm(subgrafo->getOrder());
 
     cout << "2º passo concluído com sucesso" << endl;
 
@@ -752,23 +829,9 @@ void Graph::agmPrim(Graph *subgrafo, ofstream &outFile)
     cout << "3º passo concluído com sucesso" << endl;
 
     // 4º PASSO: Imprimir a Árvore Geradora Mínima e seu peso
+    
+    imprimirPrim(subgrafo, agm, outFile);
 
-    int peso = 0;
-    cout << "\nÁRVORE GERADORA MÍNIMA via Prim\n"
-         << endl;
-    cout << "graph {" << endl;
-    for (int i = 1; i < subgrafo->getOrder(); i++)
-    {
-        int id_destino = subgrafo->getNodePosition(i)->getId();
-        cout << "  " << agm[i] << " -- " << id_destino;
-        cout << " [label = " << subgrafo->getNode(agm[i])->getEdge(id_destino)->getWeight() << "]" << endl;
-        peso += subgrafo->getNode(agm[i])->getEdge(id_destino)->getWeight();
-    }
-    cout << "}" << endl;
-    cout << "\nPeso da AGM: " << peso << endl;
-    cout << "\nPrim concluído com sucesso!" << endl;
-
-    delete[] agm;
     return;
 }
 
@@ -867,19 +930,7 @@ void Graph::agmKruskal(Graph *subgrafo, ofstream &outFile)
 
     // 5º PASSO: Imprimir a Árvore Geradora Mínima e seu peso
 
-    int peso = 0;
-    cout << "\nÁRVORE GERADORA MÍNIMA via Kruskal\n"
-         << endl;
-    cout << "graph {" << endl;
-    for (int i = 0; i < agm.size(); i++)
-    {
-        cout << "  " << arestas[agm[i]].second.first << " -- " << arestas[agm[i]].second.second;
-        cout << " [label = " << arestas[agm[i]].first << "]" << endl;
-        peso += arestas[agm[i]].first;
-    }
-    cout << "}" << endl;
-    cout << "\nPeso da AGM: " << peso << endl;
-    cout << "\nKruskal concluído com sucesso!" << endl;
+    imprimirKruskal(arestas, agm, outFile);
 
     delete[] subarvores;
     return;

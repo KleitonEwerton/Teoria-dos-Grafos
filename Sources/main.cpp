@@ -23,7 +23,7 @@ Graph *leitura(ifstream &input_file, int directed, int weightedEdge, int weighte
     float edgeWeight;
 
     //Pegando a ordem do grafo
-    //input_file >> order;
+    input_file >> order;
 
     cout << "\nLendo o arquivo input.txt..." << endl;
     cout << "Ordem: " << order << endl;
