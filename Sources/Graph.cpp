@@ -53,7 +53,7 @@ Graph::~Graph()
     }
 }
 
-// Getters --------------------------------------------------------------------------------------------
+//! Getters --------------------------------------------------------------------------------------------
 
 int Graph::getOrder()
 {
@@ -302,7 +302,7 @@ void Graph::cleanVisited()
 }
 
 
-// FUNÇÕES AUXILIARES --------------------------------------------------------------------------------------------
+//! FUNÇÕES AUXILIARES --------------------------------------------------------------------------------------------
 
 // Estrutura e funções auxiliares para o algoritmo de Kruskal
 struct SubArvore
@@ -458,7 +458,7 @@ void Graph::indirectTransitiveClosing(int id, ofstream &outFile)
 }
 
 /**
- * @brief               Função para buscar o caminho minimo usando o algoritmo de dijkstra
+ * @brief    Função para buscar o caminho minimo usando o algoritmo de dijkstra
  */
 float Graph::dijkstra(ofstream &outFile)
 {
@@ -575,7 +575,10 @@ float Graph::dijkstra(ofstream &outFile)
 }
 
 /**
- * @brief               Função de busca de caminho minimo usando o algoritmo de Floyd-Warshall
+ * @brief Função de busca de caminho minimo usando o algoritmo de Floyd-Warshall
+ * 
+ * @param outFile 
+ * @return float 
  */
 float Graph::floydWarshall(ofstream &outFile)
 {
@@ -654,8 +657,13 @@ float Graph::floydWarshall(ofstream &outFile)
     }
 }
 
-// ALGORITMO DE PRIM
-// para encontrar a Árvore Geradora Mínima
+ 
+/**
+ * @brief ALGORITMO DE PRIM para encontrar a Árvore Geradora Mínima
+ * 
+ * @param subgrafo 
+ * @param outFile 
+ */
 void Graph::agmPrim(Graph *subgrafo, ofstream &outFile)
 {
     cout << "\nIniciando a execução do algoritmo de Prim..." << endl;
@@ -933,7 +941,7 @@ void Graph::topologicalSorting()
 }
 
 
-// AUXILIAR METHODS --------------------------------------------------------------------------------------------
+//! AUXILIAR METHODS --------------------------------------------------------------------------------------------
 
 void Graph::deepPath(Node *node)
 {
@@ -1138,6 +1146,12 @@ void Graph::saidaDijkstra(int antecessor[], int idSource, int idTarget,ofstream 
     
 }
 
+/**
+ * @brief Verifica se o grafo é ciclico ou se é cíclico e direcionado
+ * 
+ * @return true 
+ * @return false 
+ */
 bool Graph::thisIsCyclic()
 {
     if (this->directed)
@@ -1146,6 +1160,15 @@ bool Graph::thisIsCyclic()
         return this->isCyclic();
 }
 
+/**
+ * @brief Função auxiliar para verificação se o grafo é cíclico
+ * 
+ * @param nodeId 
+ * @param isVisited 
+ * @param parentId 
+ * @return true 
+ * @return false 
+ */
 bool Graph::auxIsCyclic(int nodeId, bool isVisited[], int parentId)
 {
     isVisited[nodeId] = true;
@@ -1172,7 +1195,12 @@ bool Graph::auxIsCyclic(int nodeId, bool isVisited[], int parentId)
 
     return false;
 }
-
+/**
+ * @brief Função auxiliar para verificação se o graph é cíclico 
+ * 
+ * @return true 
+ * @return false 
+ */
 bool Graph::isCyclic()
 {
     int order = this->getOrder();
@@ -1200,7 +1228,15 @@ bool Graph::isCyclic()
 
     return false;
 }
-
+/**
+ * @brief Função auxiliar para verificação se o graph é cíclico e direcionado
+ * 
+ * @param nodeId 
+ * @param isVisited 
+ * @param isContainedRecusirve 
+ * @return true 
+ * @return false 
+ */
 bool Graph::auxIsCyclicDirected(int nodeId, bool isVisited[], bool *isContainedRecusirve)
 {
     Node *node = this->getNode(nodeId);
@@ -1229,7 +1265,12 @@ bool Graph::auxIsCyclicDirected(int nodeId, bool isVisited[], bool *isContainedR
     isContainedRecusirve[nodeId] = false;
     return false;
 }
-
+/** 
+ * @brief Função boleana que verifica se o graph é ciclíco
+ * 
+ * @return true 
+ * @return false 
+ */
 bool Graph::isCyclicDirected()
 {
     bool *isVisited = new bool[this->getOrder()];
@@ -1238,7 +1279,7 @@ bool Graph::isCyclicDirected()
 
     for (int i = 0; i < this->getOrder(); i++)
     {
-        isVisited[i] = false;
+        isVisited[i] = false;               // Verifica se o nó atual foi visitado.
         isContainedRecusirve[i] = false;
     }
 
@@ -1283,4 +1324,3 @@ void Graph::topologicalSortUtil(Node *node, Edge *edge, stack<int> &Stack)
             Stack.push(node->getId());
     }
 }
-

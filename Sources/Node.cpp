@@ -5,10 +5,10 @@
 using namespace std;
 
 /**************************************************************************************************
- * Defining the Node's methods
+ //! Defining the Node's methods
 **************************************************************************************************/
 
-// Constructor
+//! Constructor
 Node::Node(int id){
 
     this->id = id;
@@ -21,7 +21,7 @@ Node::Node(int id){
     this->visited = false;
 };
 
-// Destructor
+//! Destructor
 Node::~Node(){
 
     Edge* next_edge = this->first_edge;
@@ -36,7 +36,7 @@ Node::~Node(){
 
 };
 
-// Getters
+//! Getters
 Edge* Node::getFirstEdge(){
 
     return this->first_edge;
@@ -97,7 +97,7 @@ bool Node::getVisited(){
     return visited;
 }
 
-// Setters
+//! Setters
 
 void Node::setNextNode(Node* next_node){
 
@@ -115,7 +115,8 @@ void Node::setVisited(bool v){
     this->visited = v;
 }
 
-// Other methods
+//! Other methods
+
 void Node::insertEdge(int target_id, int target_position ,float weight){
     // Verifica se há pelo menos uma aresta no nó
     if(this->first_edge != nullptr){
