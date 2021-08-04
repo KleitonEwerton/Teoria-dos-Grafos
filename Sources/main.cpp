@@ -26,7 +26,7 @@ Graph *leitura(ifstream &input_file, int directed, int weightedEdge, int weighte
     input_file >> order;
 
     cout << "\nLendo o arquivo input.txt..." << endl;
-    cout << "Ordem: " << order << endl;
+    //cout << "Ordem: " << order << endl;
 
     //Criando objeto grafo: Ordem - direcionado - peso Aresta - peso Nó
     Graph *graph = new Graph(order, directed, weightedEdge, weightedNode);
@@ -108,7 +108,6 @@ void selecionar(int selecao, Graph *graph, ofstream &output_file)
         break;
     case 1: // Fecho Transitivo Direto;
         int v;
-
         cout << "Digite o id do nó: ";
         cin >> v;
 
@@ -118,22 +117,18 @@ void selecionar(int selecao, Graph *graph, ofstream &output_file)
 
     case 2: // Fecho Transitivo Indireto;
         int h;
-
         cout << "Digite o id do nó: ";
         cin >> h;
-
         graph->indirectTransitiveClosing(h, output_file);
         cout << endl;
         break;
 
     case 3: //Caminho Mínimo entre dois vértices - Dijkstra
         graph->dijkstra(output_file);
-
         break;
 
     case 4: // Caminho Mínimo entre dois vértices - Floyd
         graph->floydWarshall(output_file);
-        
         break;
 
     case 5: // Árvore Geradora Mínima sobre subgrafo vertice induzido por X usando algoritmo de Prim
@@ -147,7 +142,6 @@ void selecionar(int selecao, Graph *graph, ofstream &output_file)
         break;
 
     case 7: // Caminhamento Profundidade destacando as Arestas de retorno
-        
         graph->deepSearch(output_file);
         break;
 

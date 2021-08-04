@@ -175,7 +175,6 @@ Graph *Graph::getVertInduz()
     return subgrafo;
 }
 
-
 //! Other methods --------------------------------------------------------------------------------------------
 /*
     The outdegree attribute of nodes is used as a counter for the number of edges in the graph.
@@ -301,7 +300,6 @@ void Graph::cleanVisited()
     }
 }
 
-
 //! FUNÇÕES AUXILIARES --------------------------------------------------------------------------------------------
 
 // Estrutura e funções auxiliares para o algoritmo de Kruskal
@@ -380,9 +378,9 @@ void imprimirPrim(Graph *subgrafo, vector<int> &agm, ofstream &outFile)
     {
         cout << "Sua opção: ";
         cin >> op;
-    } while(op != 1 && op != 0);
+    } while (op != 1 && op != 0);
 
-    if(op == 1)
+    if (op == 1)
     {
         outFile << "graph {" << endl;
         for (int i = 1; i < subgrafo->getOrder(); i++)
@@ -419,9 +417,9 @@ void imprimirKruskal(vector<pair<int, pair<int, int>>> &arestas, vector<int> &ag
     {
         cout << "Sua opção: ";
         cin >> op;
-    } while(op != 1 && op != 0);
+    } while (op != 1 && op != 0);
 
-    if(op == 1)
+    if (op == 1)
     {
         outFile << "graph {" << endl;
         for (int i = 0; i < agm.size(); i++)
@@ -450,16 +448,18 @@ void Graph::directTransitiveClosing(int id, ofstream &outFile)
     this->cleanVisited(); // Chama a função para setar todos os nós do grafo como não visitados.
 
     // Verifica se o nó node existe.
-    if (node != nullptr){
-        
+    if (node != nullptr)
+    {
+
         int entrada;
-        
+
         cout << "Deseja salvar o resultado em um arquivo de saída? " << endl;
         cout << "Digite: \n1 - Sim\n2 - Não" << endl;
         cout << "Entrada: ";
         cin >> entrada;
 
-        if(entrada == 1){
+        if (entrada == 1)
+        {
             outFile << "digraph{\n";
         }
 
@@ -477,8 +477,10 @@ void Graph::directTransitiveClosing(int id, ofstream &outFile)
                 cout << node->getId() << " | ";
 
                 // Imprime no arquivo .dot a árvore do fecho transitivo direto.
-                if(entrada == 1){
-                    while (edge != nullptr){
+                if (entrada == 1)
+                {
+                    while (edge != nullptr)
+                    {
 
                         int id = edge->getTargetId();
                         outFile << node->getId() << "->" << edge->getTargetId() << ";\n";
@@ -488,7 +490,8 @@ void Graph::directTransitiveClosing(int id, ofstream &outFile)
             }
         }
 
-        if(entrada == 1){
+        if (entrada == 1)
+        {
             outFile << "}\n";
         }
     }
@@ -505,22 +508,25 @@ void Graph::directTransitiveClosing(int id, ofstream &outFile)
      * @param outFile  Arquivo de saída em .dot.
      * 
      */
-void Graph::indirectTransitiveClosing(int id, ofstream &outFile){
+void Graph::indirectTransitiveClosing(int id, ofstream &outFile)
+{
 
     Node *target = this->getNode(id);    // Nó alvo que recebe o id passado como parâmetro.
     Node *source = this->getFirstNode(); // Nó através do qual será feita a verificação se target é acessível.
 
     // Verifica se o nó target existe.
-    if (target != nullptr){
+    if (target != nullptr)
+    {
 
         int entrada;
-        
+
         cout << "Deseja salvar o resultado em um arquivo de saída? " << endl;
         cout << "Digite: \n1 - Sim\n2 - Não" << endl;
         cout << "Entrada: ";
         cin >> entrada;
 
-        if(entrada == 1){
+        if (entrada == 1)
+        {
             outFile << "digraph{\n";
         }
 
@@ -535,18 +541,21 @@ void Graph::indirectTransitiveClosing(int id, ofstream &outFile){
             deepPath(source); // Realiza o caminho em profundidade no grafo a partir do nó source.
 
             // Se target foi visitado no caminho em profundidade, imprime o id de source.
-            if (target->getVisited()){
+            if (target->getVisited())
+            {
 
                 cout << source->getId() << " | ";
 
-                if(entrada == 1){
+                if (entrada == 1)
+                {
                     outFile << source->getId() << ";\n"; // Imprime no arquivo .dot o id do nó source.
                 }
             }
             source = source->getNextNode();
         }
 
-        if(entrada == 1){
+        if (entrada == 1)
+        {
             outFile << "}\n";
         }
     }
@@ -577,7 +586,7 @@ float Graph::dijkstra(ofstream &outFile)
     }
     catch (const exception &e)
     {
-        cout << "Parâmetros inválidos" << endl;
+        cout << "Parâmetros inválidos." << endl;
         return 0;
     }
 
@@ -657,7 +666,7 @@ float Graph::dijkstra(ofstream &outFile)
         delete[] visited;  //Desalocando o vetore usado
 
         if (distancia < INF)
-            saidaDijkstra(antec, pSource, pTarget,outFile); //Imprime todo a lista na ordem de acesso
+            saidaDijkstra(antec, pSource, pTarget, outFile); //Imprime todo a lista na ordem de acesso
 
         delete[] antec;
         cout << "\n\nA distância é: " << distancia << endl;
@@ -735,7 +744,7 @@ float Graph::floydWarshall(ofstream &outFile)
         delete[] dist; //Desalocando a matriz distancia usada
 
         if (distancia < INF)
-            saidaFloyd(pred, noSource, noTarget,outFile);
+            saidaFloyd(pred, noSource, noTarget, outFile);
 
         for (i = 0; i < V; i++)
         {
@@ -757,7 +766,6 @@ float Graph::floydWarshall(ofstream &outFile)
     }
 }
 
- 
 /**
  * @brief ALGORITMO DE PRIM para encontrar a Árvore Geradora Mínima
  * 
@@ -829,7 +837,7 @@ void Graph::agmPrim(Graph *subgrafo, ofstream &outFile)
     cout << "3º passo concluído com sucesso" << endl;
 
     // 4º PASSO: Imprimir a Árvore Geradora Mínima e seu peso
-    
+
     imprimirPrim(subgrafo, agm, outFile);
 
     return;
@@ -937,12 +945,19 @@ void Graph::agmKruskal(Graph *subgrafo, ofstream &outFile)
 }
 
 /**
- * @brief Busca em profundidade de um Nó dado
+ * @brief Caminhamento Profundidade destacando as Arestas de retorno
  * 
+ * @param outFile Arquivo paraa getação de saida gráfica
  */
 void Graph::deepSearch(ofstream &outFile)
 {
+    // variáveis
+    vector<int> retorno;
+    vector<int> findG;
+    vector<string> graph;
     int id;
+    char r;
+
     cout << "\nCaminhamento Profundidade destacando as Arestas de retorno\n\n";
     do
     {
@@ -950,23 +965,47 @@ void Graph::deepSearch(ofstream &outFile)
         cin >> id;
     } while (!this->searchNode(id));
 
-    cout << "\n -- Árvore em Profundidade -- \n\n";
-
-    vector<int> retorno;
-    vector<int> findG;
-    int k = this->getOrder();
     Node *node = this->getNode(id);
+    auxDeepSearch(node, &findG, &retorno, outFile, &graph); //chama a função auxiliar 
 
-    auxDeepSearch(node, &findG, &retorno);
-
+    cout << "\n -- Árvore em Profundidade -- \n";
     for (int i = 0; i < findG.size(); i++)
-        cout << findG[i] << " < ";
+        cout << findG[i] << " | ";
 
-    cout << "\n\n -- Arestas de Retorno -- \n\n";
-
+    cout << "\n\n -- Arestas de Retorno -- \n";
     for (int i = 0; i < retorno.size(); i++)
-        cout << retorno[i] << " < ";
-    cout << "\n\n --- \n";
+        cout << retorno[i] << " | ";
+    cout << endl;
+
+    do
+    {
+        cout << "Gerar Grafo e arquivo de saída(s/n)?\n";
+        cin >> r;
+    } while (r != 's' && r != 'S' && r != 'n' && r != 'n');
+
+    if (r == 's' || r == 'S')
+        printDeepSearch(&graph, outFile);
+    retorno.clear();
+    findG.clear();
+    graph.clear(); 
+}
+
+void Graph::printDeepSearch(vector<string> *graph, ofstream &outFile)
+{
+        ofstream output;
+        output.open("output.dot", ios::out | ios::trunc);
+        output << "graph{\n";
+        outFile<< "graph{\n";
+        for (int i = 0; i < graph->size(); i++)
+        {
+            output << graph->at(i) << endl;
+            outFile<< graph->at(i) << endl;
+        }
+        output << "}";
+        outFile<< "}";
+        output.close();
+        system("dot -Tpng output.dot -o output.png");
+        //outFile.close();
 }
 
 /**
@@ -1014,7 +1053,6 @@ void Graph::topologicalSorting()
     }
 }
 
-
 //! AUXILIAR METHODS --------------------------------------------------------------------------------------------
 
 /**
@@ -1022,18 +1060,21 @@ void Graph::topologicalSorting()
  *  @param node    Nó através do qual será feito o caminho em profundidade.
  *  
  */
-void Graph::deepPath(Node *node){
+void Graph::deepPath(Node *node)
+{
 
     node->setVisited(true); // Define o nó node como visitado.
 
     // Operação recursiva para percorrer todos os nós acessíveis a partir de node.
     // Percorre todas as arestas do nó.
-    for (Edge *edge = node->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge()){
+    for (Edge *edge = node->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge())
+    {
 
         // Verifica se o nó para o qual a aresta aponta foi visitado.
         // Caso não tenha sido, deepPath é chamado novamente passando como parâmetro o nó alvo da aresta.
-        if (!getNode(edge->getTargetId())->getVisited()){
-            
+        if (!getNode(edge->getTargetId())->getVisited())
+        {
+
             deepPath(getNode(edge->getTargetId()));
         }
     }
@@ -1042,18 +1083,25 @@ void Graph::deepPath(Node *node){
 /**
  * @brief Auxiliar da busca em profundidade de um Nó dado
  * 
- * @param node 
- * @param findG 
- * @param retorno 
+ * @param node      Ponteiro para o nó
+ * @param findG     vetor para os vértices do caminho
+ * @param retorno   vetor para as arestas de retorno
+ * @param outFile   arquivo texto de saída
+ * @param graf      vetor para gravação dos dados impressos no arquivo de saída
  */
-void Graph::auxDeepSearch(Node *node, vector<int> *findG, vector<int> *retorno)
+void Graph::auxDeepSearch(Node *node, vector<int> *findG, vector<int> *retorno, ofstream &outFile, vector<string> *graf)
 {
+
     findG->push_back(node->getId());
-    node->setVisited(true);             
+    node->setVisited(true);
     for (Edge *edge = node->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge())
+    {
         if (!getNode(edge->getTargetId())->getVisited())
-            auxDeepSearch(getNode(edge->getTargetId()), findG, retorno);
-        
+        {
+            graf->push_back(to_string(node->getId()) + "--" + to_string(edge->getTargetId()));
+            auxDeepSearch(getNode(edge->getTargetId()), findG, retorno, outFile, graf);
+        }
+    }
     retorno->push_back(node->getId());
 }
 
@@ -1066,25 +1114,28 @@ void Graph::caminhoMinimo(list<int> &antecessor, ofstream &outFile)
 {
     string arco, entrada;                            //Para a escrita no outFile, se for arco '->' se for aresta '--'
     int primeiro = antecessor.front(), tNode, sNode; //Usado para armazenar o primeiro vertice, e auxiliar na escrita no arquivo dot
-    
-    cout << "\nDeseja salvar a saída?\n1 para sim.\nQualquer outra opção para não"<<endl;
+
+    cout << "\nDeseja salvar a saída?\n1 para sim.\nQualquer outra opção para não" << endl;
     cout << "Sua opção: ";
     cin >> entrada;
     if (getDirected())
     {
-        if(entrada=="1")outFile << "\ndigraph{ \n";
+        if (entrada == "1")
+            outFile << "\ndigraph{ \n";
         arco = " -> ";
     }
     else
     {
-        if(entrada=="1")outFile << "\ngraph{ \n";
+        if (entrada == "1")
+            outFile << "\ngraph{ \n";
         arco = " -- ";
     }
     Node *no = getNodePosition(primeiro);
     sNode = no->getId();
     Node *noAux = nullptr; //No auxiliar
     Edge *edge = nullptr;  //Edge auxiliar para pegar o peso
-    cout << "\nCAMINHO MINIMO\n"<<endl;
+    cout << "\nCAMINHO MINIMO\n"
+         << endl;
     while (!antecessor.empty())
     {                                   //Passa por toda a lista de ordem de acesso em buscando o ID
         no = getNodePosition(primeiro); //no recebe o node que é o primeiro no caminho minimo
@@ -1106,7 +1157,8 @@ void Graph::caminhoMinimo(list<int> &antecessor, ofstream &outFile)
         primeiro = antecessor.front(); //Atualiza o valor do primeiro
         noAux = no;                    //Atualiza o valor do noAux
     }
-    if(entrada=="1")outFile << "}";
+    if (entrada == "1")
+        outFile << "}";
 }
 
 /**
@@ -1169,7 +1221,7 @@ int **Graph::iniciaDistanciaFloyd(int **distancia, int tam)
  * @brief               Função auxiliar de floyd para imprimir e salvar em arquivo dot o caminho mínimo
  * @param   antecessor  Lista contendo os antecessores do caminho minimo, representa a ordem de acesso
  */
-void Graph::saidaFloyd(int **pred, Node *noSource, Node *noTarget,ofstream &outFile)
+void Graph::saidaFloyd(int **pred, Node *noSource, Node *noTarget, ofstream &outFile)
 {
 
     list<int> ordemAcesso; //Lista para conteer a ordem de acesso dos vertices, de trás para frente
@@ -1186,7 +1238,6 @@ void Graph::saidaFloyd(int **pred, Node *noSource, Node *noTarget,ofstream &outF
     ordemAcesso.push_front(noSource->getPosition());
 
     caminhoMinimo(ordemAcesso, outFile);
-    
 }
 
 /**
@@ -1195,7 +1246,7 @@ void Graph::saidaFloyd(int **pred, Node *noSource, Node *noTarget,ofstream &outF
  * @param   idSource    ID do nó de origem
  * @param   idTarget    ID do nó de destino   
  */
-void Graph::saidaDijkstra(int antecessor[], int idSource, int idTarget,ofstream &outFile)
+void Graph::saidaDijkstra(int antecessor[], int idSource, int idTarget, ofstream &outFile)
 {
 
     string arco;
@@ -1215,7 +1266,6 @@ void Graph::saidaDijkstra(int antecessor[], int idSource, int idTarget,ofstream 
     primeiro = ordemAcesso.front();
 
     caminhoMinimo(ordemAcesso, outFile);
-    
 }
 
 /**
@@ -1351,7 +1401,7 @@ bool Graph::isCyclicDirected()
 
     for (int i = 0; i < this->getOrder(); i++)
     {
-        isVisited[i] = false;               // Verifica se o nó atual foi visitado.
+        isVisited[i] = false; // Verifica se o nó atual foi visitado.
         isContainedRecusirve[i] = false;
     }
 
