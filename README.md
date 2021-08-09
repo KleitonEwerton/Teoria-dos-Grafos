@@ -30,8 +30,6 @@ Matrícula       Nome                                E-mail
 
 ## Como Compilar?
 
-## Como Compilar?
-
 Utilizando os comando do Makefile:
 
 Exclui todos os arquivos .o e o arquivo ./execGrupo22.exe
