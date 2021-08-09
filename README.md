@@ -1,4 +1,15 @@
 # Trabalho de Grafos
+## Parte1: Funcionalidades básicas em grafos simples
+
+## Equipe
+
+Matrícula       Nome                                E-mail
+```
+202065020A      Daniel Muller Rezende               daniel.rezende@estudante.ufjf.br
+201876043       Deoclécio Porfírio Ferreira Filho   deoclecio.filho@estudante.ufjf.br
+202065500B      Guilherme Martins Couto
+202065050A      Kleiton Ewerton de Oliveira         kleitonewertonoliveira@gmail.com
+```
 ## Parte 1:
 
 - [x] Fecho Transitivo Direto
@@ -18,48 +29,52 @@
 
 
 ## Como Compilar?
-Cria o arquivo auto.exe e todos os arquivos .o
+
+## Como Compilar?
+
+Utilizando os comando do Makefile:
+
+Exclui todos os arquivos .o e o arquivo ./execGrupo22.exe
+Cria o arquivo execGrupo22.exe e todos os arquivos .o
 
 ```
-Make all
+Make
 ```
 
-Exclui todos os arquivos .o e o arquivo ./auto.exe
+Exclui todos os arquivos .o e o arquivo ./execGrupo22.exe
 
 ```
 Make clean
-```
-
-## Gerar o arquivo dot
-
-Comando para instalação do programa Grafix (linux)
-
-```
-sudo apt install graphviz
-```
-Comando para criação do gráfico via o programa Grafix
-```
-dot -Tpng output.dot -o output.png
 ```
 ## Como rodar?
 
 Grafo não direcionado, sem peso nas aresta e sem peso nos vértices 
 ```
-./grafo.exe input.txt output.txt 0 0 0
+./execGrupo22.exe input.txt output.txt 0 0 0
 ```
 
 Grafo direcionado 
 ```
-./grafo.exe input.txt output.txt 1 0 0
+./execGrupo22.exe input.txt output.txt 1 0 0
 ```
 
 Grafo com peso na aresta 
 ```
-./grafo.exe input.txt output.txt 0 1 0
+./execGrupo22.exe input.txt output.txt 0 1 0
 ```
 
 Grafo com peso no vértices 
 ```
-./grafo.exe input.txt output.txt 0 0 1
+./execGrupo22.exe input.txt output.txt 0 0 1
+```
+## Gerar o arquivo dot
 
+Comando para instalação do programa Graphviz (linux)
+
+```
+sudo apt install graphviz
+```
+Comando para criação do gráfico via o programa Graphviz
+```
+dot -Tpng output.dot -o output.png
 ```
