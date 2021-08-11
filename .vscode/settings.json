@@ -12,6 +12,7 @@
     "vector": "cpp",
     "deque": "cpp",
     "list": "cpp",
-    "xiosbase": "cpp"
+    "xiosbase": "cpp",
+    "utility": "cpp"
   }
 }
