@@ -12,20 +12,25 @@ Matrícula       Nome                                E-mail
 ```
 ## Parte 1:
 
-- [x] Fecho Transitivo Direto
-- [x] Fecho Transitivo Indireto
-- [x] Caminho Mínimo entre dois vértices - Dijkstra
-- [x] Caminho Mínimo entre dois vértices - Floyd
-- [x] Árvore Geradora Mínima sobre subgrafo vertice induzido por X usando algorítmo de Prim
-- [x] Árvore Geradora Mínima sobre subgrafo vertice induzido por X usando algorítmo de Kruskal
-- [x] Caminhamento Profundidade destacando as Arestas de retorno
-- [x] Ordenação topologica em D ou a informação de que não é um grafo acíclico direcionado
-- [x] Modulo de teste
-- [x] Salvar grafo em arquivo .dot - Não direcionado
-- [x] Salvar grafo em arquivo .dot - Direcionado
-## Parte 2:
+- [X] Fecho Transitivo Direto
+- [X] Fecho Transitivo Indireto
+- [X] Caminho Mínimo entre dois vértices - Dijkstra
+- [X] Caminho Mínimo entre dois vértices - Floyd
+- [X] Árvore Geradora Mínima sobre subgrafo vertice induzido por X usando algorítmo de Prim
+- [X] Árvore Geradora Mínima sobre subgrafo vertice induzido por X usando algorítmo de Kruskal
+- [X] Caminhamento Profundidade destacando as Arestas de retorno
+- [X] Ordenação topologica em D ou a informação de que não é um grafo acíclico direcionado
+- [X] Modulo de teste
+- [X] Salvar grafo em arquivo .dot - Não direcionado
+- [X] Salvar grafo em arquivo .dot - Direcionado
 
 
+## Parte 2: Apresentar os algoritmos abaixo para o problema:
+### Arvore Geradora Mínima com Restrição de Grau
+
+- [ ] Algoritmo guloso
+- [ ] Algoritmo guloso randomizado;
+- [ ] Algoritmo guloso randomizado reativo;
 
 
 ## Como Compilar?
