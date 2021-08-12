@@ -1,5 +1,4 @@
 # Trabalho de Grafos
-## Parte1: Funcionalidades básicas em grafos simples
 
 ## Equipe
 
@@ -10,7 +9,7 @@ Matrícula       Nome                                E-mail
 202065500B      Guilherme Martins Couto
 202065050A      Kleiton Ewerton de Oliveira         kleitonewertonoliveira@gmail.com
 ```
-## Parte 1:
+## Parte1: Funcionalidades básicas em grafos simples
 
 - [X] Fecho Transitivo Direto
 - [X] Fecho Transitivo Indireto
