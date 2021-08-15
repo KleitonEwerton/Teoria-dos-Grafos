@@ -81,15 +81,18 @@ int menu()
     int selecao;
     cout << "\nMENU" << endl;
     cout << "----" << endl;
-    cout << "[1] Fecho Transitivo Direto" << endl;
-    cout << "[2] Fecho Transitivo Indireto" << endl;
-    cout << "[3] Caminho Mínimo entre dois vértices - Dijkstra" << endl;
-    cout << "[4] Caminho Mínimo entre dois vértices - Floyd" << endl;
-    cout << "[5] Árvore Geradora Mínima sobre subgrafo vertice induzido por X usando algoritmo de Prim" << endl;
-    cout << "[6] Árvore Geradora Mínima sobre subgrafo vertice induzido por X usando algoritmo de Kruskal" << endl;
-    cout << "[7] Caminhamento Profundidade destacando as Arestas de retorno" << endl;
-    cout << "[8] Ordenação topologica em D ou a informação de que não é um grafo acíclico direcionado" << endl;
-    cout << "[0] Sair" << endl;
+    cout << "[1]  Fecho Transitivo Direto" << endl;
+    cout << "[2]  Fecho Transitivo Indireto" << endl;
+    cout << "[3]  Caminho Mínimo entre dois vértices - Dijkstra" << endl;
+    cout << "[4]  Caminho Mínimo entre dois vértices - Floyd" << endl;
+    cout << "[5]  Árvore Geradora Mínima sobre subgrafo vertice induzido por X usando algoritmo de Prim" << endl;
+    cout << "[6]  Árvore Geradora Mínima sobre subgrafo vertice induzido por X usando algoritmo de Kruskal" << endl;
+    cout << "[7]  Caminhamento Profundidade destacando as Arestas de retorno" << endl;
+    cout << "[8]  Ordenação topologica em D ou a informação de que não é um grafo acíclico direcionado" << endl;
+    cout << "[9]  Algoritmo Guloso" << endl;
+    cout << "[10] Algoritmo Guloso Randomizado " << endl;
+    cout << "[11] Algoritmo Guloso Randomizado Reativo" << endl;
+    cout << "[0]  Sair" << endl;
 
     cout << "\nSua opção: ";
     cin >> selecao;
@@ -145,10 +148,18 @@ void selecionar(int selecao, Graph *graph, ofstream &output_file)
         graph->deepSearch(output_file);
         break;
 
-    case 8: // Ordenação topologica em D ou a informação de que não é um grafo acíclico direcionado
+    case 8: // Ordenação topologica em DAG ou a informação de que não é um grafo acíclico direcionado
         graph->topologicalSorting();
         break;
+    case 9: //Algoritmo Guloso
 
+        break;
+    case 10: //Algoritmo Guloso Randomizado
+
+        break;
+    case 11: //Algoritmo Guloso Randomizado Reativo
+
+        break;
     default:
         system("clear");
         cout << " Erro!!! Opção invalida." << endl;

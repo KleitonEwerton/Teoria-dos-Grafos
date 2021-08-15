@@ -18,11 +18,7 @@ Matrícula       Nome                                E-mail
 - [X] Árvore Geradora Mínima sobre subgrafo vertice induzido por X usando algorítmo de Prim
 - [X] Árvore Geradora Mínima sobre subgrafo vertice induzido por X usando algorítmo de Kruskal
 - [X] Caminhamento Profundidade destacando as Arestas de retorno
-- [X] Ordenação topologica em D ou a informação de que não é um grafo acíclico direcionado
-- [X] Modulo de teste
-- [X] Salvar grafo em arquivo .dot - Não direcionado
-- [X] Salvar grafo em arquivo .dot - Direcionado
-
+- [X] Ordenação topologica em DAG ou a informação de que não é um grafo acíclico direcionado
 
 ## Parte 2: Apresentar os algoritmos abaixo para o problema:
 ### Arvore Geradora Mínima com Restrição de Grau
