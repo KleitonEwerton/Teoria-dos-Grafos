@@ -152,13 +152,16 @@ void selecionar(int selecao, Graph *graph, ofstream &output_file)
         graph->topologicalSorting();
         break;
     case 9: //Algoritmo Guloso
+        graph->greed();
 
         break;
     case 10: //Algoritmo Guloso Randomizado
+        graph->greedRandom();
 
         break;
     case 11: //Algoritmo Guloso Randomizado Reativo
-
+        graph->greedRactiveRandom();
+        
         break;
     default:
         system("clear");

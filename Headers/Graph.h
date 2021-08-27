@@ -62,11 +62,11 @@ public:
     void topologicalSorting();
     void printDeepSearch(vector<string> *corpo,ofstream &outFile);
 
-    /* Para 2a parte do trabalho
+    /* Para 2a parte do trabalho*/
     float greed();
     float greedRandom();
     float greedRactiveRandom();
-    */
+    
 
 private:
     //Auxiliar methods

@@ -356,7 +356,7 @@ int posicaoMenor(vector<int> &custoViz, vector<bool> &naAGM)
             tem_pos = true;
         }
     }
-    if(tem_pos)
+    if (tem_pos)
         return pos;
     else
     {
@@ -369,7 +369,7 @@ int posicaoMenor(vector<int> &custoViz, vector<bool> &naAGM)
                 tem_pos = true;
                 return pos;
             }
-        }    
+        }
     }
     return pos;
 }
@@ -383,13 +383,13 @@ void imprimirPrim(Graph *subgrafo, vector<int> &agm, ofstream &outFile)
     cout << "graph {" << endl;
     for (int i = 0; i < subgrafo->getOrder(); i++)
     {
-        if(agm[i] != INF)
+        if (agm[i] != INF)
         {
             int id_destino = subgrafo->getNodePosition(i)->getId();
             if (agm[i] == id_destino)
                 cout << "  " << agm[i] << endl;
             else
-            {    
+            {
                 cout << "  " << agm[i] << " -- " << id_destino;
                 cout << " [label = " << subgrafo->getNode(agm[i])->getEdge(id_destino)->getWeight() << "]" << endl;
                 peso += subgrafo->getNode(agm[i])->getEdge(id_destino)->getWeight();
@@ -413,13 +413,13 @@ void imprimirPrim(Graph *subgrafo, vector<int> &agm, ofstream &outFile)
         outFile << "graph {" << endl;
         for (int i = 0; i < subgrafo->getOrder(); i++)
         {
-            if(agm[i] != INF)
+            if (agm[i] != INF)
             {
                 int id_destino = subgrafo->getNodePosition(i)->getId();
                 if (agm[i] == id_destino)
                     outFile << "  " << agm[i] << endl;
                 else
-                {    
+                {
                     outFile << "  " << agm[i] << " -- " << id_destino;
                     outFile << " [label = " << subgrafo->getNode(agm[i])->getEdge(id_destino)->getWeight() << "]" << endl;
                 }
@@ -439,14 +439,14 @@ void imprimirKruskal(vector<pair<int, pair<int, int>>> &arestas, vector<int> &ag
     cout << "graph {" << endl;
     for (int i = 0; i < agm.size(); i++)
     {
-        if(arestas[agm[i]].second.first == arestas[agm[i]].second.second)
+        if (arestas[agm[i]].second.first == arestas[agm[i]].second.second)
             cout << "  " << arestas[agm[i]].second.first << endl;
-        else    
+        else
         {
             cout << "  " << arestas[agm[i]].second.first << " -- " << arestas[agm[i]].second.second;
             cout << " [label = " << arestas[agm[i]].first << "]" << endl;
             peso += arestas[agm[i]].first;
-        }    
+        }
     }
     cout << "}" << endl;
     cout << "\nPeso da AGM: " << peso << endl;
@@ -465,13 +465,13 @@ void imprimirKruskal(vector<pair<int, pair<int, int>>> &arestas, vector<int> &ag
         outFile << "graph {" << endl;
         for (int i = 0; i < agm.size(); i++)
         {
-            if(arestas[agm[i]].second.first == arestas[agm[i]].second.second)
+            if (arestas[agm[i]].second.first == arestas[agm[i]].second.second)
                 outFile << "  " << arestas[agm[i]].second.first << endl;
-            else    
+            else
             {
                 outFile << "  " << arestas[agm[i]].second.first << " -- " << arestas[agm[i]].second.second;
                 outFile << " [label = " << arestas[agm[i]].first << "]" << endl;
-            } 
+            }
         }
         outFile << "}" << endl;
         cout << "\nImpressão concluída! Cheque o arquivo de saída" << endl;
@@ -861,10 +861,10 @@ void Graph::agmPrim(Graph *subgrafo, ofstream &outFile)
 
         // Iterar pelos nós v adjacentes a u e verificar se o peso da aresta entre eles é menor que o seu custoViz
         Edge *aux = subgrafo->getNode(u)->getFirstEdge();
-        if(aux == nullptr) // nó não tem arestas
+        if (aux == nullptr) // nó não tem arestas
             agm[pos_menor] = u;
         else
-        { 
+        {
             while (aux != nullptr)
             {
                 int v = aux->getTargetId();                      // ID de v
@@ -909,16 +909,16 @@ void Graph::agmKruskal(Graph *subgrafo, ofstream &outFile)
     Node *noAux = subgrafo->getFirstNode();
     Edge *arestaAux = noAux->getFirstEdge();
 
-    int u = noAux->getId();           // id do nó de origem
+    int u = noAux->getId(); // id do nó de origem
     int v;
 
-    if(arestaAux != nullptr)
+    if (arestaAux != nullptr)
         v = arestaAux->getTargetId(); //id do nó destino
 
     // Percorrer todas as arestas do Grafo
     for (int i = 1; i < subgrafo->getOrder(); i++)
     {
-        if(arestaAux == nullptr)
+        if (arestaAux == nullptr)
             arestas.push_back({INF, {u, u}});
 
         while (arestaAux != nullptr)
@@ -939,8 +939,8 @@ void Graph::agmKruskal(Graph *subgrafo, ofstream &outFile)
         noAux = subgrafo->getNodePosition(i);
         arestaAux = noAux->getFirstEdge();
         u = noAux->getId();
-        if(arestaAux != nullptr)
-            v = arestaAux->getTargetId();    
+        if (arestaAux != nullptr)
+            v = arestaAux->getTargetId();
     }
 
     cout << "1º passo concluído com sucesso" << endl;
@@ -975,7 +975,7 @@ void Graph::agmKruskal(Graph *subgrafo, ofstream &outFile)
         int u = proxAresta.first;
         int v = proxAresta.second;
 
-        if(u == v)
+        if (u == v)
             agm.push_back(cont);
 
         // Se u e v não estão na mesma subárvore
@@ -1018,7 +1018,7 @@ void Graph::deepSearch(ofstream &outFile)
     } while (!this->searchNode(id));
 
     Node *node = this->getNode(id);
-    auxDeepSearch(node, &findG, &retorno, outFile, &graph); //chama a função auxiliar 
+    auxDeepSearch(node, &findG, &retorno, outFile, &graph); //chama a função auxiliar
 
     cout << "\n -- Árvore em Profundidade -- \n";
     for (int i = 0; i < findG.size(); i++)
@@ -1039,25 +1039,25 @@ void Graph::deepSearch(ofstream &outFile)
         printDeepSearch(&graph, outFile);
     retorno.clear();
     findG.clear();
-    graph.clear(); 
+    graph.clear();
 }
 
 void Graph::printDeepSearch(vector<string> *graph, ofstream &outFile)
 {
-        ofstream output;
-        output.open("output.dot", ios::out | ios::trunc);
-        output << "graph{\n";
-        outFile<< "graph{\n";
-        for (int i = 0; i < graph->size(); i++)
-        {
-            output << graph->at(i) << endl;
-            outFile<< graph->at(i) << endl;
-        }
-        output << "}";
-        outFile<< "}";
-        output.close();
-        system("dot -Tpng output.dot -o output.png");
-        //outFile.close();
+    ofstream output;
+    output.open("output.dot", ios::out | ios::trunc);
+    output << "graph{\n";
+    outFile << "graph{\n";
+    for (int i = 0; i < graph->size(); i++)
+    {
+        output << graph->at(i) << endl;
+        outFile << graph->at(i) << endl;
+    }
+    output << "}";
+    outFile << "}";
+    output.close();
+    system("dot -Tpng output.dot -o output.png");
+    //outFile.close();
 }
 
 /**
@@ -1497,4 +1497,32 @@ void Graph::topologicalSortUtil(Node *node, Edge *edge, stack<int> &Stack)
         if (node != nullptr) //Empilha o vértice atual
             Stack.push(node->getId());
     }
+}
+
+/**
+ * @brief Algoritmo Guloso
+ * 
+ * @return float 
+ */
+float Graph::greed()
+{
+}
+
+/**
+ * @brief Algoritmo Guloso Randomizado
+ * 
+ * @return float 
+ */
+float Graph::greedRandom()
+{
+}
+
+
+/**
+ * @brief Algoritmo Guloso Randomizado Reativo
+ * 
+ * @return float 
+ */
+float Graph::greedRactiveRandom()
+{
 }
