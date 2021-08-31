@@ -63,7 +63,7 @@ public:
     void printDeepSearch(vector<string> *corpo,ofstream &outFile);
 
     /* Para 2a parte do trabalho*/
-    float greed();
+    void greed();
     float greedRandom();
     float greedRactiveRandom();
     

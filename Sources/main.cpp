@@ -189,7 +189,7 @@ int mainMenu(ofstream &output_file, Graph *graph)
 }
 
 int main(int argc, char const *argv[])
-{
+{    
     //Verificação se todos os parâmetros do programa foram entrados
     if (argc != 6)
     {
