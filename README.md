@@ -1,65 +1,78 @@
 # Trabalho de Grafos
-## Parte 1:
 
-- [x] Fecho Transitivo Direto
-- [x] Fecho Transitivo Indireto
-- [x] Caminho Mínimo entre dois vértices - Dijkstra
-- [x] Caminho Mínimo entre dois vértices - Floyd
-- [x] Árvore Geradora Mínima sobre subgrafo vertice induzido por X usando algorítmo de Prim
-- [x] Árvore Geradora Mínima sobre subgrafo vertice induzido por X usando algorítmo de Kruskal
-- [x] Caminhamento Profundidade destacando as Arestas de retorno
-- [x] Ordenação topologica em D ou a informação de que não é um grafo acíclico direcionado
-- [x] Modulo de teste
-- [x] Salvar grafo em arquivo .dot - Não direcionado
-- [x] Salvar grafo em arquivo .dot - Direcionado
-## Parte 2:
+## Equipe
 
+Matrícula       Nome                                E-mail
+```
+202065020A      Daniel Muller Rezende               daniel.rezende@estudante.ufjf.br
+201876043       Deoclécio Porfírio Ferreira Filho   deoclecio.filho@estudante.ufjf.br
+202065500B      Guilherme Martins Couto
+202065050A      Kleiton Ewerton de Oliveira         kleitonewertonoliveira@gmail.com
+```
+## Parte 1: Funcionalidades básicas em grafos simples
 
+- [X] Fecho Transitivo Direto
+- [X] Fecho Transitivo Indireto
+- [X] Caminho Mínimo entre dois vértices - Dijkstra
+- [X] Caminho Mínimo entre dois vértices - Floyd
+- [X] Árvore Geradora Mínima sobre subgrafo vertice induzido por X usando algorítmo de Prim
+- [X] Árvore Geradora Mínima sobre subgrafo vertice induzido por X usando algorítmo de Kruskal
+- [X] Caminhamento Profundidade destacando as Arestas de retorno
+- [X] Ordenação topologica em DAG ou a informação de que não é um grafo acíclico direcionado
+
+## Parte 2: Apresentar os algoritmos abaixo para o problema:
+### Arvore Geradora Mínima com Restrição de Grau
+
+- [ ] Algoritmo guloso
+- [ ] Algoritmo guloso randomizado;
+- [ ] Algoritmo guloso randomizado reativo;
 
 
 ## Como Compilar?
-Cria o arquivo auto.exe e todos os arquivos .o
+
+Utilizando os comandos do Makefile:
+
+Exclui todos os arquivos .o e o arquivo ./execGrupo22.exe
+Cria o arquivo execGrupo22.exe e todos os arquivos .o
 
 ```
-Make all
+Make
 ```
 
-Exclui todos os arquivos .o e o arquivo ./auto.exe
+Exclui todos os arquivos .o e o arquivo ./execGrupo22.exe
 
 ```
 Make clean
-```
-
-## Gerar o arquivo dot
-
-Comando para instalação do programa Grafix (linux)
-
-```
-sudo apt install graphviz
-```
-Comando para criação do gráfico via o programa Grafix
-```
-dot -Tpng output.dot -o output.png
 ```
 ## Como rodar?
 
 Grafo não direcionado, sem peso nas aresta e sem peso nos vértices 
 ```
-./grafo.exe input.txt output.txt 0 0 0
+./execGrupo22.exe input.txt output.txt 0 0 0
 ```
 
 Grafo direcionado 
 ```
-./grafo.exe input.txt output.txt 1 0 0
+./execGrupo22.exe input.txt output.txt 1 0 0
 ```
 
 Grafo com peso na aresta 
 ```
-./grafo.exe input.txt output.txt 0 1 0
+./execGrupo22.exe input.txt output.txt 0 1 0
 ```
 
 Grafo com peso no vértices 
 ```
-./grafo.exe input.txt output.txt 0 0 1
+./execGrupo22.exe input.txt output.txt 0 0 1
+```
+## Gerar o arquivo dot
 
+Comando para instalação do programa Graphviz (linux)
+
+```
+sudo apt install graphviz
+```
+Comando para criação do gráfico via o programa Graphviz
+```
+dot -Tpng output.dot -o output.png
 ```

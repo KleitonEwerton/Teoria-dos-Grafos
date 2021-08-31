@@ -14,6 +14,9 @@
 #include <float.h>
 #include <string>
 #include <sstream>
+#include <time.h>
+#include <ctime>
+#include <chrono>
 
 #include "Graph.h"
 #include "Node.h"
@@ -166,6 +169,9 @@ Graph *Graph::getVertInduz()
                 Edge *aux = this->getNode(idvertices[i])->getEdge(idvertices[j]);
                 subgrafo->insertEdge(idvertices[i], idvertices[j], aux->getWeight());
             }
+            else
+                subgrafo->insertNode(idvertices[j]);
+
         this->getNode(idvertices[i])->setVisited(true);
     }
 
@@ -174,7 +180,6 @@ Graph *Graph::getVertInduz()
 
     return subgrafo;
 }
-
 
 //! Other methods --------------------------------------------------------------------------------------------
 /*
@@ -301,7 +306,6 @@ void Graph::cleanVisited()
     }
 }
 
-
 //! FUNÇÕES AUXILIARES --------------------------------------------------------------------------------------------
 
 // Estrutura e funções auxiliares para o algoritmo de Kruskal
@@ -345,17 +349,137 @@ int posicaoMenor(vector<int> &custoViz, vector<bool> &naAGM)
 {
     int min = INF;
     int pos;
+    bool tem_pos = false;
     for (int i = 0; i < custoViz.size(); i++)
     {
         if (custoViz[i] < min && naAGM[i] == false)
         {
             min = custoViz[i];
             pos = i;
+            tem_pos = true;
+        }
+    }
+    if (tem_pos)
+        return pos;
+    else
+    {
+        for (int i = 0; i < custoViz.size(); i++)
+        {
+            if (custoViz[i] == min && naAGM[i] == false)
+            {
+                min = custoViz[i];
+                pos = i;
+                tem_pos = true;
+                return pos;
+            }
         }
     }
     return pos;
 }
 
+// Função para imprimir a AGM via Prim
+void imprimirPrim(Graph *subgrafo, vector<int> &agm, ofstream &outFile)
+{
+    int peso = 0;
+    cout << "\nÁRVORE GERADORA MÍNIMA via Prim\n"
+         << endl;
+    cout << "graph {" << endl;
+    for (int i = 0; i < subgrafo->getOrder(); i++)
+    {
+        if (agm[i] != INF)
+        {
+            int id_destino = subgrafo->getNodePosition(i)->getId();
+            if (agm[i] == id_destino)
+                cout << "  " << agm[i] << endl;
+            else
+            {
+                cout << "  " << agm[i] << " -- " << id_destino;
+                cout << " [label = " << subgrafo->getNode(agm[i])->getEdge(id_destino)->getWeight() << "]" << endl;
+                peso += subgrafo->getNode(agm[i])->getEdge(id_destino)->getWeight();
+            }
+        }
+    }
+    cout << "}" << endl;
+    cout << "\nPeso da AGM: " << peso << endl;
+    cout << "\nPrim concluído com sucesso!" << endl;
+
+    cout << "\nDeseja imprimir essa AGM no arquivo de saída? (1 - Sim ou 0 - Não)" << endl;
+    int op;
+    do
+    {
+        cout << "Sua opção: ";
+        cin >> op;
+    } while (op != 1 && op != 0);
+
+    if (op == 1)
+    {
+        outFile << "graph {" << endl;
+        for (int i = 0; i < subgrafo->getOrder(); i++)
+        {
+            if (agm[i] != INF)
+            {
+                int id_destino = subgrafo->getNodePosition(i)->getId();
+                if (agm[i] == id_destino)
+                    outFile << "  " << agm[i] << endl;
+                else
+                {
+                    outFile << "  " << agm[i] << " -- " << id_destino;
+                    outFile << " [label = " << subgrafo->getNode(agm[i])->getEdge(id_destino)->getWeight() << "]" << endl;
+                }
+            }
+        }
+        outFile << "}" << endl;
+        cout << "\nImpressão concluída! Cheque o arquivo de saída" << endl;
+    }
+}
+
+// Função para imprimir a AGM via Kruskal
+void imprimirKruskal(vector<pair<int, pair<int, int>>> &arestas, vector<int> &agm, ofstream &outFile)
+{
+    int peso = 0;
+    cout << "\nÁRVORE GERADORA MÍNIMA via Kruskal\n"
+         << endl;
+    cout << "graph {" << endl;
+    for (int i = 0; i < agm.size(); i++)
+    {
+        if (arestas[agm[i]].second.first == arestas[agm[i]].second.second)
+            cout << "  " << arestas[agm[i]].second.first << endl;
+        else
+        {
+            cout << "  " << arestas[agm[i]].second.first << " -- " << arestas[agm[i]].second.second;
+            cout << " [label = " << arestas[agm[i]].first << "]" << endl;
+            peso += arestas[agm[i]].first;
+        }
+    }
+    cout << "}" << endl;
+    cout << "\nPeso da AGM: " << peso << endl;
+    cout << "\nKruskal concluído com sucesso!" << endl;
+
+    cout << "\nDeseja imprimir essa AGM no arquivo de saída? (1 - Sim ou 0 - Não)" << endl;
+    int op;
+    do
+    {
+        cout << "Sua opção: ";
+        cin >> op;
+    } while (op != 1 && op != 0);
+
+    if (op == 1)
+    {
+        outFile << "graph {" << endl;
+        for (int i = 0; i < agm.size(); i++)
+        {
+            if (arestas[agm[i]].second.first == arestas[agm[i]].second.second)
+                outFile << "  " << arestas[agm[i]].second.first << endl;
+            else
+            {
+                outFile << "  " << arestas[agm[i]].second.first << " -- " << arestas[agm[i]].second.second;
+                outFile << " [label = " << arestas[agm[i]].first << "]" << endl;
+            }
+        }
+        outFile << "}" << endl;
+        cout << "\nImpressão concluída! Cheque o arquivo de saída" << endl;
+    }
+}
 
 // FUNCIONALIDADES --------------------------------------------------------------------------------------------
 
@@ -373,16 +497,18 @@ void Graph::directTransitiveClosing(int id, ofstream &outFile)
     this->cleanVisited(); // Chama a função para setar todos os nós do grafo como não visitados.
 
     // Verifica se o nó node existe.
-    if (node != nullptr){
-        
+    if (node != nullptr)
+    {
+
         int entrada;
-        
+
         cout << "Deseja salvar o resultado em um arquivo de saída? " << endl;
         cout << "Digite: \n1 - Sim\n2 - Não" << endl;
         cout << "Entrada: ";
         cin >> entrada;
 
-        if(entrada == 1){
+        if (entrada == 1)
+        {
             outFile << "digraph{\n";
         }
 
@@ -400,8 +526,10 @@ void Graph::directTransitiveClosing(int id, ofstream &outFile)
                 cout << node->getId() << " | ";
 
                 // Imprime no arquivo .dot a árvore do fecho transitivo direto.
-                if(entrada == 1){
-                    while (edge != nullptr){
+                if (entrada == 1)
+                {
+                    while (edge != nullptr)
+                    {
 
                         int id = edge->getTargetId();
                         outFile << node->getId() << "->" << edge->getTargetId() << ";\n";
@@ -411,7 +539,8 @@ void Graph::directTransitiveClosing(int id, ofstream &outFile)
             }
         }
 
-        if(entrada == 1){
+        if (entrada == 1)
+        {
             outFile << "}\n";
         }
     }
@@ -428,22 +557,25 @@ void Graph::directTransitiveClosing(int id, ofstream &outFile)
      * @param outFile  Arquivo de saída em .dot.
      * 
      */
-void Graph::indirectTransitiveClosing(int id, ofstream &outFile){
+void Graph::indirectTransitiveClosing(int id, ofstream &outFile)
+{
 
     Node *target = this->getNode(id);    // Nó alvo que recebe o id passado como parâmetro.
     Node *source = this->getFirstNode(); // Nó através do qual será feita a verificação se target é acessível.
 
     // Verifica se o nó target existe.
-    if (target != nullptr){
+    if (target != nullptr)
+    {
 
         int entrada;
-        
+
         cout << "Deseja salvar o resultado em um arquivo de saída? " << endl;
         cout << "Digite: \n1 - Sim\n2 - Não" << endl;
         cout << "Entrada: ";
         cin >> entrada;
 
-        if(entrada == 1){
+        if (entrada == 1)
+        {
             outFile << "digraph{\n";
         }
 
@@ -458,18 +590,21 @@ void Graph::indirectTransitiveClosing(int id, ofstream &outFile){
             deepPath(source); // Realiza o caminho em profundidade no grafo a partir do nó source.
 
             // Se target foi visitado no caminho em profundidade, imprime o id de source.
-            if (target->getVisited()){
+            if (target->getVisited())
+            {
 
                 cout << source->getId() << " | ";
 
-                if(entrada == 1){
+                if (entrada == 1)
+                {
                     outFile << source->getId() << ";\n"; // Imprime no arquivo .dot o id do nó source.
                 }
             }
             source = source->getNextNode();
         }
 
-        if(entrada == 1){
+        if (entrada == 1)
+        {
             outFile << "}\n";
         }
     }
@@ -500,7 +635,7 @@ float Graph::dijkstra(ofstream &outFile)
     }
     catch (const exception &e)
     {
-        cout << "Parâmetros inválidos" << endl;
+        cout << "Parâmetros inválidos." << endl;
         return 0;
     }
 
@@ -580,7 +715,7 @@ float Graph::dijkstra(ofstream &outFile)
         delete[] visited;  //Desalocando o vetore usado
 
         if (distancia < INF)
-            saidaDijkstra(antec, pSource, pTarget,outFile); //Imprime todo a lista na ordem de acesso
+            saidaDijkstra(antec, pSource, pTarget, outFile); //Imprime todo a lista na ordem de acesso
 
         delete[] antec;
         cout << "\n\nA distância é: " << distancia << endl;
@@ -658,7 +793,7 @@ float Graph::floydWarshall(ofstream &outFile)
         delete[] dist; //Desalocando a matriz distancia usada
 
         if (distancia < INF)
-            saidaFloyd(pred, noSource, noTarget,outFile);
+            saidaFloyd(pred, noSource, noTarget, outFile);
 
         for (i = 0; i < V; i++)
         {
@@ -680,7 +815,6 @@ float Graph::floydWarshall(ofstream &outFile)
     }
 }
 
- 
 /**
  * @brief ALGORITMO DE PRIM para encontrar a Árvore Geradora Mínima
  * 
@@ -709,11 +843,11 @@ void Graph::agmPrim(Graph *subgrafo, ofstream &outFile)
 
     cout << "1º passo concluído com sucesso" << endl;
 
-    // 2º PASSO: Criar Arvore Geradora Minima -> vetor com os pais de cada nó da agm
+    // 2º PASSO: Criar Arvore Geradora Minima -> vetor com os pais de cada nó da agm ou INF caso nao tenha pai
 
     // Os índices da agm corresponderão à posição do nó no subgrafo
     // A raiz da agm, indice 0, será o primeiro nó do subgrafo, portanto não terá pai
-    int *agm = new int[subgrafo->getOrder() * sizeof(int)];
+    vector<int> agm(subgrafo->getOrder(), INF);
 
     cout << "2º passo concluído com sucesso" << endl;
 
@@ -730,21 +864,26 @@ void Graph::agmPrim(Graph *subgrafo, ofstream &outFile)
 
         // Iterar pelos nós v adjacentes a u e verificar se o peso da aresta entre eles é menor que o seu custoViz
         Edge *aux = subgrafo->getNode(u)->getFirstEdge();
-        while (aux != nullptr)
+        if (aux == nullptr) // nó não tem arestas
+            agm[pos_menor] = u;
+        else
         {
-            int v = aux->getTargetId();                      // ID de v
-            int pos_v = subgrafo->getNode(v)->getPosition(); // posição de v
-            if (!naAGM[pos_v])                               // executa caso o nó v ainda não esteja na agm
+            while (aux != nullptr)
             {
-                // Se o peso da aresta (u, v) for menor que o custoViz de v, atualiza o custoViz com o valor do peso
-                if (aux->getWeight() < custoViz[pos_v])
+                int v = aux->getTargetId();                      // ID de v
+                int pos_v = subgrafo->getNode(v)->getPosition(); // posição de v
+                if (!naAGM[pos_v])                               // executa caso o nó v ainda não esteja na agm
                 {
-                    custoViz[pos_v] = aux->getWeight();
-                    // Atualiza o pai de v na agm
-                    agm[pos_v] = u;
+                    // Se o peso da aresta (u, v) for menor que o custoViz de v, atualiza o custoViz com o valor do peso
+                    if (aux->getWeight() < custoViz[pos_v])
+                    {
+                        custoViz[pos_v] = aux->getWeight();
+                        // Atualiza o pai de v na agm
+                        agm[pos_v] = u;
+                    }
                 }
+                aux = aux->getNextEdge();
             }
-            aux = aux->getNextEdge();
         }
         cont++;
     }
@@ -753,22 +892,8 @@ void Graph::agmPrim(Graph *subgrafo, ofstream &outFile)
 
     // 4º PASSO: Imprimir a Árvore Geradora Mínima e seu peso
 
-    int peso = 0;
-    cout << "\nÁRVORE GERADORA MÍNIMA via Prim\n"
-         << endl;
-    cout << "graph {" << endl;
-    for (int i = 1; i < subgrafo->getOrder(); i++)
-    {
-        int id_destino = subgrafo->getNodePosition(i)->getId();
-        cout << "  " << agm[i] << " -- " << id_destino;
-        cout << " [label = " << subgrafo->getNode(agm[i])->getEdge(id_destino)->getWeight() << "]" << endl;
-        peso += subgrafo->getNode(agm[i])->getEdge(id_destino)->getWeight();
-    }
-    cout << "}" << endl;
-    cout << "\nPeso da AGM: " << peso << endl;
-    cout << "\nPrim concluído com sucesso!" << endl;
+    imprimirPrim(subgrafo, agm, outFile);
 
-    delete[] agm;
     return;
 }
 
@@ -787,12 +912,18 @@ void Graph::agmKruskal(Graph *subgrafo, ofstream &outFile)
     Node *noAux = subgrafo->getFirstNode();
     Edge *arestaAux = noAux->getFirstEdge();
 
-    int u = noAux->getId();           // id do nó de origem
-    int v = arestaAux->getTargetId(); //id do nó destino
+    int u = noAux->getId(); // id do nó de origem
+    int v;
+
+    if (arestaAux != nullptr)
+        v = arestaAux->getTargetId(); //id do nó destino
 
     // Percorrer todas as arestas do Grafo
     for (int i = 1; i < subgrafo->getOrder(); i++)
     {
+        if (arestaAux == nullptr)
+            arestas.push_back({INF, {u, u}});
+
         while (arestaAux != nullptr)
         {
             // Coloca a aresta no vetor de arestas
@@ -811,16 +942,8 @@ void Graph::agmKruskal(Graph *subgrafo, ofstream &outFile)
         noAux = subgrafo->getNodePosition(i);
         arestaAux = noAux->getFirstEdge();
         u = noAux->getId();
-        v = arestaAux->getTargetId();
-    }
-
-    // Conferir se o vetor de arestas contém todas as arestas do grafo
-    if (arestas.size() != subgrafo->getNumberEdges())
-    {
-        cout << "\nO vector arestas não foi preenchido corretamente" << endl;
-        cout << "arestas.size = " << arestas.size() << " enquanto getNumberEdges = " << subgrafo->getNumberEdges() << endl;
-        cout << "Encerrando a execução" << endl;
-        return;
+        if (arestaAux != nullptr)
+            v = arestaAux->getTargetId();
     }
 
     cout << "1º passo concluído com sucesso" << endl;
@@ -855,6 +978,9 @@ void Graph::agmKruskal(Graph *subgrafo, ofstream &outFile)
         int u = proxAresta.first;
         int v = proxAresta.second;
 
+        if (u == v)
+            agm.push_back(cont);
+
         // Se u e v não estão na mesma subárvore
         if (qualSubArvore(subarvores, subgrafo->getNode(u)->getPosition()) != qualSubArvore(subarvores, subgrafo->getNode(v)->getPosition()))
         {
@@ -867,31 +993,26 @@ void Graph::agmKruskal(Graph *subgrafo, ofstream &outFile)
 
     // 5º PASSO: Imprimir a Árvore Geradora Mínima e seu peso
 
-    int peso = 0;
-    cout << "\nÁRVORE GERADORA MÍNIMA via Kruskal\n"
-         << endl;
-    cout << "graph {" << endl;
-    for (int i = 0; i < agm.size(); i++)
-    {
-        cout << "  " << arestas[agm[i]].second.first << " -- " << arestas[agm[i]].second.second;
-        cout << " [label = " << arestas[agm[i]].first << "]" << endl;
-        peso += arestas[agm[i]].first;
-    }
-    cout << "}" << endl;
-    cout << "\nPeso da AGM: " << peso << endl;
-    cout << "\nKruskal concluído com sucesso!" << endl;
+    imprimirKruskal(arestas, agm, outFile);
 
     delete[] subarvores;
     return;
 }
 
 /**
- * @brief Busca em profundidade de um Nó dado
+ * @brief Caminhamento Profundidade destacando as Arestas de retorno
  * 
+ * @param outFile Arquivo paraa getação de saida gráfica
  */
 void Graph::deepSearch(ofstream &outFile)
 {
+    // variáveis
+    vector<int> retorno;
+    vector<int> findG;
+    vector<string> graph;
     int id;
+    char r;
+
     cout << "\nCaminhamento Profundidade destacando as Arestas de retorno\n\n";
     do
     {
@@ -899,23 +1020,47 @@ void Graph::deepSearch(ofstream &outFile)
         cin >> id;
     } while (!this->searchNode(id));
 
-    cout << "\n -- Árvore em Profundidade -- \n\n";
-
-    vector<int> retorno;
-    vector<int> findG;
-    int k = this->getOrder();
     Node *node = this->getNode(id);
+    auxDeepSearch(node, &findG, &retorno, outFile, &graph); //chama a função auxiliar
 
-    auxDeepSearch(node, &findG, &retorno);
-
+    cout << "\n -- Árvore em Profundidade -- \n";
     for (int i = 0; i < findG.size(); i++)
-        cout << findG[i] << " < ";
+        cout << findG[i] << " | ";
 
-    cout << "\n\n -- Arestas de Retorno -- \n\n";
-
+    cout << "\n\n -- Arestas de Retorno -- \n";
     for (int i = 0; i < retorno.size(); i++)
-        cout << retorno[i] << " < ";
-    cout << "\n\n --- \n";
+        cout << retorno[i] << " | ";
+    cout << endl;
+
+    do
+    {
+        cout << "Gerar Grafo e arquivo de saída(s/n)?\n";
+        cin >> r;
+    } while (r != 's' && r != 'S' && r != 'n' && r != 'n');
+
+    if (r == 's' || r == 'S')
+        printDeepSearch(&graph, outFile);
+    retorno.clear();
+    findG.clear();
+    graph.clear();
+}
+
+void Graph::printDeepSearch(vector<string> *graph, ofstream &outFile)
+{
+    ofstream output;
+    output.open("output.dot", ios::out | ios::trunc);
+    output << "graph{\n";
+    outFile << "graph{\n";
+    for (int i = 0; i < graph->size(); i++)
+    {
+        output << graph->at(i) << endl;
+        outFile << graph->at(i) << endl;
+    }
+    output << "}";
+    outFile << "}";
+    output.close();
+    system("dot -Tpng output.dot -o output.png");
+    //outFile.close();
 }
 
 /**
@@ -963,7 +1108,6 @@ void Graph::topologicalSorting()
     }
 }
 
-
 //! AUXILIAR METHODS --------------------------------------------------------------------------------------------
 
 /**
@@ -971,18 +1115,21 @@ void Graph::topologicalSorting()
  *  @param node    Nó através do qual será feito o caminho em profundidade.
  *  
  */
-void Graph::deepPath(Node *node){
+void Graph::deepPath(Node *node)
+{
 
     node->setVisited(true); // Define o nó node como visitado.
 
     // Operação recursiva para percorrer todos os nós acessíveis a partir de node.
     // Percorre todas as arestas do nó.
-    for (Edge *edge = node->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge()){
+    for (Edge *edge = node->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge())
+    {
 
         // Verifica se o nó para o qual a aresta aponta foi visitado.
         // Caso não tenha sido, deepPath é chamado novamente passando como parâmetro o nó alvo da aresta.
-        if (!getNode(edge->getTargetId())->getVisited()){
-            
+        if (!getNode(edge->getTargetId())->getVisited())
+        {
+
             deepPath(getNode(edge->getTargetId()));
         }
     }
@@ -991,18 +1138,25 @@ void Graph::deepPath(Node *node){
 /**
  * @brief Auxiliar da busca em profundidade de um Nó dado
  * 
- * @param node 
- * @param findG 
- * @param retorno 
+ * @param node      Ponteiro para o nó
+ * @param findG     vetor para os vértices do caminho
+ * @param retorno   vetor para as arestas de retorno
+ * @param outFile   arquivo texto de saída
+ * @param graf      vetor para gravação dos dados impressos no arquivo de saída
  */
-void Graph::auxDeepSearch(Node *node, vector<int> *findG, vector<int> *retorno)
+void Graph::auxDeepSearch(Node *node, vector<int> *findG, vector<int> *retorno, ofstream &outFile, vector<string> *graf)
 {
+
     findG->push_back(node->getId());
-    node->setVisited(true);             
+    node->setVisited(true);
     for (Edge *edge = node->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge())
+    {
         if (!getNode(edge->getTargetId())->getVisited())
-            auxDeepSearch(getNode(edge->getTargetId()), findG, retorno);
-        
+        {
+            graf->push_back(to_string(node->getId()) + "--" + to_string(edge->getTargetId()));
+            auxDeepSearch(getNode(edge->getTargetId()), findG, retorno, outFile, graf);
+        }
+    }
     retorno->push_back(node->getId());
 }
 
@@ -1015,25 +1169,28 @@ void Graph::caminhoMinimo(list<int> &antecessor, ofstream &outFile)
 {
     string arco, entrada;                            //Para a escrita no outFile, se for arco '->' se for aresta '--'
     int primeiro = antecessor.front(), tNode, sNode; //Usado para armazenar o primeiro vertice, e auxiliar na escrita no arquivo dot
-    
-    cout << "\nDeseja salvar a saída?\n1 para sim.\nQualquer outra opção para não"<<endl;
+
+    cout << "\nDeseja salvar a saída?\n1 para sim.\nQualquer outra opção para não" << endl;
     cout << "Sua opção: ";
     cin >> entrada;
     if (getDirected())
     {
-        if(entrada=="1")outFile << "\ndigraph{ \n";
+        if (entrada == "1")
+            outFile << "\ndigraph{ \n";
         arco = " -> ";
     }
     else
     {
-        if(entrada=="1")outFile << "\ngraph{ \n";
+        if (entrada == "1")
+            outFile << "\ngraph{ \n";
         arco = " -- ";
     }
     Node *no = getNodePosition(primeiro);
     sNode = no->getId();
     Node *noAux = nullptr; //No auxiliar
     Edge *edge = nullptr;  //Edge auxiliar para pegar o peso
-    cout << "\nCAMINHO MINIMO\n"<<endl;
+    cout << "\nCAMINHO MINIMO\n"
+         << endl;
     while (!antecessor.empty())
     {                                   //Passa por toda a lista de ordem de acesso em buscando o ID
         no = getNodePosition(primeiro); //no recebe o node que é o primeiro no caminho minimo
@@ -1055,7 +1212,8 @@ void Graph::caminhoMinimo(list<int> &antecessor, ofstream &outFile)
         primeiro = antecessor.front(); //Atualiza o valor do primeiro
         noAux = no;                    //Atualiza o valor do noAux
     }
-    if(entrada=="1")outFile << "}";
+    if (entrada == "1")
+        outFile << "}";
 }
 
 /**
@@ -1118,7 +1276,7 @@ int **Graph::iniciaDistanciaFloyd(int **distancia, int tam)
  * @brief               Função auxiliar de floyd para imprimir e salvar em arquivo dot o caminho mínimo
  * @param   antecessor  Lista contendo os antecessores do caminho minimo, representa a ordem de acesso
  */
-void Graph::saidaFloyd(int **pred, Node *noSource, Node *noTarget,ofstream &outFile)
+void Graph::saidaFloyd(int **pred, Node *noSource, Node *noTarget, ofstream &outFile)
 {
 
     list<int> ordemAcesso; //Lista para conteer a ordem de acesso dos vertices, de trás para frente
@@ -1135,7 +1293,6 @@ void Graph::saidaFloyd(int **pred, Node *noSource, Node *noTarget,ofstream &outF
     ordemAcesso.push_front(noSource->getPosition());
 
     caminhoMinimo(ordemAcesso, outFile);
-    
 }
 
 /**
@@ -1144,7 +1301,7 @@ void Graph::saidaFloyd(int **pred, Node *noSource, Node *noTarget,ofstream &outF
  * @param   idSource    ID do nó de origem
  * @param   idTarget    ID do nó de destino   
  */
-void Graph::saidaDijkstra(int antecessor[], int idSource, int idTarget,ofstream &outFile)
+void Graph::saidaDijkstra(int antecessor[], int idSource, int idTarget, ofstream &outFile)
 {
 
     string arco;
@@ -1164,7 +1321,6 @@ void Graph::saidaDijkstra(int antecessor[], int idSource, int idTarget,ofstream 
     primeiro = ordemAcesso.front();
 
     caminhoMinimo(ordemAcesso, outFile);
-    
 }
 
 /**
@@ -1300,7 +1456,7 @@ bool Graph::isCyclicDirected()
 
     for (int i = 0; i < this->getOrder(); i++)
     {
-        isVisited[i] = false;               // Verifica se o nó atual foi visitado.
+        isVisited[i] = false; // Verifica se o nó atual foi visitado.
         isContainedRecusirve[i] = false;
     }
 
@@ -1344,4 +1500,117 @@ void Graph::topologicalSortUtil(Node *node, Edge *edge, stack<int> &Stack)
         if (node != nullptr) //Empilha o vértice atual
             Stack.push(node->getId());
     }
+}
+
+
+// 2a PARTE DO TRABALHO  ------------------------------------------------------------------------------------------------
+
+/**
+ * @brief Algoritmo Guloso
+ * 
+ * @return float 
+ */
+void Graph::greed()
+{
+    cout << "\nIniciando a execução do Algoritmo Guloso..." << endl;
+    
+    cout << "\nQual será o grau d de restrição? " << endl;
+    int d;
+    cin >> d;
+
+    // 1º PASSO: Inicializar as variáveis
+
+    vector<int> agmRG(this->getOrder()); // AGM com restrição de grau. Começa vazio
+    vector<int> set(this->getOrder()); // Conjunto de Sets para auxiliar ao longo do algoritmo. Começa vazio
+    vecotr<bool> U(this->getOrder(), false); // Verifica se o vertice já foi analisado. O índice no vector é compatível com a posição do nó no subgrafo
+    int flag1, flag2 = 0;
+    int cont = 0;
+
+
+    // Vector para armazenar os custoViz dos nós do subgrafo. O índice no vector é compatível com a posição do nó no subgrafo
+    vector<int> custoViz;
+    custoViz.clear();
+
+    // Vector para checar se o nó já foi inserido na agm
+    vector<bool> naAGM(subgrafo->getOrder(), false);
+
+    // O primeiro nó do vector será inicializado com custoViz = 0
+    custoViz.push_back(0);
+
+    // Os demais nós serão inicializados com custoViz = INFINITO
+    for (int i = 1; i < subgrafo->getOrder(); i++)
+        custoViz.push_back(INF);
+
+    cout << "1º passo concluído com sucesso" << endl;
+
+    // 2º PASSO
+    vector<int> agm(this->getOrder(), INF);
+
+    cout << "2º passo concluído com sucesso" << endl;
+
+
+    // 3º PASSO !!TEM QUE ALTERAR A HEURISTICA
+
+    ti = chrono::high_resolution_clock::now(); //Comeca a contar o tempo
+
+    int cont = 0;
+    while (cont < this->getOrder())
+    {
+        // Pega o nó com menor custoViz que ainda não está na agm
+        int pos_menor = posicaoMenor(custoViz, naAGM);         // Posição do nó
+        int u = this->getNodePosition(pos_menor)->getId(); // ID do nó
+        // Atualiza naAGM, pois, nessa iteração, u será colocado na agm
+        naAGM[pos_menor] = true;
+
+        // Iterar pelos nós v adjacentes a u e verificar se o peso da aresta entre eles é menor que o seu custoViz
+        Edge *aux = this->getNode(u)->getFirstEdge();
+        if (aux == nullptr) // nó não tem arestas
+            agm[pos_menor] = u;
+        else
+        {
+            while (aux != nullptr)
+            {
+                int v = aux->getTargetId();                      // ID de v
+                int pos_v = this->getNode(v)->getPosition(); // posição de v
+                if (!naAGM[pos_v])                               // executa caso o nó v ainda não esteja na agm
+                {
+                    // Se o peso da aresta (u, v) for menor que o custoViz de v, atualiza o custoViz com o valor do peso
+                    if (aux->getWeight() < custoViz[pos_v])
+                    {
+                        custoViz[pos_v] = aux->getWeight();
+                        // Atualiza o pai de v na agm
+                        agm[pos_v] = u;
+                    }
+                }
+                aux = aux->getNextEdge();
+            }
+        }
+        cont++;
+    }
+
+    tf = chrono::high_resolution_clock::now(); //Termina de contar o tempo
+    auto duracao = chrono::duration_cast<chrono::nanoseconds>(tf - ti).count();
+
+    cout << "3º passo concluído com sucesso" << endl;
+
+    return;
+}
+
+/**
+ * @brief Algoritmo Guloso Randomizado
+ * 
+ * @return float 
+ */
+float Graph::greedRandom()
+{
+}
+
+
+/**
+ * @brief Algoritmo Guloso Randomizado Reativo
+ * 
+ * @return float 
+ */
+float Graph::greedRactiveRandom()
+{
 }

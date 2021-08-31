@@ -9,6 +9,10 @@
     "xutility": "cpp",
     "istream": "cpp",
     "string": "cpp",
-    "vector": "cpp"
+    "vector": "cpp",
+    "deque": "cpp",
+    "list": "cpp",
+    "xiosbase": "cpp",
+    "utility": "cpp"
   }
 }

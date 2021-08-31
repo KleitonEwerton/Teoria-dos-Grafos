@@ -22,7 +22,7 @@ CC_FLAGS= -g -I./Headers
 # Command used at clean target
 RM = rm -rf
 
-target     := ./grafo.exe 
+target     := ./execGrupo22.exe 
  
 #
 # Compilation and linking
