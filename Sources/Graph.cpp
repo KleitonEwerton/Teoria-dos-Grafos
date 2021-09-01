@@ -1566,7 +1566,7 @@ void Graph::greed()
  * 
  * @return float 
  */
-float Graph::greedRandom()
+void Graph::greedRandom()
 {
 }
 
@@ -1576,6 +1576,6 @@ float Graph::greedRandom()
  * 
  * @return float 
  */
-float Graph::greedRactiveRandom()
+void Graph::greedRactiveRandom()
 {
 }

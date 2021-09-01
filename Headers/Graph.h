@@ -64,8 +64,8 @@ public:
 
     /* Para 2a parte do trabalho*/
     void greed();
-    float greedRandom();
-    float greedRactiveRandom();
+    void greedRandom();
+    void greedRactiveRandom();
     
 
 private:
