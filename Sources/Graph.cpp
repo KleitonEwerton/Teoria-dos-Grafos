@@ -1522,23 +1522,17 @@ void Graph::greed()
 
     vector<int> agmRG(this->getOrder()); // AGM com restrição de grau. Começa vazio
     vector<int> set(this->getOrder()); // Conjunto de Sets para auxiliar ao longo do algoritmo. Começa vazio
-    vecotr<bool> U(this->getOrder(), false); // Verifica se o vertice já foi analisado. O índice no vector é compatível com a posição do nó no subgrafo
+    vector<bool> U(this->getOrder(), false); // Verifica se o vertice já foi analisado. O índice no vector é compatível com a posição do nó no subgrafo
     int flag1, flag2 = 0;
-    int cont = 0;
+    int count = 0;
 
 
     // Vector para armazenar os custoViz dos nós do subgrafo. O índice no vector é compatível com a posição do nó no subgrafo
-    vector<int> custoViz;
-    custoViz.clear();
-
-    // Vector para checar se o nó já foi inserido na agm
-    vector<bool> naAGM(subgrafo->getOrder(), false);
-
-    // O primeiro nó do vector será inicializado com custoViz = 0
-    custoViz.push_back(0);
+    vector<int> custoViz; // talvez tenha que ser uma matriz
+    custoViz.push_back(0); // O primeiro nó do vector será inicializado com custoViz = 0
 
     // Os demais nós serão inicializados com custoViz = INFINITO
-    for (int i = 1; i < subgrafo->getOrder(); i++)
+    for (int i = 1; i < this->getOrder(); i++)
         custoViz.push_back(INF);
 
     cout << "1º passo concluído com sucesso" << endl;
@@ -1551,44 +1545,15 @@ void Graph::greed()
 
     // 3º PASSO !!TEM QUE ALTERAR A HEURISTICA
 
-    ti = chrono::high_resolution_clock::now(); //Comeca a contar o tempo
+    auto ti = chrono::high_resolution_clock::now(); //Comeca a contar o tempo
 
     int cont = 0;
     while (cont < this->getOrder())
     {
-        // Pega o nó com menor custoViz que ainda não está na agm
-        int pos_menor = posicaoMenor(custoViz, naAGM);         // Posição do nó
-        int u = this->getNodePosition(pos_menor)->getId(); // ID do nó
-        // Atualiza naAGM, pois, nessa iteração, u será colocado na agm
-        naAGM[pos_menor] = true;
-
-        // Iterar pelos nós v adjacentes a u e verificar se o peso da aresta entre eles é menor que o seu custoViz
-        Edge *aux = this->getNode(u)->getFirstEdge();
-        if (aux == nullptr) // nó não tem arestas
-            agm[pos_menor] = u;
-        else
-        {
-            while (aux != nullptr)
-            {
-                int v = aux->getTargetId();                      // ID de v
-                int pos_v = this->getNode(v)->getPosition(); // posição de v
-                if (!naAGM[pos_v])                               // executa caso o nó v ainda não esteja na agm
-                {
-                    // Se o peso da aresta (u, v) for menor que o custoViz de v, atualiza o custoViz com o valor do peso
-                    if (aux->getWeight() < custoViz[pos_v])
-                    {
-                        custoViz[pos_v] = aux->getWeight();
-                        // Atualiza o pai de v na agm
-                        agm[pos_v] = u;
-                    }
-                }
-                aux = aux->getNextEdge();
-            }
-        }
-        cont++;
+        // entra a heuristica
     }
 
-    tf = chrono::high_resolution_clock::now(); //Termina de contar o tempo
+    auto tf = chrono::high_resolution_clock::now(); //Termina de contar o tempo
     auto duracao = chrono::duration_cast<chrono::nanoseconds>(tf - ti).count();
 
     cout << "3º passo concluído com sucesso" << endl;
@@ -1601,7 +1566,7 @@ void Graph::greed()
  * 
  * @return float 
  */
-float Graph::greedRandom()
+void Graph::greedRandom()
 {
 }
 
@@ -1611,6 +1576,6 @@ float Graph::greedRandom()
  * 
  * @return float 
  */
-float Graph::greedRactiveRandom()
+void Graph::greedRactiveRandom()
 {
 }

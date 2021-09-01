@@ -6,7 +6,7 @@ Matrícula       Nome                                E-mail
 ```
 202065020A      Daniel Muller Rezende               daniel.rezende@estudante.ufjf.br
 201876043       Deoclécio Porfírio Ferreira Filho   deoclecio.filho@estudante.ufjf.br
-202065500B      Guilherme Martins Couto
+202065500B      Guilherme Martins Couto             guilherme.couto@estudante.ufjf.br
 202065050A      Kleiton Ewerton de Oliveira         kleitonewertonoliveira@gmail.com
 ```
 ## Parte 1: Funcionalidades básicas em grafos simples

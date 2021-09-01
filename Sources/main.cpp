@@ -9,8 +9,24 @@
 #include <chrono>
 #include "Graph.h"
 #include "Node.h"
+#include <map>
+#include <vector>
+#include <math.h>
 
 using namespace std;
+
+struct pontos
+{
+    float x;
+    float y;
+};
+
+struct instancia
+{
+    int nodeSource;
+    int nodeTarget;
+    int edWeight;
+};
 
 Graph *leitura(ifstream &input_file, int directed, int weightedEdge, int weightedNode)
 {
@@ -74,6 +90,64 @@ Graph *leitura(ifstream &input_file, int directed, int weightedEdge, int weighte
     }
 
     return graph;
+}
+
+void calcPeso(vector<pontos> coord)
+{
+    vector<instancia> instanc;
+    float valF = 0.0, var = 0.0, valI = 0.0;
+    int dist = 0;
+    int size = coord.size();
+    stringstream ss;
+    ss << "inst" << size << ".txt";
+    ofstream output;
+    output.open(ss.str(), ios::out | ios::trunc);
+    output << coord.size() << endl;
+
+    for (int i = 1; i < coord.size(); i++)
+    {
+        for (int j = i + 1; j < coord.size(); j++)
+        {
+            valF = sqrt((coord[i].x - coord[j].x) * (coord[i].x - coord[j].x)) + ((coord[i].y - coord[j].y) * (coord[i].y - coord[j].y));
+            valF = sqrt(pow((coord[i].x - coord[j].x), 2) + pow((coord[i].y - coord[j].y), 2));
+
+            valI = (int)valF;
+            var = fabs(valF - valI);
+            if (var >= 0.5)
+                dist = valI + 1;
+            else
+                dist = valI;
+
+            instancia ins = {i, j, dist};
+            instanc.push_back(ins);
+            output << i << " " << j << " " << dist << endl;
+        }
+    }
+
+    output.close();
+}
+
+void leInstancia(string path)
+{
+    string x, y, temp;
+    vector<pontos> coord;
+
+    fstream inst(path, ios::in);
+
+    int i = 0;
+    while (inst.good())
+    {
+        getline(inst, temp, ' ');
+        getline(inst, x, ' ');
+        getline(inst, y, '\n');
+
+        pontos p = {stof(x.c_str()), stof(y.c_str())};
+        coord.push_back(p);
+    }
+
+    inst.close();
+
+    calcPeso(coord);
 }
 
 int menu()
@@ -161,7 +235,7 @@ void selecionar(int selecao, Graph *graph, ofstream &output_file)
         break;
     case 11: //Algoritmo Guloso Randomizado Reativo
         graph->greedRactiveRandom();
-        
+
         break;
     default:
         system("clear");
@@ -189,7 +263,7 @@ int mainMenu(ofstream &output_file, Graph *graph)
 }
 
 int main(int argc, char const *argv[])
-{    
+{
     //Verificação se todos os parâmetros do programa foram entrados
     if (argc != 6)
     {
@@ -242,6 +316,8 @@ int main(int argc, char const *argv[])
     cout << "Direcionado? " << d << endl;
     cout << "Arestas com peso? " << a << endl;
     cout << "Vertices com peso? " << v << endl;
+
+    //leInstancia("pr136.txt");
 
     mainMenu(output_file, graph);
 
