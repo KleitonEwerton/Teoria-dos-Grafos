@@ -1679,9 +1679,17 @@ void primAdaptado(Graph *grafo, vector<vector<pair<int, int>>> &matriz, vector<v
             pesoTotalNo[i].second ++;
             pesoTotalNo[pos_u].second ++;
             if (pesoTotalNo[i].second > D)
+            {
                 dentroRestricao[i] = false;
+                cout << "\nID fora: " << grafo->getNodePosition(i)->getId() << endl;
+                cout << "index fora: " << i << endl;
+            }
             if(pesoTotalNo[pos_u].second > D)
+            {
                 dentroRestricao[pos_u] = false;
+                cout << "\nID fora: " << grafo->getNodePosition(pos_u)->getId() << endl;
+                cout << "index fora: " << pos_u << endl;
+            }    
             pesoTotalNo[i].first += aux;
             pesoTotalNo[pos_u].first += aux;
         }
@@ -1733,7 +1741,9 @@ void Graph::greed()
         cout << "\nNós fora da restrição: " << count(dentroRestricao.begin(), dentroRestricao.end(), false) << endl;
 
         // index do nó que está fora da restrição de grau
-        int index = find(dentroRestricao.begin(), dentroRestricao.end(), true) - dentroRestricao.begin();
+        int index = (int)(find(dentroRestricao.begin(), dentroRestricao.end(), false) - dentroRestricao.begin());
+        cout << "index fora da restrição: " << index << endl;
+        cout << "ID do fora da restrição: " << this->getNodePosition(index)->getId() << endl;
 
         // SUBSTITUIÇÃO DE ARESTA
 
