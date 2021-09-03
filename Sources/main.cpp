@@ -104,9 +104,9 @@ void calcPeso(vector<pontos> coord)
     output.open(ss.str(), ios::out | ios::trunc);
     output << coord.size() << endl;
 
-    for (int i = 1; i < coord.size(); i++)
+    for (int i = 1; i <= coord.size(); i++)
     {
-        for (int j = i + 1; j < coord.size(); j++)
+        for (int j = i + 1; j <= coord.size(); j++)
         {
             valF = sqrt((coord[i].x - coord[j].x) * (coord[i].x - coord[j].x)) + ((coord[i].y - coord[j].y) * (coord[i].y - coord[j].y));
             valF = sqrt(pow((coord[i].x - coord[j].x), 2) + pow((coord[i].y - coord[j].y), 2));
