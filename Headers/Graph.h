@@ -65,7 +65,7 @@ public:
     /* Para 2a parte do trabalho*/
     void greed();
     void greedRandom();
-    void greedRactiveRandom();
+    void greedRactiveRandom(int numIter, int block);
     
 
 private:
