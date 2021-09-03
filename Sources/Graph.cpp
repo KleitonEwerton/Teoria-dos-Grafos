@@ -1738,7 +1738,7 @@ void Graph::greed()
     // Enquanto não estiver tudo dentro da restrição
     while (find(dentroRestricao.begin(), dentroRestricao.end(), false) != dentroRestricao.end())
     {
-        cout << "\nNós fora da restrição: " << count(dentroRestricao.begin(), dentroRestricao.end(), false) << endl;
+        cout << "\nNós ainda fora da restrição: " << count(dentroRestricao.begin(), dentroRestricao.end(), false) << endl;
 
         // index do nó que está fora da restrição de grau
         int index = (int)(find(dentroRestricao.begin(), dentroRestricao.end(), false) - dentroRestricao.begin());
