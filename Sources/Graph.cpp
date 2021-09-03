@@ -1829,6 +1829,130 @@ void Graph::greedRandom()
  * 
  * @return float 
  */
-void Graph::greedRactiveRandom()
-{
+void Graph::greedRactiveRandom(int numIter, int block){
+
+    int d;                   // Grau de restrição;
+    int numIt = numIter;     // Número de iterações;
+    int numbloco = block;    // Num bloco (Ainda não sei o que é isso...);
+
+    cout << "\nInicializando a execução do Algorítimo Guloso Randomizado Reativo..." << endl;
+    cout << "\nQual será o grau d de restrição?" << endl;
+    cin >> d;
+    cout << endl;
+
+    // 1º PASSO: Inicializar as variáveis:
+
+    vector<float> alfas;    // Vetor utilizado para armazenar os valores de alfa; //! Necessário decidir como o vetor de alfas será inicializado
+    vector<float> solBest;  // Vetor utilizado para armazenar melhor solução encontrada por cada alfa (Os valores são referentes ao alfa que se encontra no elemento de mesmo índice do vetor de alfas);
+    vector<media> medias;   // Vetor utilizado para armazenar a média das soluções de cada alfa (Os valores são referentes ao alfa que se encontra no elemento de mesmo índice do vetor de alfas);
+    vector<float> prob;     // Vetor utilizado para armazenar a probabilidade de cada alfa (Os valores são referentes ao alfa que se encontra no elemento de mesmo índice do vetor de alfas);
+    vector<float> q;        // Vetor utilizado para armazenar o q (operação necessária para o cálculo da probabilidade) de cada alfa (Os valores são referentes ao alfa que se encontra no elemento de mesmo índice do vetor de alfas);
+
+    inicializaVetores(prob, medias, alfas.size());
 }
+
+//TODOS: Funções auxiliares para os algorítimos gulósos randomizados -------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+//!Necessário adaptar a escolha randomizada de acordo com a heurística desenvolvida (Ao invés de analizar um vetor, será analizada uma matriz)---//
+/**
+ * @brief       Função utilizada para randomizar a escolha do candidato à entrar na solução
+ * 
+ * @param alfa  Valor que varia de 0 a 1 utilizado na operação de randomização
+ * @param tam   Tamanho do vetor de alfas
+ * @return int  Índice do alfa escolhido
+ */
+int randAlfa(float alfa, int tam){
+    
+    int k = rand() % (int)(alfa *(tam-1));
+
+    return k;
+}
+//!---------------------------------------------------------------------------------------------------------------------------------------------//
+
+/**
+ * @brief Struct utilizada para facilitar a manipulação dos valores no vetor de médias
+ * 
+ */
+struct media{
+    float soma;
+    float numSolucoes;
+    float media;
+};
+
+/**
+ * @brief           Operação responsável por inicializar os vetores associados aos valores alfa
+ * 
+ * @param prob      Vetor das probabilidades de alfa
+ * @param media     Vetor das médias das soluções de cada alfa
+ * @param numAlfas  Número de alfas existentes
+ */
+void inicializaVetores(vector<float> &prob, vector<media> &medias, int numAlfas){
+
+    media aux = {0,0,0};  // Variável do tipo media utilizada para iniciar todos os elementos do vetor de médias com valor 0;
+
+
+    for(int i=0; i<numAlfas; i++){
+        prob.push_back(1/numAlfas);  // Os alfas começam com a mesma probabilidade;
+        medias.push_back(aux);       // Como não foi encontrada nenhuma solução, todas as médias começam com valor 0;
+    }
+}
+
+/**
+ * @brief           Operação utilizada para recalcular as probabilidades dos alfas de serem escolhidos
+ * 
+ * @param A         Vetor das médias das soluções encontradas por cada alfa
+ * @param prob      Vetor que armazena a probabilidade de cada alfa ser escolhido
+ * @param solBest   Vetor que armazena a melhor solução encontrada por cada alfa
+ * @param q         Vetor que armazena o valor "q" (resultado de uma operação necessária para calcular a probabilidade) de cada alfa
+ */
+void atualizaProbabilidades( vector <media> &medias, vector <float> &prob, vector<int> &solBest, vector <float> &q){
+
+    int somaQ = 0;  // Variável criada para armazenar a soma de todos os valores "q";
+
+    for(int i = 0; i < medias.size(); i++){
+        q[i] = pow(solBest[i] / medias[i].media , 100); // q[i] receberá o valor da divisão da melhor solução do respectivo alfa pela média de suas soluções elevado a um valor de precisão;
+        somaQ += q[i];                                  // À medida que se calcula os valores de "q", tal valor é incrementado em somaQ;
+    }
+
+    for(int i=0; i< medias.size(); i++){
+        prob[i] = q[i] / somaQ;  // Operação para calcular a probabilidade de cada alfa dada pela divisão de q[i] pela soma de todos os valores "q";
+    }
+}
+
+/**
+ * @brief          Fução utilizada para atualizar os valores das médias relacionadas a cada alfa
+ * 
+ * @param medias   Vetor das médias de cada alfa
+ * @param solucao  Valor da solução encontrada na dada iteração  
+ * @param alfas    Vetor de alfas
+ * @param alfa     Valor do alfa utilizado
+ */
+void atualizaMedias(vector<media> medias, int solucao, vector<float> alfas, float alfa){
+
+    int aux;  // Variável utilizada para armazenar o índice referente à posição do alfa no vetor de alfas;
+
+    for(int i=0; i<alfas.size(); i++){
+        if(alfa == alfas[i]){
+            aux = i;  // Atribuindo o índice correto a aux;
+            break;
+        }
+    }
+
+    medias[aux].soma = medias[aux].soma + solucao;                   //  Atualizando o valor da soma;
+    medias[aux].numSolucoes++;                                       //  Atualizando o número de soluções;
+    medias[aux].media = medias[aux].soma / medias[aux].numSolucoes;  //  Recalculando a média do respectivo alfa utilizando os valores atualizados da soma e numero de soluções; 
+}
+
+//! Ainda não possui implementação ----------------------------------------------------------------------------------------------------//
+/**
+ * @brief       Função utilizada para escolher o alfa a ser utilizado com base no vetor de probabilidades
+ * 
+ * @param prob  Vetor de probabilidades
+ * @return int  Índice do alfa a ser escolhido
+ */
+int escolheAlfa(vector<float> &prob){
+    int k;
+
+    return k;
+}
+//! ------------------------------------------------------------------------------------------------------------------------------------//
