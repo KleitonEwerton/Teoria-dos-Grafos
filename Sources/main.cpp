@@ -12,6 +12,7 @@
 #include <map>
 #include <vector>
 #include <math.h>
+#include <sstream>
 
 using namespace std;
 
@@ -108,7 +109,7 @@ void calcPeso(vector<pontos> coord)
     {
         for (int j = i + 1; j <= coord.size(); j++)
         {
-            valF = sqrt((coord[i].x - coord[j].x) * (coord[i].x - coord[j].x)) + ((coord[i].y - coord[j].y) * (coord[i].y - coord[j].y));
+           
             valF = sqrt(pow((coord[i].x - coord[j].x), 2) + pow((coord[i].y - coord[j].y), 2));
 
             valI = (int)valF;
