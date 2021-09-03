@@ -11,6 +11,7 @@
 #include <vector>
 #include <climits>
 #include <math.h>
+#include <numeric>
 #include <float.h>
 #include <string>
 #include <sstream>
@@ -23,6 +24,7 @@
 #include "Edge.h"
 
 int INF = 99999999;
+int D = 3; // restrição de grau
 
 using namespace std;
 
@@ -133,52 +135,62 @@ Node *Graph::getNodePosition(int position)
 // Função para gerar um Subgrafo Vértice Induzido
 Graph *Graph::getVertInduz()
 {
-    cout << "\nDigite os IDs dos vértices que irão compor esse subgrafo separados por ponto-vírgula (Exemplo: 5;6;1;8):" << endl;
+    cout << "\nVocê deseja rodar para o Grafo inteiro ou para um subgrafo?" << endl;
+    cout << "1 - Grafo inteiro\n2 - Subgrafo\nSua opção: ";
+    int opcao;
+    cin >> opcao;
 
-    // Lendo os vértices do subgrafo
-    string aux;
-    cout << "Vértices: ";
-    cin >> aux;
-
-    // Vector para armazenar os ids dos vértices do subgrafo
-    vector<int> idvertices;
-    idvertices.clear();
-
-    // Separando a string
-    stringstream ss(aux);
-    while (getline(ss, aux, ';'))
+    if (opcao == 2)
     {
-        if (this->searchNode(stoi(aux)))
-            idvertices.push_back(stoi(aux));
-        else
-            cout << "O vértice " << aux << " é inválido, pois não está no Grafo" << endl;
-    }
+        cout << "\nDigite os IDs dos vértices que irão compor esse subgrafo separados por ponto-vírgula (Exemplo: 5;6;1;8):" << endl;
 
-    // Criar o subgrafo vértice induzido
-    Graph *subgrafo = new Graph(idvertices.size(), this->getDirected(), this->getWeightedEdge(), this->getWeightedNode());
+        // Lendo os vértices do subgrafo
+        string aux;
+        cout << "Vértices: ";
+        cin >> aux;
 
-    // Inserindo as arestas correspondentes no subgrafo
-    this->cleanVisited();
-    for (int i = 0; i < idvertices.size(); i++)
-    {
-        for (int j = i + 1; j < idvertices.size(); j++)
+        // Vector para armazenar os ids dos vértices do subgrafo
+        vector<int> idvertices;
+        idvertices.clear();
 
-            // Verificar se a aresta realmente existe no grafo original
-            if ((!this->getNode(idvertices[j])->getVisited()) && this->getNode(idvertices[i])->searchEdge(idvertices[j]))
-            {
-                Edge *aux = this->getNode(idvertices[i])->getEdge(idvertices[j]);
-                subgrafo->insertEdge(idvertices[i], idvertices[j], aux->getWeight());
-            }
+        // Separando a string
+        stringstream ss(aux);
+        while (getline(ss, aux, ';'))
+        {
+            if (this->searchNode(stoi(aux)))
+                idvertices.push_back(stoi(aux));
             else
-                subgrafo->insertNode(idvertices[j]);
+                cout << "O vértice " << aux << " é inválido, pois não está no Grafo" << endl;
+        }
 
-        this->getNode(idvertices[i])->setVisited(true);
+        // Criar o subgrafo vértice induzido
+        Graph *subgrafo = new Graph(idvertices.size(), this->getDirected(), this->getWeightedEdge(), this->getWeightedNode());
+
+        // Inserindo as arestas correspondentes no subgrafo
+        this->cleanVisited();
+        for (int i = 0; i < idvertices.size(); i++)
+        {
+            for (int j = i + 1; j < idvertices.size(); j++)
+
+                // Verificar se a aresta realmente existe no grafo original
+                if ((!this->getNode(idvertices[j])->getVisited()) && this->getNode(idvertices[i])->searchEdge(idvertices[j]))
+                {
+                    Edge *aux = this->getNode(idvertices[i])->getEdge(idvertices[j]);
+                    subgrafo->insertEdge(idvertices[i], idvertices[j], aux->getWeight());
+                }
+                else
+                    subgrafo->insertNode(idvertices[j]);
+
+            this->getNode(idvertices[i])->setVisited(true);
+        }
+
+        cout << "\nO Subgrafo X foi gerado com sucesso! ";
+        cout << "(Ordem = " << subgrafo->getOrder() << " e Num de Arestas = " << subgrafo->getNumberEdges() << ")" << endl;
+
+        return subgrafo;
     }
-
-    cout << "\nO Subgrafo X foi gerado com sucesso! ";
-    cout << "(Ordem = " << subgrafo->getOrder() << " e Num de Arestas = " << subgrafo->getNumberEdges() << ")" << endl;
-
-    return subgrafo;
+    else
+        return this;
 }
 
 //! Other methods --------------------------------------------------------------------------------------------
@@ -1502,8 +1514,196 @@ void Graph::topologicalSortUtil(Node *node, Edge *edge, stack<int> &Stack)
     }
 }
 
-
 // 2a PARTE DO TRABALHO  ------------------------------------------------------------------------------------------------
+
+bool maior(pair<int, int> i, pair<int, int> j)
+{
+    return (i.first > j.first);
+}
+
+int acha(vector<pair<int, int>> &vet, pair<int, int> val)
+{
+    int i = 0;
+    for (i = 0; i < vet.size(); i++)
+    {
+        if (vet[i].first == val.first && vet[i].second == val.second)
+            return i;
+    }
+    return INF;
+}
+
+/* A função ordenaArestas recebe como parâmetro uma matriz e uma opção. Na matriz,
+    o vector de fora representa cada nó e, para cada nó, há um vector de pares, em que
+    cada par representa uma aresta daquele nó. O par tem o formato {peso, posicao_notarget}.
+    A função ordena cada uma dessas arestas de cada nó. Se op = 0, ordem crescente. Se op = 1, descrescente*/
+void ordenaArestas(vector<vector<pair<int, int>>> &matriz, int op)
+{
+    for (int i = 0; i < matriz.size(); i++)
+    {
+        if (op == 0)
+            sort(matriz[i].begin(), matriz[i].end());
+        else if (op == 1)
+            sort(matriz[i].begin(), matriz[i].end(), maior);
+    }
+}
+
+/* A função ordenaArestas recebe como parâmetro uma matriz em que o vector de fora
+    representa cada nó e, para cada nó, há um vector de pares, em que
+    cada par representa uma aresta daquele nó. O par tem o formato {peso, posicao_notarget}.
+    A função retorna essa matriz preenchida*/
+void preencheMatriz(Graph *grafo, vector<vector<pair<int, int>>> &matriz)
+{
+    grafo->cleanVisited();
+    Node *noAux = grafo->getFirstNode();
+    Edge *arestaAux = noAux->getFirstEdge();
+
+    int pos_u = noAux->getPosition(); // id do nó de origem
+    int v;
+
+    if (arestaAux != nullptr)
+        v = arestaAux->getTargetId(); //id do nó destino
+
+    // Percorrer todas as arestas do Grafo
+    for (int i = 1; i < grafo->getOrder(); i++)
+    {
+        if (arestaAux == nullptr)
+            matriz[pos_u].push_back({INF, pos_u});
+
+        while (arestaAux != nullptr)
+        {
+            // Coloca a aresta na matriz de acordo com o nó de origem correspondente
+            if (!grafo->getNode(v)->getVisited())
+            {
+                int pos_v = grafo->getNode(v)->getPosition();
+                matriz[pos_u].push_back({arestaAux->getWeight(), pos_v});
+            }
+
+            // Atualiza os auxiliares se a aresta não for null
+            arestaAux = arestaAux->getNextEdge();
+            if (arestaAux != nullptr)
+                v = arestaAux->getTargetId();
+        }
+
+        noAux->setVisited(true);
+        noAux = grafo->getNodePosition(i);
+        arestaAux = noAux->getFirstEdge();
+        pos_u = noAux->getPosition();
+        if (arestaAux != nullptr)
+            v = arestaAux->getTargetId();
+    }
+}
+
+void primAdaptado(Graph *grafo, vector<vector<pair<int, int>>> &matriz, vector<vector<pair<int, int>>> &matrizAGM, vector<pair<int, int>> &pesoTotalNo, vector<bool> &dentroRestricao)
+{
+    // Vector para armazenar os custoViz dos nós do subgrafo. O índice no vector é compatível com a posição do nó no subgrafo
+    vector<int> custoViz;
+    custoViz.clear();
+
+    // Vector para checar se o nó já foi inserido na agm
+    vector<bool> naAGM(grafo->getOrder(), false);
+
+    // O primeiro nó do vector será inicializado com custoViz = 0
+    custoViz.push_back(0);
+
+    // Os demais nós serão inicializados com custoViz = INFINITO
+    for (int i = 1; i < grafo->getOrder(); i++)
+        custoViz.push_back(INF);
+
+    vector<int> agm(grafo->getOrder(), INF);
+
+    int cont = 0;
+    while (cont < grafo->getOrder())
+    {
+        // Pega o nó com menor custoViz que ainda não está na agm
+        int pos_u = posicaoMenor(custoViz, naAGM);      // Posição do nó
+        int u = grafo->getNodePosition(pos_u)->getId(); // ID do nó
+        // Atualiza naAGM, pois, nessa iteração, u será colocado na agm
+        naAGM[pos_u] = true;
+
+        // Iterar pelos nós v adjacentes a u e verificar se o peso da aresta entre eles é menor que o seu custoViz
+        Edge *aux = grafo->getNode(u)->getFirstEdge();
+
+        while (aux != nullptr)
+        {
+            int v = aux->getTargetId();                   // ID de v
+            int pos_v = grafo->getNode(v)->getPosition(); // posição de v
+            if (!naAGM[pos_v])                            // executa caso o nó v ainda não esteja na agm
+            {
+                // Se o peso da aresta (u, v) for menor que o custoViz de v, atualiza o custoViz com o valor do peso
+                if (aux->getWeight() < custoViz[pos_v])
+                {
+                    custoViz[pos_v] = aux->getWeight();
+
+                    // Atualiza o pai de v na agm
+                    agm[pos_v] = u;
+                }
+            }
+            aux = aux->getNextEdge();
+        }
+        cont++;
+    }
+
+    // Atualiza os parametros matriz, matrizAGM, pesoTotalNo, dentroRestricao
+    for (int i = 0; i < agm.size(); i++)
+    {
+        //cout << "i = " << i << " tem-se: {" << matriz[i][0].first << ", " << matriz[i][0].second << "}" << endl;
+        if (agm[i] != INF)
+        {
+            int pos_u = grafo->getNode(agm[i])->getPosition();
+            int aux = grafo->getNodePosition(i)->getEdge(agm[i])->getWeight();
+
+            int grau;
+
+            pair<int, int> aresta(aux, pos_u);
+            //cout << "aresta: {" << aresta.first << ", " << aresta.second << endl;
+            int it = acha(matriz[i], aresta);
+
+            if (it != INF)
+            {
+                //cout << " . ";
+                matrizAGM[i].push_back(aresta);          // insere a aresta na matrizAGM
+                matriz[i].erase(matriz[i].begin() + it); // apaga da matriz
+            }
+            else
+            {
+                aresta = {aux, i};
+                it = acha(matriz[pos_u], aresta);
+                if (it != INF)
+                {
+                    //cout << " ! ";
+                    matrizAGM[pos_u].push_back(aresta);              // insere a aresta na matrizAGM
+                    matriz[pos_u].erase(matriz[pos_u].begin() + it); // apaga da matriz
+                }
+            }
+
+            pesoTotalNo[i].second ++;
+            pesoTotalNo[pos_u].second ++;
+            if (pesoTotalNo[i].second > D)
+            {
+                dentroRestricao[i] = false;
+                cout << "\nID fora: " << grafo->getNodePosition(i)->getId() << endl;
+                cout << "index fora: " << i << endl;
+            }
+            if(pesoTotalNo[pos_u].second > D)
+            {
+                dentroRestricao[pos_u] = false;
+                cout << "\nID fora: " << grafo->getNodePosition(pos_u)->getId() << endl;
+                cout << "index fora: " << pos_u << endl;
+            }    
+            pesoTotalNo[i].first += aux;
+            pesoTotalNo[pos_u].first += aux;
+        }
+    }
+    return;
+}
+
+int pesoTotalAGM(vector<pair<int, int>> &pesoNoTotal)
+{
+    int peso = 0;
+    for (int i = 0; i < pesoNoTotal.size(); i++)
+        peso += pesoNoTotal[i].first;
+    return peso / 2;
+}
 
 /**
  * @brief Algoritmo Guloso
@@ -1512,52 +1712,91 @@ void Graph::topologicalSortUtil(Node *node, Edge *edge, stack<int> &Stack)
  */
 void Graph::greed()
 {
-    cout << "\nIniciando a execução do Algoritmo Guloso..." << endl;
-    
-    cout << "\nQual será o grau d de restrição? " << endl;
-    int d;
-    cin >> d;
+    /* matriz em que o vector de fora representa cada nó e,
+    para cada nó, há um vector de pares, em que cada par representa
+    uma aresta daquele nó. O par tem o formato {peso, posicao_notarget} */
+    vector<vector<pair<int, int>>> matriz(this->getOrder());
 
-    // 1º PASSO: Inicializar as variáveis
+    // Preenchendo e ordenando a matriz
+    preencheMatriz(this, matriz);
 
-    vector<int> agmRG(this->getOrder()); // AGM com restrição de grau. Começa vazio
-    vector<int> set(this->getOrder()); // Conjunto de Sets para auxiliar ao longo do algoritmo. Começa vazio
-    vector<bool> U(this->getOrder(), false); // Verifica se o vertice já foi analisado. O índice no vector é compatível com a posição do nó no subgrafo
-    int flag1, flag2 = 0;
-    int count = 0;
+    ordenaArestas(matriz, 1);
 
+    // controles
+    vector<pair<int, int>> pesoTotalNo(this->getOrder(), {0, 0}); // par {peso, grau}
+    vector<bool> dentroRestricao(this->getOrder(), true);         // vector para controlar os nós que estão dentro da restrição
 
-    // Vector para armazenar os custoViz dos nós do subgrafo. O índice no vector é compatível com a posição do nó no subgrafo
-    vector<int> custoViz; // talvez tenha que ser uma matriz
-    custoViz.push_back(0); // O primeiro nó do vector será inicializado com custoViz = 0
+    // matriz que vai ter as arestas da agm
+    vector<vector<pair<int, int>>> matrizAGM(this->getOrder());
 
-    // Os demais nós serão inicializados com custoViz = INFINITO
-    for (int i = 1; i < this->getOrder(); i++)
-        custoViz.push_back(INF);
+    primAdaptado(this, matriz, matrizAGM, pesoTotalNo, dentroRestricao);
 
-    cout << "1º passo concluído com sucesso" << endl;
+    int pesoAGM = pesoTotalAGM(pesoTotalNo);
 
-    // 2º PASSO
-    vector<int> agm(this->getOrder(), INF);
+    ordenaArestas(matrizAGM, 0);
 
-    cout << "2º passo concluído com sucesso" << endl;
-
-
-    // 3º PASSO !!TEM QUE ALTERAR A HEURISTICA
-
-    auto ti = chrono::high_resolution_clock::now(); //Comeca a contar o tempo
-
-    int cont = 0;
-    while (cont < this->getOrder())
+    // Enquanto não estiver tudo dentro da restrição
+    while (find(dentroRestricao.begin(), dentroRestricao.end(), false) != dentroRestricao.end())
     {
-        // entra a heuristica
+        cout << "\nQntd de nós ainda fora da restrição: " << count(dentroRestricao.begin(), dentroRestricao.end(), false) << endl;
+
+        // index do nó que está fora da restrição de grau
+        int index = (int)(find(dentroRestricao.begin(), dentroRestricao.end(), false) - dentroRestricao.begin());
+        cout << "index fora da restrição: " << index << endl;
+        cout << "ID do fora da restrição: " << this->getNodePosition(index)->getId() << endl;
+
+        // SUBSTITUIÇÃO DE ARESTA
+
+        // 1o descarta as arestas que nao poderão ser inseridas caso o nó já esteja no limite
+        pair<int, int> aresta1 = matrizAGM[index].back(); // par {peso, posição_notarget}
+        while (pesoTotalNo[aresta1.second].second >= D)
+        {
+            matriz[aresta1.second].clear();
+            matrizAGM[index].pop_back();
+            aresta1 = matrizAGM[index].back();
+            while (matriz[aresta1.second].size() == 0)
+            {
+                matrizAGM[index].pop_back();
+                aresta1 = matrizAGM[index].back();
+            }
+        }
+
+        // 2o pega na matriz a primeira aresta mais leve do nó
+        pair<int, int> aresta2 = matriz[aresta1.second].back();
+
+        // se a entrada da aresta violar a restrição de grau, pegar a próxima menor
+        while (pesoTotalNo[aresta2.second].second >= D)
+        {
+            matriz[aresta2.second].clear();
+            matriz[aresta2.second].pop_back();
+            aresta2 = matriz[aresta2.second].back();
+            while (matriz[aresta2.second].size() == 0)
+            {
+                matriz[aresta2.second].pop_back();
+                aresta2 = matriz[aresta2.second].back();
+            }
+        }
+
+        // 3o com a aresta pronta, retira-la da matriz e atualizar os valores dos controles
+        matriz[aresta2.second].pop_back();
+
+        // atualiza peso e grau dos nós
+        pesoTotalNo[index].first -= aresta1.first;
+        pesoTotalNo[index].second--;
+        pesoTotalNo[aresta1.second].first -= aresta1.first;
+        pesoTotalNo[aresta1.second].second--;
+
+        // atualiza o status das restrições
+        if (pesoTotalNo[index].second <= D)
+            dentroRestricao[index] = true;
+        if (pesoTotalNo[aresta1.second].second <= D)
+            dentroRestricao[aresta1.second] = true;
+
+        // atualiza peso agm
+        pesoAGM = pesoAGM - aresta1.first + aresta2.first;
     }
 
-    auto tf = chrono::high_resolution_clock::now(); //Termina de contar o tempo
-    auto duracao = chrono::duration_cast<chrono::nanoseconds>(tf - ti).count();
-
-    cout << "3º passo concluído com sucesso" << endl;
-
+    cout << "\nPeso da Arvore Geradora com Restrição de Grau = " << pesoAGM << endl;
     return;
 }
 
@@ -1569,7 +1808,6 @@ void Graph::greed()
 void Graph::greedRandom()
 {
 }
-
 
 /**
  * @brief Algoritmo Guloso Randomizado Reativo
