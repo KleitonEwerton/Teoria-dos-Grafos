@@ -1521,7 +1521,7 @@ bool maior(pair<int, int> i, pair<int, int> j)
     return (i.first > j.first);
 }
 
-int acha(vector<pair<int, int>> &vet, pair<int, int> &val)
+int acha(vector<pair<int, int>> &vet, pair<int, int> val)
 {
     int i = 0;
     for (i = 0; i < vet.size(); i++)
@@ -1557,7 +1557,7 @@ void preencheMatriz(Graph *grafo, vector<vector<pair<int, int>>> &matriz)
     Node *noAux = grafo->getFirstNode();
     Edge *arestaAux = noAux->getFirstEdge();
 
-    int u = noAux->getId(); // id do nó de origem
+    int pos_u = noAux->getPosition(); // id do nó de origem
     int v;
 
     if (arestaAux != nullptr)
@@ -1567,13 +1567,16 @@ void preencheMatriz(Graph *grafo, vector<vector<pair<int, int>>> &matriz)
     for (int i = 1; i < grafo->getOrder(); i++)
     {
         if (arestaAux == nullptr)
-            matriz[grafo->getNode(u)->getPosition()].push_back({INF, u});
+            matriz[pos_u].push_back({INF, pos_u});
 
         while (arestaAux != nullptr)
         {
             // Coloca a aresta na matriz de acordo com o nó de origem correspondente
             if (!grafo->getNode(v)->getVisited())
-                matriz[grafo->getNode(u)->getPosition()].push_back({arestaAux->getWeight(), v});
+            {
+                int pos_v = grafo->getNode(v)->getPosition();
+                matriz[pos_u].push_back({arestaAux->getWeight(), pos_v});
+            }
 
             // Atualiza os auxiliares se a aresta não for null
             arestaAux = arestaAux->getNextEdge();
@@ -1584,7 +1587,7 @@ void preencheMatriz(Graph *grafo, vector<vector<pair<int, int>>> &matriz)
         noAux->setVisited(true);
         noAux = grafo->getNodePosition(i);
         arestaAux = noAux->getFirstEdge();
-        u = noAux->getId();
+        pos_u = noAux->getPosition();
         if (arestaAux != nullptr)
             v = arestaAux->getTargetId();
     }
@@ -1643,6 +1646,7 @@ void primAdaptado(Graph *grafo, vector<vector<pair<int, int>>> &matriz, vector<v
     // Atualiza os parametros matriz, matrizAGM, pesoTotalNo, dentroRestricao
     for (int i = 0; i < agm.size(); i++)
     {
+        //cout << "i = " << i << " tem-se: {" << matriz[i][0].first << ", " << matriz[i][0].second << "}" << endl;
         if (agm[i] != INF)
         {
             int pos_u = grafo->getNode(agm[i])->getPosition();
@@ -1650,30 +1654,34 @@ void primAdaptado(Graph *grafo, vector<vector<pair<int, int>>> &matriz, vector<v
 
             int grau;
 
-            pair<int, int> aresta = {aux, pos_u};
+            pair<int, int> aresta(aux, pos_u);
+            //cout << "aresta: {" << aresta.first << ", " << aresta.second << endl;
             int it = acha(matriz[i], aresta);
 
             if (it != INF)
             {
-                matrizAGM[i].push_back({aux, pos_u}); // insere a aresta na matrizAGM
-                matriz[i].erase(matriz[i].begin() + it);                  // apaga da matriz
-                grau = matrizAGM[i].size();
-                pesoTotalNo[i].second = grau;
-                if (grau > D)
-                    dentroRestricao[i] = false;
+                //cout << " . ";
+                matrizAGM[i].push_back(aresta);          // insere a aresta na matrizAGM
+                matriz[i].erase(matriz[i].begin() + it); // apaga da matriz
             }
             else
             {
                 aresta = {aux, i};
-                it = acha(matriz[i], aresta);
-                matrizAGM[pos_u].push_back({aux, i}); // insere a aresta na matrizAGM
-                matriz[pos_u].erase(matriz[pos_u].begin() + it);              // apaga da matriz
-                grau = matrizAGM[pos_u].size();
-                pesoTotalNo[pos_u].second = grau;
-                if (grau > D)
-                    dentroRestricao[pos_u] = false;
+                it = acha(matriz[pos_u], aresta);
+                if (it != INF)
+                {
+                    //cout << " ! ";
+                    matrizAGM[pos_u].push_back(aresta);              // insere a aresta na matrizAGM
+                    matriz[pos_u].erase(matriz[pos_u].begin() + it); // apaga da matriz
+                }
             }
 
+            pesoTotalNo[i].second ++;
+            pesoTotalNo[pos_u].second ++;
+            if (pesoTotalNo[i].second > D)
+                dentroRestricao[i] = false;
+            if(pesoTotalNo[pos_u].second > D)
+                dentroRestricao[pos_u] = false;
             pesoTotalNo[i].first += aux;
             pesoTotalNo[pos_u].first += aux;
         }
@@ -1707,8 +1715,8 @@ void Graph::greed()
     ordenaArestas(matriz, 1);
 
     // controles
-    vector<pair<int, int>> pesoTotalNo(this->getOrder()); // par {peso, grau}
-    vector<bool> dentroRestricao(this->getOrder(), true); // vector para controlar os nós que estão dentro da restrição
+    vector<pair<int, int>> pesoTotalNo(this->getOrder(), {0, 0}); // par {peso, grau}
+    vector<bool> dentroRestricao(this->getOrder(), true);         // vector para controlar os nós que estão dentro da restrição
 
     // matriz que vai ter as arestas da agm
     vector<vector<pair<int, int>>> matrizAGM(this->getOrder());
@@ -1722,6 +1730,8 @@ void Graph::greed()
     // Enquanto não estiver tudo dentro da restrição
     while (find(dentroRestricao.begin(), dentroRestricao.end(), false) != dentroRestricao.end())
     {
+        cout << "\nNós fora da restrição: " << count(dentroRestricao.begin(), dentroRestricao.end(), false) << endl;
+
         // index do nó que está fora da restrição de grau
         int index = find(dentroRestricao.begin(), dentroRestricao.end(), true) - dentroRestricao.begin();
 
@@ -1776,7 +1786,7 @@ void Graph::greed()
         pesoAGM = pesoAGM - aresta1.first + aresta2.first;
     }
 
-    cout << "Peso da Arvore Geradora com Restrição de Grau = " << pesoAGM << endl;
+    cout << "\nPeso da Arvore Geradora com Restrição de Grau = " << pesoAGM << endl;
     return;
 }
 
