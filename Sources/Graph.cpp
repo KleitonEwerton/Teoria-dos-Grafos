@@ -1516,11 +1516,26 @@ void Graph::topologicalSortUtil(Node *node, Edge *edge, stack<int> &Stack)
 
 // 2a PARTE DO TRABALHO  ------------------------------------------------------------------------------------------------
 
+/**
+ * @brief Função que recebe dois pares como parametro e retorna se o first de i for maior
+ * 
+ * @param i par
+ * @param j par
+ * @return true 
+ * @return false 
+ */
 bool maior(pair<int, int> i, pair<int, int> j)
 {
     return (i.first > j.first);
 }
 
+/**
+ * @brief 
+ * 
+ * @param vet 
+ * @param val 
+ * @return int 
+ */
 int acha(vector<pair<int, int>> &vet, pair<int, int> val)
 {
     int i = 0;
@@ -1749,10 +1764,10 @@ void Graph::greed()
 
         // 1o descarta as arestas que nao poderão ser inseridas caso o nó já esteja no limite
         pair<int, int> aresta1 = matrizAGM[index].back(); // par {peso, posição_notarget}
-        while (pesoTotalNo[aresta1.second].second >= D)
+        while (pesoTotalNo[aresta1.second].second > D)
         {
             matriz[aresta1.second].clear();
-            matrizAGM[index].pop_back();
+            matrizAGM[index].pop_back(); 
             aresta1 = matrizAGM[index].back();
             while (matriz[aresta1.second].size() == 0)
             {
@@ -1784,7 +1799,7 @@ void Graph::greed()
         pesoTotalNo[index].first -= aresta1.first;
         pesoTotalNo[index].second--;
         pesoTotalNo[aresta1.second].first -= aresta1.first;
-        pesoTotalNo[aresta1.second].second--;
+        pesoTotalNo[aresta1.second].first += aresta2.first;
 
         // atualiza o status das restrições
         if (pesoTotalNo[index].second <= D)
