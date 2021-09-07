@@ -39,7 +39,7 @@ struct media{
 int escolheAlfa(vector<float> &prob);
 void atualizaMedias(vector<media> &medias, float solucao, vector<float> &alfas, float alfa, vector<float> &solBest);
 void atualizaProbabilidades( vector <media> &medias, vector <float> &prob, vector<float> &solBest, vector <float> &q);
-int randAlfa(float alfa, vector<vector<pair<int, int>>> &matriz);
+int randAlfa(float alfa, vector<pair<int, int>> &arestas);
 void inicializaVetores(vector<float> &prob, vector<media> &medias, int numAlfas);
 
 using namespace std;
@@ -1563,6 +1563,19 @@ int acha(vector<pair<int, int>> &vet, pair<int, int> val)
     return INF;
 }
 
+void imprimirMatriz(vector<vector<pair<int, int>>> &matriz)
+{
+    for(int i = 0 ; i< matriz.size(); i++)
+    {
+        cout << i << " (" << matriz[i].size() << "): ";
+        for(int j = 0; j < matriz[i].size(); j++)
+        {
+            cout << matriz[i][j].second << " -- ";
+        }
+        cout << "\n";
+    }
+}
+
 /* A função ordenaArestas recebe como parâmetro uma matriz e uma opção. Na matriz,
     o vector de fora representa cada nó e, para cada nó, há um vector de pares, em que
     cada par representa uma aresta daquele nó. O par tem o formato {peso, posicao_notarget}.
@@ -1624,7 +1637,7 @@ void preencheMatriz(Graph *grafo, vector<vector<pair<int, int>>> &matriz)
     }
 }
 
-void primAdaptado(Graph *grafo, vector<vector<pair<int, int>>> &matriz, vector<vector<pair<int, int>>> &matrizAGM, vector<pair<int, int>> &pesoTotalNo, vector<bool> &dentroRestricao)
+void primAdaptado(Graph *grafo, vector<vector<pair<int, int>>> &matriz, vector<vector<pair<int, int>>> &matrizAGM, vector<pair<int, int>> &pesoTotalNo, vector<bool> &dentroRestricao, float alfa = -1.0)
 {
     // Vector para armazenar os custoViz dos nós do subgrafo. O índice no vector é compatível com a posição do nó no subgrafo
     vector<int> custoViz;
@@ -1635,6 +1648,8 @@ void primAdaptado(Graph *grafo, vector<vector<pair<int, int>>> &matriz, vector<v
 
     // O primeiro nó do vector será inicializado com custoViz = 0
     custoViz.push_back(0);
+
+    imprimirMatriz(matriz);
 
     // Os demais nós serão inicializados com custoViz = INFINITO
     for (int i = 1; i < grafo->getOrder(); i++)
@@ -1652,24 +1667,34 @@ void primAdaptado(Graph *grafo, vector<vector<pair<int, int>>> &matriz, vector<v
         naAGM[pos_u] = true;
 
         // Iterar pelos nós v adjacentes a u e verificar se o peso da aresta entre eles é menor que o seu custoViz
-        Edge *aux = grafo->getNode(u)->getFirstEdge();
-
-        while (aux != nullptr)
+        //cout << " aqui " << endl;
+        int k = 0;
+        pair<int, int> aux = matriz[pos_u][k];
+        cout << "\n\n ->>>> "<< aux.second << endl;
+        if(alfa != -1)
         {
-            int v = aux->getTargetId();                   // ID de v
+            k = randAlfa(alfa, matriz[pos_u]);
+            aux = matriz[pos_u][k];
+        }   
+        //cout << " aqui1 " << endl;
+
+        while (k != (matriz[pos_u]).size())
+        {
+            int v = grafo->getNodePosition(aux.second)->getId();                   // ID de v
             int pos_v = grafo->getNode(v)->getPosition(); // posição de v
             if (!naAGM[pos_v])                            // executa caso o nó v ainda não esteja na agm
             {
                 // Se o peso da aresta (u, v) for menor que o custoViz de v, atualiza o custoViz com o valor do peso
-                if (aux->getWeight() < custoViz[pos_v])
+                if (aux.first < custoViz[pos_v])
                 {
-                    custoViz[pos_v] = aux->getWeight();
+                    custoViz[pos_v] = aux.first;
 
                     // Atualiza o pai de v na agm
                     agm[pos_v] = u;
                 }
             }
-            aux = aux->getNextEdge();
+            k ++;
+            aux = matriz[pos_u][k];
         }
         cont++;
     }
@@ -1727,7 +1752,7 @@ void primAdaptado(Graph *grafo, vector<vector<pair<int, int>>> &matriz, vector<v
     }
     return;
 }
-
+/*
 void primAdaptadoRandom(Graph *grafo, vector<vector<pair<int, int>>> &matriz, vector<vector<pair<int, int>>> &matrizAGM, vector<pair<int, int>> &pesoTotalNo, vector<bool> &dentroRestricao, float alfa)
 {
     // Vector para armazenar os custoViz dos nós do subgrafo. O índice no vector é compatível com a posição do nó no subgrafo
@@ -1831,7 +1856,7 @@ void primAdaptadoRandom(Graph *grafo, vector<vector<pair<int, int>>> &matriz, ve
         }
     }
     return;
-}
+}*/
 
 int pesoTotalAGM(vector<pair<int, int>> &pesoNoTotal)
 {
@@ -1840,7 +1865,6 @@ int pesoTotalAGM(vector<pair<int, int>> &pesoNoTotal)
         peso += pesoNoTotal[i].first;
     return peso / 2;
 }
-
 
 
 /**
@@ -1857,8 +1881,9 @@ void Graph::greed()
 
     // Preenchendo e ordenando a matriz
     preencheMatriz(this, matriz);
-
     ordenaArestas(matriz, 1);
+
+    imprimirMatriz(matriz);
 
     // controles
     vector<pair<int, int>> pesoTotalNo(this->getOrder(), {0, 0}); // par {peso, grau}
@@ -1965,7 +1990,7 @@ void Graph::greedRandom(){
 
     vector<vector<pair<int, int>>> matrizAGM(this->getOrder());
 
-    primAdaptadoRandom(this, matriz, matrizAGM, pesoTotalNo, dentroRestricao, auxAlfa);
+    primAdaptado(this, matriz, matrizAGM, pesoTotalNo, dentroRestricao, auxAlfa);
 
     int pesoAGM = pesoTotalAGM(pesoTotalNo);
 
@@ -2088,7 +2113,7 @@ void Graph::greedRactiveRandom(){
 
         auxAlfa = escolheAlfa(prob);
 
-        primAdaptadoRandom(this, matriz, matrizAGM, pesoTotalNo, dentroRestricao, auxAlfa);
+        primAdaptado(this, matriz, matrizAGM, pesoTotalNo, dentroRestricao, auxAlfa);
 
         int pesoAGM = pesoTotalAGM(pesoTotalNo);
 
@@ -2164,9 +2189,9 @@ void Graph::greedRactiveRandom(){
 
 //TODO: Funções auxiliares para os algorítimos gulósos randomizados -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-int randAlfa(float alfa, vector<vector<pair<int, int>>> &matriz){
+int randAlfa(float alfa, vector<pair<int, int>> &arestas){
     
-    int k = (int)((1-alfa)*matriz.size()) + rand() % (matriz.size()-1);
+    int k = (int)((1-alfa)*arestas.size()) + rand() % (arestas.size()-1);
 
     return k;
 }
