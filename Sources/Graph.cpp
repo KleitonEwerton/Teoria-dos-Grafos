@@ -1670,18 +1670,20 @@ void primAdaptado(Graph *grafo, vector<vector<pair<int, int>>> &matriz, vector<v
         //cout << " aqui " << endl;
         int k = 0;
         pair<int, int> aux = matriz[pos_u][k];
-        cout << "\n\n ->>>> "<< aux.second << endl;
+        //cout << "\n\n ->>>> "<< aux.second << endl;
         if(alfa != -1)
         {
             k = randAlfa(alfa, matriz[pos_u]);
             aux = matriz[pos_u][k];
         }   
         //cout << " aqui1 " << endl;
-
-        while (k != (matriz[pos_u]).size())
+        cout << "cont: " << cont << " "; 
+        while (k < (matriz[pos_u]).size())
         {
+            
             int v = grafo->getNodePosition(aux.second)->getId();                   // ID de v
             int pos_v = grafo->getNode(v)->getPosition(); // posição de v
+            
             if (!naAGM[pos_v])                            // executa caso o nó v ainda não esteja na agm
             {
                 // Se o peso da aresta (u, v) for menor que o custoViz de v, atualiza o custoViz com o valor do peso
@@ -1694,6 +1696,7 @@ void primAdaptado(Graph *grafo, vector<vector<pair<int, int>>> &matriz, vector<v
                 }
             }
             k ++;
+            cout << "k: " << k << " || ";
             aux = matriz[pos_u][k];
         }
         cont++;
