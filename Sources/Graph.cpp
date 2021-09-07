@@ -26,6 +26,22 @@
 int INF = 99999999;
 int D = 3; // restrição de grau
 
+/**
+ * @brief Struct utilizada para facilitar a manipulação dos valores no vetor de médias
+ * 
+ */
+struct media{
+    float soma;
+    float numSolucoes;
+    float media;
+};
+
+int escolheAlfa(vector<float> &prob);
+void atualizaMedias(vector<media> &medias, float solucao, vector<float> &alfas, float alfa, vector<float> &solBest);
+void atualizaProbabilidades( vector <media> &medias, vector <float> &prob, vector<float> &solBest, vector <float> &q);
+int randAlfa(float alfa, vector<vector<pair<int, int>>> &matriz);
+void inicializaVetores(vector<float> &prob, vector<media> &medias, int numAlfas);
+
 using namespace std;
 
 //**************************************************************************************************
@@ -1734,7 +1750,8 @@ void primAdaptadoRandom(Graph *grafo, vector<vector<pair<int, int>>> &matriz, ve
     while (cont < grafo->getOrder())
     {
         // Pega o nó com menor custoViz que ainda não está na agm
-        int pos_u = randAlfa(alfa, naAGM);      // Posição do nó
+        int pos_u = randAlfa(alfa, matriz);      // Posição do nó
+        cout << " POS_U: "<< pos_u<<endl;
         int u = grafo->getNodePosition(pos_u)->getId(); // ID do nó
         // Atualiza naAGM, pois, nessa iteração, u será colocado na agm
         naAGM[pos_u] = true;
@@ -1824,15 +1841,7 @@ int pesoTotalAGM(vector<pair<int, int>> &pesoNoTotal)
     return peso / 2;
 }
 
-/**
- * @brief Struct utilizada para facilitar a manipulação dos valores no vetor de médias
- * 
- */
-struct media{
-    float soma;
-    float numSolucoes;
-    float media;
-};
+
 
 /**
  * @brief Algoritmo Guloso
@@ -2153,7 +2162,7 @@ void Graph::greedRactiveRandom(){
 
 }
 
-//TODOS: Funções auxiliares para os algorítimos gulósos randomizados -------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//TODO: Funções auxiliares para os algorítimos gulósos randomizados -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 int randAlfa(float alfa, vector<vector<pair<int, int>>> &matriz){
     
