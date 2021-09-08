@@ -9,6 +9,9 @@
 #include <vector>
 #include <stack>
 #include <list>
+#include <chrono>
+#include <time.h>
+#include <ctime>
 
 using namespace std;
 
@@ -68,6 +71,10 @@ public:
     void greedRactiveRandom();
     
 
+    void iniciaProces(chrono::time_point<chrono::system_clock> *inicio);
+    double fimProces(chrono::time_point<chrono::system_clock> *inicio, chrono::time_point<chrono::system_clock> *fim);
+    
+
 private:
     //Auxiliar methods
     void deepPath(Node *node);
@@ -83,6 +90,9 @@ private:
     bool auxIsCyclicDirected(int nodeId, bool isVisited[], bool *isContainedRecusirve);
     bool isCyclicDirected();
     void topologicalSortUtil(Node *node, Edge *edge, stack<int> &Stack);
+
 };
+
+
 
 #endif // GRAPH_H_INCLUDED
