@@ -1718,6 +1718,9 @@ void Graph::greedRandom() {
   cin >> auxAlfa;
   cout << endl;
 
+  chrono::time_point<chrono::system_clock> inicio, fim;
+  iniciaProces(&inicio);
+
   vector<vector<pair<int, int>>> matriz(this->getOrder());
   preencheMatriz(this, matriz);
   ordenaArestas(matriz, 1);
@@ -1787,8 +1790,10 @@ void Graph::greedRandom() {
     // atualiza peso agm
     pesoAGM = pesoAGM - aresta1.first + aresta2.first;
   }
+  double temp = fimProces(&inicio, &fim);
 
-  cout << "\nPeso da Arvore Geradora com Restrição de Grau = " << pesoAGM << endl;
+  cout << "\nPeso da Arvore Geradora com Restrição de Grau = " << pesoAGM
+       << "\nTempo total: " << temp << " segundos" << endl;
 }
 
 /**
@@ -1827,6 +1832,9 @@ void Graph::greedRactiveRandom() {
   alfas = {0.05, 0.10, 0.15, 0.30, 0, 50};
 
   cout << "\nVetor de alfas inicializado com sucesso!" << endl;
+
+  chrono::time_point<chrono::system_clock> inicio, fim;
+  iniciaProces(&inicio);
 
   inicializaVetores(prob, medias, numAlfas); // Chamada da função para inicializar os vetores de médias e probabilidades;
 
@@ -1908,7 +1916,10 @@ void Graph::greedRactiveRandom() {
 
     atualizaMedias(medias, pesoAGM, alfas, auxAlfa, solBest);
 
-    cout << "\nPeso da Arvore Geradora com Restrição de Grau = " << pesoAGM << endl;
+    double temp = fimProces(&inicio, &fim);
+
+    cout << "\nPeso da Arvore Geradora com Restrição de Grau = " << pesoAGM
+         << "\nTempo total: " << temp << " segundos" << endl;
   }
 }
 
