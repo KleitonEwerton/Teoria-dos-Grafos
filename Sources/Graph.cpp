@@ -1827,6 +1827,7 @@ void ajustaGrau(vector<vector<pair<int, int>>> &matriz, vector<vector<pair<int, 
                 aresta1 = matrizAGM[index].back();
             }
         }
+        matrizAGM[index].pop_back();
         
         // 2o pega na matriz a primeira aresta mais leve do nó
         pair<int, int> aresta2 = matriz[aresta1.second].back();
@@ -1843,9 +1844,11 @@ void ajustaGrau(vector<vector<pair<int, int>>> &matriz, vector<vector<pair<int, 
                 aresta2 = matriz[aresta1.second].back();
             }
         }
+        
 
-        // 3o com a aresta pronta, retira-la da matriz e atualizar os valores dos controles
+        // 3o com a aresta pronta, retira-la da matriz, colocá-la na matrizAGM e atualizar os valores dos controles
         matriz[aresta1.second].pop_back();
+        matrizAGM[aresta1.second].push_back(aresta2);
 
         // atualiza peso e grau dos nós
         pesoEGrauNo[index].first -= aresta1.first;
@@ -1895,10 +1898,11 @@ void Graph::greed()
     ordenaArestas(matrizAGM, 0);
 
     int pesoAGM = pesoTotalAGM(pesoEGrauNo);
-
+    imprimirMatriz(matrizAGM);
     ajustaGrau(matriz, matrizAGM, pesoEGrauNo, dentroRestricao, &pesoAGM);
 
-    //imprimirMatriz(matrizAGM);
+    cout << "\ndepois:" << endl;
+    imprimirMatriz(matrizAGM);
     
     cout << "\nPeso da Arvore Geradora com Restrição de Grau = " << pesoAGM << endl;
     return;
