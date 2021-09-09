@@ -2306,20 +2306,25 @@ void Graph::greedRactiveRandom()
     int numBloco;  // Número de iterações até atualizar novamente o vetor de probabilidades;
     int numAlfas;  // Variável ustilizada para armazenar a quantidade de alfas que serão analizados;
     int index;     // índice do alfa escolhido para a iteração;
+    int solucao;   // Armazena a solução da iteração;
     float auxAlfa; // Variável auxiliar utilizada para armazenar o valor do alfa;
 
-    cout << "\nInicializando a execução do Algoritmo Guloso Randomizado Reativo..." << endl;
-    cout << "\nQual será o grau d de restrição?" << endl;
-    cin >> d;
-    cout << endl;
+    d = 3;
+    numIt = 10;
+    numBloco = 5;
 
-    cout << "\nQual será o número total de iterações?" << endl;
-    cin >> numIt;
-    cout << endl;
+    //cout << "\nInicializando a execução do Algoritmo Guloso Randomizado Reativo..." << endl;
+    //cout << "\nQual será o grau d de restrição?" << endl;
+    //cin >> d;
+    //cout << endl;
 
-    cout << "\nQual será a quantidade de iterações por bloco?" << endl;
-    cin >> numBloco;
-    cout << endl;
+    //cout << "\nQual será o número total de iterações?" << endl;
+    //cin >> numIt;
+    //cout << endl;
+
+    //cout << "\nQual será a quantidade de iterações por bloco?" << endl;
+    //cin >> numBloco;
+    //cout << endl;
 
     vector<float> alfas;   // Vetor utilizado para armazenar os valores de alfa;
     vector<float> solBest; // Vetor utilizado para armazenar melhor solução encontrada por cada alfa (Os valores são referentes ao alfa que se encontra no elemento de mesmo índice do vetor de alfas);
@@ -2327,14 +2332,20 @@ void Graph::greedRactiveRandom()
     vector<float> prob;    // Vetor utilizado para armazenar a probabilidade de cada alfa (Os valores são referentes ao alfa que se encontra no elemento de mesmo índice do vetor de alfas);;
     vector<float> q;       // Vetor utilizado para armazenar o q (operação necessária para o cálculo da probabilidade) de cada alfa (Os valores são referentes ao alfa que se encontra no elemento de mesmo índice do vetor de alfas);;
 
-    alfas = {0.05, 0.10, 0.15, 0.30, 0, 50};
+    alfas.push_back(0.05);
+    alfas.push_back(0.10);
+    alfas.push_back(0.15);
+    alfas.push_back(0.30);
+    alfas.push_back(0.50);
+
+    numAlfas = alfas.size();
+
+    inicializaVetores(prob, medias, numAlfas); // Chamada da função para inicializar os vetores de médias e probabilidades;
 
     cout << "\nVetor de alfas inicializado com sucesso!" << endl;
 
     chrono::time_point<chrono::system_clock> inicio, fim;
     iniciaProces(&inicio);
-
-    inicializaVetores(prob, medias, numAlfas); // Chamada da função para inicializar os vetores de médias e probabilidades;
 
     for (int i = 0; i < numIt; i++)
     {
@@ -2349,25 +2360,51 @@ void Graph::greedRactiveRandom()
 
         vector<pair<int, int>> pesoEGrauNo(this->getOrder(), {0, 0});
         vector<bool> dentroRestricao(this->getOrder(), true);
-        vector<vector<pair<int, int>>> matrizAGM(this->getOrder());
 
-        auxAlfa = escolheAlfa(prob);
+        vector<vector<pair<int, int>>> matrizAG(this->getOrder());
 
-        //primAdaptado(this, matriz, matrizAGM, pesoEGrauNo, dentroRestricao, auxAlfa);
+        int pesoAG;
 
-        int pesoAGM = pesoTotalAGM(pesoEGrauNo);
+        auxAlfa = alfas[escolheAlfa(prob)];
 
-        ordenaArestas(matrizAGM, 0);
+        cout << "ERRO" << endl;
 
-        ajustaGrau(matriz, matrizAGM, pesoEGrauNo, dentroRestricao, &pesoAGM);
+        geraAG(this, matriz, matrizAG, pesoEGrauNo, dentroRestricao, auxAlfa);
+        pesoAG = pesoTotalAGM(pesoEGrauNo);
+        ordenaArestas(matrizAG, 0);
+        int numArestas = 0;
+        for (int i = 0; i < matrizAG.size(); i++)
+        {
+            numArestas += matrizAG[i].size();
+        }
+        cout << "numArestas Matriz AG: " << numArestas << endl;
+        //imprimirMatriz(matrizAG);
+        //restringeGrau(matriz, matrizAG, pesoEGrauNo, dentroRestricao, &pesoAG);
+        imprimirMatriz(matrizAG);
 
-        atualizaMedias(medias, pesoAGM, alfas, auxAlfa, solBest);
+        cout << "Aqui";
 
-        double temp = fimProces(&inicio, &fim);
+        solucao = pesoAG;
 
-        cout << "\nPeso da Arvore Geradora com Restrição de Grau = " << pesoAGM
-             << "\nTempo total: " << temp << " segundos" << endl;
+        atualizaMedias(medias, solucao, alfas, auxAlfa, solBest);
+
     }
+
+    int auxSolBest;
+    for(int i=0; i<solBest.size(); i++){
+        if(i == 0){
+            auxSolBest = solBest[i];
+        }
+
+        if(solBest[i] < auxSolBest){
+            auxSolBest = solBest[i];
+        }
+    }
+
+    double temp = fimProces(&inicio, &fim);
+
+    cout << "\nMelhor Peso da Arvore Geradora com Restrição de Grau = " << auxSolBest
+         << "\nTempo total: " << temp / numIt << " segundos" << endl;
 }
 
 //TODO: Funções auxiliares para os algorítimos gulósos randomizados -------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -2392,7 +2429,10 @@ int randAlfa(float alfa, int tam_vetor)
 void inicializaVetores(vector<float> &prob, vector<media> &medias, int numAlfas)
 {
 
-    media aux = {0, 0, 0}; // Variável do tipo media utilizada para iniciar todos os elementos do vetor de médias com valor 0;
+    media aux; // Variável do tipo media utilizada para iniciar todos os elementos do vetor de médias com valor 0;
+    aux.soma = 0;
+    aux.numSolucoes = 0;
+    aux.media = 0;
 
     for (int i = 0; i < numAlfas; i++)
     {
@@ -2417,7 +2457,7 @@ void atualizaProbabilidades(vector<media> &medias, vector<float> &prob, vector<f
     for (int i = 0; i < medias.size(); i++)
     {
         q[i] = pow(solBest[i] / medias[i].media, 100); // q[i] receberá o valor da divisão da melhor solução do respectivo alfa pela média de suas soluções elevado a um valor de precisão;
-        somaQ += q[i];                                 // À medida que se calcula os valores de "q", tal valor é incrementado em somaQ;
+        somaQ = somaQ + q[i];                                 // À medida que se calcula os valores de "q", tal valor é incrementado em somaQ;
     }
 
     for (int i = 0; i < medias.size(); i++)
@@ -2474,7 +2514,7 @@ int escolheAlfa(vector<float> &prob)
     }
 
     // Sorteia aleatoriamente o índice do alfa no vetor "aux";
-    index = rand() % (aux.size() - 1);
+    index = rand() % (aux.size());
 
     return index;
 }
