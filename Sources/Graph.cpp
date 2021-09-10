@@ -40,7 +40,7 @@ int escolheAlfa(vector<float> &prob);
 void atualizaMedias(vector<media> &medias, float solucao, vector<float> &alfas, float alfa, vector<float> &solBest);
 void atualizaProbabilidades(vector<media> &medias, vector<float> &prob, vector<float> &solBest, vector<float> &q);
 int randAlfa(float alfa, int tam_vetor);
-void inicializaVetores(vector<float> &prob, vector<media> &medias, int numAlfas);
+void inicializaVetores(vector<float> &prob, vector<media> &medias, int &numAlfas);
 
 using namespace std;
 
@@ -2340,7 +2340,19 @@ void Graph::greedRactiveRandom()
 
     numAlfas = alfas.size();
 
+    cout << "numAlfas: " << numAlfas << endl;
+
     inicializaVetores(prob, medias, numAlfas); // Chamada da função para inicializar os vetores de médias e probabilidades;
+
+    cout << "\nMedias: " << endl;
+    for(int i=0; i< medias.size(); i++){
+        cout << medias[i].media << " | ";
+    }
+
+    cout << "\nProbs: " << endl;
+    for(int i=0; i< prob.size(); i++){
+        cout << prob[i] << " | ";
+    }
 
     cout << "\nVetor de alfas inicializado com sucesso!" << endl;
 
@@ -2349,9 +2361,19 @@ void Graph::greedRactiveRandom()
 
     for (int i = 0; i < numIt; i++)
     {
-        if (i % numBloco == 0)
+        if ((i!=0) && (i % numBloco == 0))
         {
+            cout << "\nProbs: " << endl;
+            for(int i=0; i< prob.size(); i++){
+                cout << prob[i] << " | ";
+            }
+            cout << endl;
             atualizaProbabilidades(medias, prob, solBest, q); // Chamada da função que irá atualizar o vetor de probabilidades;
+            cout << "\nProbs: " << endl;
+            for(int i=0; i< prob.size(); i++){
+                cout << prob[i] << " | ";
+            }
+            cout << endl;
         }
 
         vector<vector<pair<int, int>>> matriz(this->getOrder());
@@ -2365,9 +2387,9 @@ void Graph::greedRactiveRandom()
 
         int pesoAG;
 
-        auxAlfa = alfas[escolheAlfa(prob)];
-
-        cout << "ERRO" << endl;
+        int index = escolheAlfa(prob);
+        cout << index;
+        auxAlfa = alfas[index];
 
         geraAG(this, matriz, matrizAG, pesoEGrauNo, dentroRestricao, auxAlfa);
         pesoAG = pesoTotalAGM(pesoEGrauNo);
@@ -2387,7 +2409,11 @@ void Graph::greedRactiveRandom()
         solucao = pesoAG;
 
         atualizaMedias(medias, solucao, alfas, auxAlfa, solBest);
-
+        cout << "\nMedias: " << endl;
+        for(int i=0; i< medias.size(); i++){
+            cout << medias[i].media << " | ";
+        }
+        cout << endl;
     }
 
     int auxSolBest;
@@ -2426,17 +2452,21 @@ int randAlfa(float alfa, int tam_vetor)
  * @param media     Vetor das médias das soluções de cada alfa
  * @param numAlfas  Número de alfas existentes
  */
-void inicializaVetores(vector<float> &prob, vector<media> &medias, int numAlfas)
+void inicializaVetores(vector<float> &prob, vector<media> &medias, int &numAlfas)
 {
 
     media aux; // Variável do tipo media utilizada para iniciar todos os elementos do vetor de médias com valor 0;
     aux.soma = 0;
     aux.numSolucoes = 0;
     aux.media = 0;
+    float auxNumAlfas = numAlfas;
+
+    float auxProb = 1/auxNumAlfas;
+    cout << "\nauxProb: " << auxProb << endl;
 
     for (int i = 0; i < numAlfas; i++)
     {
-        prob.push_back(1 / numAlfas); // Os alfas começam com a mesma probabilidade;
+        prob.push_back(auxProb); // Os alfas começam com a mesma probabilidade;
         medias.push_back(aux);        // Como não foi encontrada nenhuma solução, todas as médias começam com valor 0;
     }
 }
@@ -2498,7 +2528,7 @@ void atualizaMedias(vector<media> &medias, float solucao, vector<float> &alfas, 
  */
 int escolheAlfa(vector<float> &prob)
 {
-
+    
     int index;       // Inteiro utilizado para armazenar o índice do alfa escolhido;
     vector<int> aux; // Vetor para auxiliar a escolha do alfa;
 
@@ -2506,7 +2536,7 @@ int escolheAlfa(vector<float> &prob)
     for (int i = 0; i < prob.size(); i++)
     {
         // Cada "i" será adicionado no vetor "aux" uma quantidade de vezes equivalente à sua probabilidade multiplicado por 100;
-        for (int j = 0; j < (prob[i] * 100); j++)
+        for (int j = 0; j < (int)(prob[i] * 100); j++)
         {
             aux.push_back(i);
         }
@@ -2514,7 +2544,7 @@ int escolheAlfa(vector<float> &prob)
     }
 
     // Sorteia aleatoriamente o índice do alfa no vetor "aux";
-    index = rand() % (aux.size());
+    index = rand() % aux.size();
 
     return index;
 }
