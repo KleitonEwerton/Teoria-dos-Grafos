@@ -136,7 +136,9 @@ void leInstancia(string path) {
 }
 
 int menu() {
+
   int selecao;
+
   cout << "\nMENU" << endl;
   cout << "----" << endl;
   cout << "[1]  Fecho Transitivo Direto" << endl;
@@ -150,6 +152,9 @@ int menu() {
   cout << "[9]  Algoritmo Guloso" << endl;
   cout << "[10] Algoritmo Guloso Randomizado " << endl;
   cout << "[11] Algoritmo Guloso Randomizado Reativo" << endl;
+  cout << "[12] Algoritmo Guloso 2" << endl;
+  cout << "[13] Algoritmo Guloso 2 Randomizado " << endl;
+  cout << "[14] Algoritmo Guloso 2 Randomizado Reativo" << endl;
   cout << "[0]  Sair" << endl;
 
   cout << "\nSua opção: ";
@@ -219,6 +224,19 @@ void selecionar(int selecao, Graph *graph, ofstream &output_file) {
     graph->greedRactiveRandom();
 
     break;
+  case 12: //Algoritmo Guloso
+    graph->greed2();
+
+    break;
+  case 13: //Algoritmo Guloso Randomizado
+    graph->greedRandom2();
+
+    break;
+  case 14: //Algoritmo Guloso Randomizado Reativo
+    graph->greedRactiveRandom2();
+
+    break;
+
   default:
     system("clear");
     cout << " Erro!!! Opção invalida." << endl;

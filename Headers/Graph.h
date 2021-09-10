@@ -67,8 +67,11 @@ public:
 
     /* Para 2a parte do trabalho*/
     void greed();
+    void greed2();
     void greedRandom();
+    void greedRandom2();
     void greedRactiveRandom();
+    void greedRactiveRandom2();
     
 
     void iniciaProces(chrono::time_point<chrono::system_clock> *inicio);
