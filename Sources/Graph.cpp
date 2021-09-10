@@ -1601,6 +1601,16 @@ void arestaDoNo(Graph *grafo, int posNo, vector<pair<int, pair<int, int>>> &ares
     }
     
 
+    int i = 0;
+    while(i < arestas.size())
+        if (naAgm[arestas[i].second.first] && naAgm[arestas[i].second.second])
+           arestas.erase(arestas.begin() + i);
+           
+        else
+            if (pesoEGrauNo[arestas[i].second.first] >= D || pesoEGrauNo[arestas[i].second.second] >= D)
+                arestas.erase(arestas.begin() + i);
+            else i++;
+
 
     // for(int i = 0;i<arestas.size();i++){
 
