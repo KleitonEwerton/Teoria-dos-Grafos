@@ -1531,25 +1531,30 @@ void Graph::topologicalSortUtil(Node *node, Edge *edge, stack<int> &Stack)
 }
 
 // 2a PARTE DO TRABALHO  ------------------------------------------------------------------------------------------------
+
+/**
+ * @brief                                   Função usada para imprimir a solução da AGM com restrição de grau
+ * 
+ * @param AGM_RESULTANTE 
+ * @param posInicial 
+ * @param alfa 
+ */
+
 void imprimeSolucao(vector<pair<int, pair<int, int>>> &AGM_RESULTANTE, int posInicial, float alfa){
 
-    ofstream arq("meuGrafo.dot");
+    ofstream arq("meuGrafo.dot");               //Arquivo de saida
     arq << "graph {\n";
 
-    int sizeAll = 0;
-    int soma = 0;
-    int qnt2 = 0;
+    int soma = 0;                               //Soma dos pesos
+    int qnt2 = 0;                               //Quantidade de arestas - 1, já AGM_RESULTANTE.size é a ordem da AGM - 1
 
     for(int i = 0;i<AGM_RESULTANTE.size(); i++){
-        //Garrantindo que não tenha self loop
-        // if(AGM_RESULTANTE[i].second.first != AGM_RESULTANTE[i].second.second){
-
+        
+            //É mostrado a posição do vertice no grafo é não seu ID
             arq << AGM_RESULTANTE[i].second.first << " -- " << AGM_RESULTANTE[i].second.second << "[ label = " << AGM_RESULTANTE[i].first << "]\n";
-            cout <<"QUANTIDADE DE ARESTAS: " << qnt2+1 << " " << AGM_RESULTANTE[i].second.first << " -- " << AGM_RESULTANTE[i].second.second << "[ label = " << AGM_RESULTANTE[i].first << " ]\n";
+            cout <<"QUANTIDADE DE ARESTAS: " << qnt2+1 << " posição de u: " << AGM_RESULTANTE[i].second.first << " -- posição de v: " << AGM_RESULTANTE[i].second.second << " PESO DA ARESTA " << AGM_RESULTANTE[i].first << " ]\n";
             soma += AGM_RESULTANTE[i].first;
             qnt2++;
-
-        // }
 
     }
 
@@ -1559,59 +1564,80 @@ void imprimeSolucao(vector<pair<int, pair<int, int>>> &AGM_RESULTANTE, int posIn
     cout << "SOLUÇÃO SALVA NO ARQUIVO saida.dot"<<endl;
 
 }
-void arestaDoNo(Graph *grafo, int posNo, vector<pair<int, pair<int, int>>> &arestas, vector<int> &pesoEGrauNo, vector<bool> &naAgm){
+/**
+ * @brief                                               Função usada para pegar todas as arestas de um determinado vertice apartir de sua posição
+ * 
+ * @param grafo 
+ * @param posNo 
+ * @param arestas 
+ * @param pesoEGrauNo 
+ * @param naAgm 
+ */
+void arestaDoNo(Graph *grafo, int posNo, vector<pair<int, pair<int, int>>> &arestas, vector<int> &pesoEGrauNo, vector<bool> &naAgm, bool visualizar){
     Node *noAux = grafo->getNodePosition(posNo);
     Edge *arestaAux = nullptr;
 
-    cout << "Pegando as arestas do vertice da posição "<< posNo <<" que estão dentro das retrições \n"<<  endl;
+    if(visualizar)cout << "Pegando as arestas do vertice da posição "<< posNo <<" que estão dentro das retrições \n"<<  endl;
     
     int pos_u, pos_v;
-    if(noAux == nullptr){
-        
-        return;}
+    if(noAux == nullptr)
+        return;
+
     else{
         pos_u = posNo;
-        arestaAux = noAux->getFirstEdge();
+        arestaAux = noAux->getFirstEdge();          //PEGA A PRIMEIRA ARESTA ADJACENTE AO VERTICE pos_u(POSISÃO EM QUE ELE É INSERIDO NO GRAFO, PELAS NOSSAS INSTÂNCIAS
+                                                    //UM NÓ COM pos_u = 0 representa o ID = 1, pos_u = 1 representa o ID = 2, assim por diante)
     }
     
-   if(arestaAux == nullptr){
-    
-   }
-    while (arestaAux != nullptr)
-    {
+    while (arestaAux != nullptr){                   //REPETE ATÉ A ARESTA FOR NULL
+
         pos_v = arestaAux->getTargetPosition();
 
+        //ADICIONA A ARESTA QUE LIGA O VERTICE DE POSIÇÃO pos_u ao vertice de POSIÇÃO pos_v CASO É ESTEJA NA CODIÇÃO DE INSERSÃO
         if (pesoEGrauNo[pos_u] < D && pesoEGrauNo[pos_v]< D && !naAgm[pos_v] && pos_v != pos_u)
             arestas.push_back({arestaAux->getWeight(), {pos_u, pos_v}});
         
-        arestaAux = arestaAux->getNextEdge();
+        arestaAux = arestaAux->getNextEdge();       //Proxima aresta
     }
     
-    for(int i = 0;i<arestas.size();i++){
 
-        if (naAgm[arestas[i].second.first] && naAgm[arestas[i].second.second])
-           arestas.erase(arestas.begin() + i);
+
+    // for(int i = 0;i<arestas.size();i++){
+
+    //     if (naAgm[arestas[i].second.first] && naAgm[arestas[i].second.second])
+    //        arestas.erase(arestas.begin() + i);
         
 
-        if (pesoEGrauNo[arestas[i].second.first] >= D || pesoEGrauNo[arestas[i].second.second] >= D)
-           arestas.erase(arestas.begin() + i);
-        
-    }
+    //     if (pesoEGrauNo[arestas[i].second.first] >= D || pesoEGrauNo[arestas[i].second.second] >= D)
+    //        arestas.erase(arestas.begin() + i);
         
     // }
-    int peso;
-    stable_sort(arestas.begin(), arestas.end());
-    // cout << "4"<<endl;
-}
-void geraAGM(Graph *grafo, vector<pair<int, pair<int, int>>> &AGM_RESULTANTE, int *melhor_solucao, float alfa, int *posNoInicial){
+        
     
-    unsigned seed = time(0); //Muda a seed dos aleatorios
-    vector<pair<int, pair<int, int>>> arestas; //vector<{peso, {pos_noOrigem, pos_noDestino}}>
-    vector<int> pesoEGrauNo(grafo->getOrder(), 0);
-    vector<bool> naAGM(grafo->getOrder(), false);
+
+    stable_sort(arestas.begin(), arestas.end());    //Organiza por peso as arestas
+    
+}
+
+/**
+ * @brief                                                   Função utilizada para criar a arvore geradora minima, com restrição de grau. com D = 3
+ * 
+ * @param grafo                                             
+ * @param AGM_RESULTANTE 
+ * @param melhor_solucao 
+ * @param alfa 
+ * @param posNoInicial 
+ */
+void geraAGM(Graph *grafo, vector<pair<int, pair<int, int>>> &AGM_RESULTANTE, int *melhor_solucao, float alfa, int *posNoInicial, int visualizar){
+    
+    unsigned seed = time(0);                                                    //Muda a seed dos aleatorios
+    vector<pair<int, pair<int, int>>> arestas;                                  //vector<{peso, {pos_noOrigem, pos_noDestino}}>
+    vector<int> pesoEGrauNo(grafo->getOrder(), 0);                              //CONTEM O GRAU DO VERTICE POS_U INSERIDO NA AGM
+    vector<bool> naAGM(grafo->getOrder(), false);                               //MARCA SE O VERTICE pos_x ESTÁ NA AGM
 
 
-    vector<pair<int, pair<int, int>>> AGM(grafo->getOrder());
+    vector<pair<int, pair<int, int>>> AGM(grafo->getOrder());                   //VETOR QUE VAI GUARDA AS ARESTAS DA AGM pos_u -- pos_v ONDE 
+                                                                                //pos_u e pos_v é a ordem que em esses vértices foram inseridos no grafo
     AGM.clear();
 
     int pos_u;
@@ -1619,56 +1645,61 @@ void geraAGM(Graph *grafo, vector<pair<int, pair<int, int>>> &AGM_RESULTANTE, in
     int peso;
     int posInicial = 0;
 
-    srand(seed);    //Seed dos aleatorios
-    posInicial = rand()%grafo->getOrder();
+    srand(seed);                                                                //Seed dos aleatorios
+    posInicial = rand()%grafo->getOrder()-1;                                    //PEGA UM VERTICE ALEATORIO DO GRAU POR SUA POSIÇÃO DE INSERSÃO
     *posNoInicial = posInicial;
-    arestaDoNo(grafo, posInicial, arestas,pesoEGrauNo, naAGM);
+
+    arestaDoNo(grafo, posInicial, arestas,pesoEGrauNo, naAGM, visualizar);      //ADICIONA NO CONJUNTO DE SOLUÇÕES AS ARESTAS QUE PODEM ENTRAR NA AGM
 
     bool cond = true;
     int cont = 0;
-    int k = 0;
-    while ((find(naAGM.begin(), naAGM.end(), false) != naAGM.end()) && cond){
+    while ((find(naAGM.begin(), naAGM.end(), false) != naAGM.end()) && cond){   //ENQUANTO TODOS OS VERTICES NÃO ESTIVEREM NA AGM
 
-        
+            int k = 0;                                                          //A K-ESSIMA ARESTAS A SER INSERIDA, SE POSSIVEL, NO RANDOMIDO 
+                                                                                //O K VARIA DE 0 A arestas.size * alfa
             if(arestas.size() > 0){
 
-                if(arestas.size() > 2 && alfa > 0)
-                    k = rand()%int(arestas.size() * alfa);
-                pos_u = arestas[k].second.first;
-                pos_v = arestas[k].second.second;
-                peso = arestas[k].first;
+                                            
+                if(int(arestas.size() * alfa) > 1)                              //O K VARIA DE 0 A arestas.size * alfa SE O ALFA FOR MAIOR QUE 0 E O VETOR DE ARESTA TIVER MAIS DE 2 CONTIDOS
+                    k = rand()%int(arestas.size() * alfa);                  
+                
+                pos_u = arestas[k].second.first;                                //VERTICE COM POSISÃO DE INSERÇÃO pos_u
+                pos_v = arestas[k].second.second;                               //VERTICE COM POSISÃO DE INSERÇÃO pos_v
+                peso = arestas[k].first;                                        //PESO DA ARESTA pos_u pos_v
         
                 if((naAGM[pos_u] && naAGM[pos_v]) || (pesoEGrauNo[pos_u] >= D || pesoEGrauNo[pos_v] >= D)){
 
-                    arestas.erase(arestas.begin() + k);
+                    arestas.erase(arestas.begin() + k);                         //REMOVE A ARESTA SE O GRAU DO pos_u ou pos_v for maior que D,
+                                                                                //ALÉM DE REMOVE-LO SE pos_u e pos_v JÁ CONSTAR NA AGM
 
                 }else{
-                    if(pos_u != pos_v){
+                    if(pos_u != pos_v){                                         //GARANTE QUE NÃO TENHA SELF LOOP
                         
-                        AGM.push_back({peso, {pos_u,pos_v}});
-                        naAGM[pos_u] = true;
-                        naAGM[pos_v] = true;
-                        pesoEGrauNo[pos_u] += 1;
-                        pesoEGrauNo[pos_v] += 1;
-                        arestas.erase(arestas.begin() + k);
-                        cout << "Vértice de poição "<< pos_v << " adicionado a AGM" << endl;
-                        arestaDoNo(grafo, pos_v, arestas,pesoEGrauNo, naAGM);
+                        AGM.push_back({peso, {pos_u,pos_v}});                   //ADICIONA NA SOLUÇÃO A ARESTA pos_u pos_v
+                        naAGM[pos_u] = true;                                    //MARCA COM JÁ ADICIONADO
+                        naAGM[pos_v] = true;                                    //MARCA COM JÁ ADICIONADO
+                        pesoEGrauNo[pos_u] += 1;                                //AUMENTA SEU GRAU
+                        pesoEGrauNo[pos_v] += 1;                                //AUMENTA SEU GRAU
+                        arestas.erase(arestas.begin() + k);                     //REMOVE DO VERTOR DE POSIVEIS SOLUÇÕES
+
+                        if(visualizar)cout << "Vértice de poição "<< pos_v << " adicionado a AGM" << endl;
+
+                        arestaDoNo(grafo, pos_v, arestas,pesoEGrauNo, naAGM, visualizar); //ADICIONA TODAS A ARESTAS DO NO RECEM ADICIONADO NO VETOR DE POSSIVEIS SOLUÇÕES 
                     }
-                    
                 }
-                
             } else{
+                cout << "CONJUNTO DE POSSIVEIS SOLUÇÕES VAZIA"<<endl;
                 cond = false;
             }
             
     }
     int soma = 0;
-    for(int i = 0;i<AGM.size(); i++)
-        if(AGM[i].second.first != AGM[i].second.second){
+    for(int i = 0;i<AGM.size(); i++)                        //SOMA O PESO DA AGM
+        if(AGM[i].second.first != AGM[i].second.second)
             soma += AGM[i].first;
-        }
-    *melhor_solucao = soma;
-    AGM_RESULTANTE = AGM;
+        
+    *melhor_solucao = soma;                                 //ATUALIZA O VALOR DO PONTEIRO
+    AGM_RESULTANTE = AGM;                                   //ATUALIZA O VALOR DO PONTEIRO
 
 }
 
@@ -2080,10 +2111,19 @@ void Graph::greed2(){
     int melhorSolucao1= 0;
     int melhorSolucao2= INF;
     int posNoInicial;
+
+    cout << "GOSTARIA DE VER O PROGRESSO DE INSERSÃO OCORRER(REQUER MAIS TEMPO)?\n1 PARA SIM\n2 PARA NÃO"<<endl;
+    string querVisuzalizar;int visuzalizar = 0;
+    cin >> querVisuzalizar;
+    if(querVisuzalizar == "1")visuzalizar = 1;
+    else
+        if(querVisuzalizar == "2")visuzalizar = 0;
+        else {cout << "OPÇÃO INVALIDA, 2 SELECIONADO AUTOMATICAMENTE"<<endl;visuzalizar = 0;}
+    cout << "\nINICIANDO A EXECUÇÃO DO ALGORITMO GULOSO 2 ..." << endl;
     for(int i = 0;i<1;i++){
 
-        geraAGM(this, AGM_RESULTANTE1,&melhorSolucao1, alfa, &posNoInicial);
-        cout<< i<<" Melhor Solução " << melhorSolucao1 << endl; 
+        geraAGM(this, AGM_RESULTANTE1,&melhorSolucao1, alfa, &posNoInicial, visuzalizar);
+        cout<< i<<" MELHOR SOLUCÃO " << melhorSolucao1 << endl; 
         if(melhorSolucao1 < melhorSolucao2){
             
             melhorSolucao2 = melhorSolucao1;
@@ -2093,7 +2133,7 @@ void Graph::greed2(){
         
     }
     imprimeSolucao(AGM_RESULTANTE2, posNoInicial, alfa);
-    cout << "Solução Final " <<melhorSolucao2<<endl;
+    cout << "SOLUÇÃO FINAL: " <<melhorSolucao2<<endl;
 
 }
 void Graph::greedRandom2(){
@@ -2101,6 +2141,15 @@ void Graph::greedRandom2(){
     float alfa;
     cout << "QUAL O ALFA"<<endl;
     cin >> alfa;
+
+    cout << "GOSTARIA DE VER O PROGRESSO DE INSERSÃO OCORRER(REQUER MAIS TEMPO)?\n1 PARA SIM\n2 PARA NÃO"<<endl;
+    string querVisuzalizar;int visuzalizar = 0;
+    cin >> querVisuzalizar;
+    if(querVisuzalizar == "1")visuzalizar = 1;
+    else
+        if(querVisuzalizar == "2")visuzalizar = 0;
+        else {cout << "OPÇÃO INVALIDA, 2 SELECIONADO AUTOMATICAMENTE"<<endl;visuzalizar = 0;}
+    cout << "\nINICIANDO A EXECUÇÃO DO ALGORITMO GULOSO RANDOMIZADO 2 ..." << endl;
     vector<pair<int, pair<int, int>>> AGM_RESULTANTE1;
     vector<pair<int, pair<int, int>>> AGM_RESULTANTE2;
     int melhorSolucao1= 0;
@@ -2108,8 +2157,8 @@ void Graph::greedRandom2(){
     int posNoInicial;
     for(int i = 0;i<1;i++){
 
-        geraAGM(this, AGM_RESULTANTE1,&melhorSolucao1, alfa, &posNoInicial);
-        cout<< i<<" melhorSolucao2 " << melhorSolucao1 << endl; 
+        geraAGM(this, AGM_RESULTANTE1,&melhorSolucao1, alfa, &posNoInicial, visuzalizar);
+        cout<< i<<" MELHOR SOLUÇÃO " << melhorSolucao1 << endl; 
         if(melhorSolucao1 < melhorSolucao2){
             
             melhorSolucao2 = melhorSolucao1;
@@ -2119,7 +2168,7 @@ void Graph::greedRandom2(){
         
     }
     imprimeSolucao(AGM_RESULTANTE2, posNoInicial, alfa);
-    cout << "Solução Final " <<melhorSolucao2<<endl;
+    cout << "SOLUÇÃO FINAL " <<melhorSolucao2<<endl;
 
 }
 
@@ -2133,9 +2182,16 @@ void Graph::greedRactiveRandom2(){
     float solucao;   // Armazena a solução da iteração;
     float auxAlfa; // Variável auxiliar utilizada para armazenar o valor do alfa;
 
+    cout << "GOSTARIA DE VER O PROGRESSO DE INSERSÃO OCORRER(REQUER MAIS TEMPO)?\n1 PARA SIM\n2 PARA NÃO"<<endl;
+    string querVisuzalizar;int visuzalizar = 0;
+    cin >> querVisuzalizar;
+    if(querVisuzalizar == "1")visuzalizar = 1;
+    else
+        if(querVisuzalizar == "2")visuzalizar = 0;
+        else {cout << "OPÇÃO INVALIDA, 2 SELECIONADO AUTOMATICAMENTE"<<endl;visuzalizar = 0;}
+
     d = 3;
 
-    cout << "\nInicializando a execução do Algoritmo Guloso Randomizado Reativo..." << endl;
 
     cout << "\nQual será o número total de iterações?" << endl;
     cin >> numIt;
@@ -2145,6 +2201,7 @@ void Graph::greedRactiveRandom2(){
     cin >> numBloco;
     cout << endl;
 
+    cout << "\nINICIANDO A EXECUÇÃO DO ALGORITMO GULOSO RANDOMIZADO REATIVO 2..." << endl;
     vector<float> alfas;   // Vetor utilizado para armazenar os valores de alfa;
     vector<float> solBest;   // Vetor utilizado para armazenar melhor solução encontrada por cada alfa (Os valores são referentes ao alfa que se encontra no elemento de mesmo índice do vetor de alfas);
     vector<media> medias;  // Vetor utilizado para armazenar a média das soluções de cada alfa (Os valores são referentes ao alfa que se encontra no elemento de mesmo índice do vetor de alfas);
@@ -2209,7 +2266,7 @@ void Graph::greedRactiveRandom2(){
         auxAlfa = alfas[index];
         cout << "auxAlfa: " << auxAlfa << endl;
 
-        geraAGM(this, AGM_RESULTANTE1,&melhorSolucao1, auxAlfa, &posNoInicial);
+        geraAGM(this, AGM_RESULTANTE1,&melhorSolucao1, auxAlfa, &posNoInicial, visuzalizar);
         cout<< i<<" melhorSolucao2 " << melhorSolucao1 << endl;
 
         atualizaMedias(medias, melhorSolucao1, alfas, auxAlfa);
