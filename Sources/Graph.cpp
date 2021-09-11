@@ -41,6 +41,8 @@ void atualizaMedias(vector<media> &medias, int solucao, vector<float> &alfas, fl
 void atualizaProbabilidades(vector<media> &medias, vector<float> &prob, vector<float> &solBest, vector<float> &q);
 int randAlfa(float alfa, int tam_vetor);
 void inicializaVetores(vector<float> &prob, vector<media> &medias, int &numAlfas);
+void imprimirMatriz(vector<vector<pair<int, int>>> &matriz);
+int pesoTotalAGM(vector<pair<int, int>> &pesoNoTotal);
 
 using namespace std;
 
@@ -1554,6 +1556,8 @@ void imprimeSolucao(vector<pair<int, pair<int, int>>> &AGM_RESULTANTE, int posIn
             //É mostrado a posição do vertice no grafo é não seu ID
             arq << AGM_RESULTANTE[i].second.first << " -- " << AGM_RESULTANTE[i].second.second << "[ label = " << AGM_RESULTANTE[i].first << "]\n";
             saida <<"QUANTIDADE DE ARESTAS: " << qnt2+1 << " posição de u: " << AGM_RESULTANTE[i].second.first << " -- posição de v: " << AGM_RESULTANTE[i].second.second << " PESO DA ARESTA " << AGM_RESULTANTE[i].first << " ]\n";
+            cout << qnt2 <<" QUANTIDADE DE ARESTAS: " << qnt2+1 << " posição de u: " << AGM_RESULTANTE[i].second.first << " -- posição de v: " << AGM_RESULTANTE[i].second.second << " PESO DA ARESTA " << AGM_RESULTANTE[i].first << " ]\n";
+
             soma += AGM_RESULTANTE[i].first;
             qnt2++;
 
@@ -1561,12 +1565,27 @@ void imprimeSolucao(vector<pair<int, pair<int, int>>> &AGM_RESULTANTE, int posIn
 
     arq << "}\n";
     saida << "SOMA DA AGM DE ORDEM "<< AGM_RESULTANTE.size()+1 <<" COMEÇANDO PELO VERTICE DE POSIÇÃO "<< posInicial<< " E COM O ALFA "<< alfa<< " : " << soma << endl;
+    
     arq.close();
     saida.close();
     cout << "SOLUÇÃO SALVA NO ARQUIVO saida.dot e saida.txt"<<endl;
     
 
 }
+/**
+ * @brief 
+ * 
+ * @param x 
+ * @param y 
+ * @return true 
+ * @return false 
+ */
+bool maiorDasAretas(pair<int, pair<int, int>> x, pair<int, pair<int, int>> y){
+
+    return x.first > y.first;
+    
+}
+
 /**
  * @brief                                               Função usada para pegar todas as arestas de um determinado vertice apartir de sua posição
  * 
@@ -1614,21 +1633,7 @@ void arestaDoNo(Graph *grafo, int posNo, vector<pair<int, pair<int, int>>> &ares
                 arestas.erase(arestas.begin() + i);
             else i++;
 
-
-    // for(int i = 0;i<arestas.size();i++){
-
-    //     if (naAgm[arestas[i].second.first] && naAgm[arestas[i].second.second])
-    //        arestas.erase(arestas.begin() + i);
-        
-
-    //     if (pesoEGrauNo[arestas[i].second.first] >= D || pesoEGrauNo[arestas[i].second.second] >= D)
-    //        arestas.erase(arestas.begin() + i);
-        
-    // }
-        
-    
-
-    stable_sort(arestas.begin(), arestas.end());    //Organiza por peso as arestas
+    sort(arestas.begin(), arestas.end());    //Organiza por peso as arestas
     
 }
 
@@ -1647,7 +1652,6 @@ void geraAGM(Graph *grafo, vector<pair<int, pair<int, int>>> &AGM_RESULTANTE, in
     vector<pair<int, pair<int, int>>> arestas;                                  //vector<{peso, {pos_noOrigem, pos_noDestino}}>
     vector<int> pesoEGrauNo(grafo->getOrder(), 0);                              //CONTEM O GRAU DO VERTICE POS_U INSERIDO NA AGM
     vector<bool> naAGM(grafo->getOrder(), false);                               //MARCA SE O VERTICE pos_x ESTÁ NA AGM
-
 
     vector<pair<int, pair<int, int>>> AGM(grafo->getOrder());                   //VETOR QUE VAI GUARDA AS ARESTAS DA AGM pos_u -- pos_v ONDE 
                                                                                 //pos_u e pos_v é a ordem que em esses vértices foram inseridos no grafo
@@ -1668,10 +1672,10 @@ void geraAGM(Graph *grafo, vector<pair<int, pair<int, int>>> &AGM_RESULTANTE, in
     int cont = 0;
     while ((find(naAGM.begin(), naAGM.end(), false) != naAGM.end()) && cond){   //ENQUANTO TODOS OS VERTICES NÃO ESTIVEREM NA AGM
 
+
             int k = 0;                                                          //A K-ESSIMA ARESTAS A SER INSERIDA, SE POSSIVEL, NO RANDOMIDO 
                                                                                 //O K VARIA DE 0 A arestas.size * alfa
             if(arestas.size() > 0){
-
                                             
                 if(int(arestas.size() * alfa) > 1)                              //O K VARIA DE 0 A arestas.size * alfa SE O ALFA FOR MAIOR QUE 0 E O VETOR DE ARESTA TIVER MAIS DE 2 CONTIDOS
                     k = rand()%int(arestas.size() * alfa);                  
@@ -1724,14 +1728,7 @@ void geraAGM(Graph *grafo, vector<pair<int, pair<int, int>>> &AGM_RESULTANTE, in
  * @return true 
  * @return false 
  */
-
-
 bool maior(pair<int, int> i, pair<int, int> j)
-{
-    return (i.first > j.first);
-}
-
-bool maiorAresta(pair<int, pair<int, int>> i, pair<int, pair<int, int>> j)
 {
     return (i.first > j.first);
 }
@@ -1754,29 +1751,6 @@ int acha(vector<pair<int, int>> &vet, pair<int, int> val)
     return INF;
 }
 
-void imprimirMatriz(vector<vector<pair<int, int>>> &matriz)
-{
-    ofstream arq("saida.dot");
-
-    arq << "graph {\n";
-    int sizeAll = 0;
-    int soma = 0;
-    int qnt2 = 0;
-    for (int i = 0; i < matriz.size(); i++)
-    {
-        for (int j = 0; j < matriz[i].size(); j++)
-        {
-
-            arq << i << " -- " << matriz[i][j].second << "[ label = " << matriz[i][j].first << "]\n";
-            cout << qnt2 << " " << i << " -- " << matriz[i][j].second << "[ label = " << matriz[i][j].first << " ]\n";
-            soma += matriz[i][j].first;
-            qnt2++;
-        }
-    }
-    arq << "}\n";
-    cout << "SOMA: " << soma << endl;
-    arq.close();
-}
 
 /* A função ordenaArestas recebe como parâmetro uma matriz e uma opção. Na matriz,
     o vector de fora representa cada nó e, para cada nó, há um vector de pares, em que
@@ -1896,7 +1870,7 @@ void preencheMatrizAGM(Graph *grafo, vector<int> &agm, vector<pair<int, pair<int
         }
     }
 }
-void kruskalAdaptado(Graph *grafo, vector<vector<pair<int, int>>> &matriz, vector<vector<pair<int, int>>> &matrizAGM, vector<pair<int, int>> &pesoEGrauNo, vector<bool> &dentroRestricao, float alfa = -1.0)
+void kruskalAdaptado(Graph *grafo, vector<vector<pair<int, int>>> &matriz, vector<vector<pair<int, int>>> &matrizAGM, vector<pair<int, int>> &pesoEGrauNo, vector<bool> &dentroRestricao,int *pesoFinal, vector<vector<pair<int, int>>> &matrizAGMFINAL,float alfa = 0)
 {
 
     vector<pair<int, pair<int, int>>> arestas; //vector<{peso, {pos_noOrigem, pos_noDestino}}>
@@ -1950,7 +1924,7 @@ void kruskalAdaptado(Graph *grafo, vector<vector<pair<int, int>>> &matriz, vecto
     }
 
     // Ordena do menor peso para o maior
-    sort(arestas.begin(), arestas.end()); //!! ----------------------------------
+    sort(arestas.begin(), arestas.end()); 
 
     int ordem = grafo->getOrder();
     SubArvore *subarvores = new SubArvore[(ordem * sizeof(SubArvore))]; // vetor para armazenar todas as subárvores
@@ -1961,34 +1935,45 @@ void kruskalAdaptado(Graph *grafo, vector<vector<pair<int, int>>> &matriz, vecto
         subarvores[i].ordem = 1;
     }
 
-    // 4º PASSO: Montar a Árvore Geradora Mínima
+    //Montar a Árvore Geradora Mínima
 
     vector<int> agm; // vetor com o índice associado à posição de cada aresta da árvore geradora mínima no vector 'arestas' do subgrafo
     agm.clear();
 
     // Iterar até atingir condição de parada
-    int cont = 0;
-    while (agm.size() < ordem - 1 && cont < arestas.size())
-    {
-        pair<int, int> proxAresta = arestas[cont].second;
-        int u = proxAresta.first;
+    int k = 0;
+    vector<pair<int, pair<int, int>>> arestasAux;
+    arestasAux.clear();
+    arestasAux = arestas;
+    vector<int>grau(grafo->getOrder(),0);
+    int cont=0;
+    while (arestas.size() > 0)
+    {   
+        k=randAlfa(alfa, arestas.size());
+        pair<int, int> proxAresta = arestas[k].second;
+        
         int pos_u = proxAresta.first;
-        int v = proxAresta.second;
         int pos_v = proxAresta.second;
 
-        if (pos_u == pos_v)
-            agm.push_back(cont);
-
         // Se u e v não estão na mesma subárvore
+        if(grau[pos_u] < D && grau[pos_v] < D)
         if (qualSubArvore(subarvores, pos_u) != qualSubArvore(subarvores, pos_v))
         {
-            agm.push_back(cont);
+            agm.push_back(cont+k);
             unirSubArvores(subarvores, pos_u, pos_v);
+            grau[pos_u] += 1;
+            grau[pos_v] += 1;
+            
         }
         cont++;
+        arestas.erase(arestas.begin());
+        
     }
 
-    preencheMatrizAGM(grafo, agm, arestas, matriz, matrizAGM, pesoEGrauNo, dentroRestricao);
+    preencheMatrizAGM(grafo, agm, arestasAux, matriz, matrizAGM, pesoEGrauNo, dentroRestricao);
+
+    *pesoFinal=pesoTotalAGM(pesoEGrauNo);
+    matrizAGMFINAL = matrizAGM;
 
     delete[] subarvores;
     return;
@@ -2002,74 +1987,6 @@ int pesoTotalAGM(vector<pair<int, int>> &pesoNoTotal)
     return peso / 2;
 }
 
-void ajustaGrau(vector<vector<pair<int, int>>> &matriz, vector<vector<pair<int, int>>> &matrizAGM, vector<pair<int, int>> &pesoEGrauNo, vector<bool> &dentroRestricao, int *pesoAGM)
-{
-    // Enquanto não estiver tudo dentro da restrição
-    while (find(dentroRestricao.begin(), dentroRestricao.end(), false) != dentroRestricao.end())
-    {
-        cout << "\nQntd de nós ainda fora da restrição: " << count(dentroRestricao.begin(), dentroRestricao.end(), false) << endl;
-
-        // index do nó que está fora da restrição de grau
-        int index = (int)(find(dentroRestricao.begin(), dentroRestricao.end(), false) - dentroRestricao.begin());
-        cout << "Posição do nó fora da restrição: " << index << endl;
-        //cout << "ID do fora da restrição: " << this->getNodePosition(index)->getId() << endl;
-
-        // SUBSTITUIÇÃO DE ARESTA
-
-        // 1o descarta as arestas que nao poderão ser inseridas caso o nó já esteja no limite
-        pair<int, int> aresta1 = matrizAGM[index].back(); // par {peso, posição_notarget}
-        while (pesoEGrauNo[aresta1.second].second > D)
-        {
-            matriz[aresta1.second].clear();
-            matrizAGM[index].pop_back();
-            aresta1 = matrizAGM[index].back();
-            while (matriz[aresta1.second].size() == 0)
-            {
-                matrizAGM[index].pop_back();
-                aresta1 = matrizAGM[index].back();
-            }
-        }
-        matrizAGM[index].pop_back();
-
-        // 2o pega na matriz a primeira aresta mais leve do nó
-        pair<int, int> aresta2 = matriz[aresta1.second].back();
-
-        // se a entrada da aresta violar a restrição de grau, pegar a próxima menor
-        while (pesoEGrauNo[aresta2.second].second >= D)
-        {
-            matriz[aresta2.second].clear();
-            matriz[aresta1.second].pop_back();
-            aresta2 = matriz[aresta1.second].back();
-            while (matriz[aresta2.second].size() == 0)
-            {
-                matriz[aresta1.second].pop_back();
-                aresta2 = matriz[aresta1.second].back();
-            }
-        }
-
-        // 3o com a aresta pronta, retira-la da matriz, colocá-la na matrizAGM e atualizar os valores dos controles
-        matriz[aresta1.second].pop_back();
-        matrizAGM[aresta1.second].push_back(aresta2);
-
-        // atualiza peso e grau dos nós
-        pesoEGrauNo[index].first -= aresta1.first;
-        pesoEGrauNo[index].second--;
-        pesoEGrauNo[aresta1.second].first -= aresta1.first;
-        pesoEGrauNo[aresta1.second].first += aresta2.first;
-        pesoEGrauNo[aresta2.second].second++;
-
-        // atualiza o status das restrições
-        if (pesoEGrauNo[index].second <= D)
-            dentroRestricao[index] = true;
-        if (pesoEGrauNo[aresta1.second].second <= D)
-            dentroRestricao[aresta1.second] = true;
-        if (pesoEGrauNo[aresta2.second].second <= D)
-            dentroRestricao[aresta2.second] = true;
-        // atualiza peso agm
-        pesoAGM = pesoAGM - aresta1.first + aresta2.first;
-    }
-}
-
 /**
  * @brief Algoritmo Guloso
  * 
@@ -2077,6 +1994,7 @@ void ajustaGrau(vector<vector<pair<int, int>>> &matriz, vector<vector<pair<int, 
  */
 void Graph::greed()
 {
+  
     /* matriz em que o vector de fora representa cada nó e,
     para cada nó, há um vector de pares, em que cada par representa
     uma aresta daquele nó. O par tem o formato {peso, posicao_notarget} */
@@ -2098,23 +2016,242 @@ void Graph::greed()
     // matriz que vai ter as arestas da agm
     vector<vector<pair<int, int>>> matrizAGM(this->getOrder());
 
-    kruskalAdaptado(this, matriz, matrizAGM, pesoEGrauNo, dentroRestricao);
+    int melhorSolucao2 = INF;
+    vector<vector<pair<int, int>>> melhorMatrizAGM2;
+    melhorMatrizAGM2.clear();
+
+    kruskalAdaptado(this, matriz, matrizAGM, pesoEGrauNo, dentroRestricao, &melhorSolucao2, melhorMatrizAGM2);
     ordenaArestas(matrizAGM, 0);
 
     int pesoAGM = pesoTotalAGM(pesoEGrauNo);
     imprimirMatriz(matrizAGM);
-    ajustaGrau(matriz, matrizAGM, pesoEGrauNo, dentroRestricao, &pesoAGM);
-
+    
     double temp = fimProces(&inicio, &fim);
 
     cout << "\ndepois:" << endl;
     // imprimirMatriz(matrizAGM);
 
-    cout << "\nPeso da Arvore Geradora com Restrição de Grau: " << pesoAGM
-         << "\nTempo total: " << temp << " segundos" << endl;
+    cout << "\nPeso da Arvore Geradora com Restrição de Grau: " << melhorSolucao2 << "\nTempo total: " << temp << " segundos" << endl;
     return;
 }
 
+void Graph::greedRandom(){
+
+
+    float alfa;
+    cout << "QUAL O ALFA"<<endl;
+    cin >> alfa;
+    int k_iteracoes = 1;
+    cout << "QUANTIDADE DE ITERAÇÕES: "<<endl;
+    cin >> k_iteracoes;
+    cout << "\nINICIANDO A EXECUÇÃO DO ALGORITMO GULOSO RANDOMIZADO ..." << endl;
+    
+    chrono::time_point<chrono::system_clock> inicio, fim;
+    iniciaProces(&inicio);
+    int melhorSolucao1 = 0;
+    int melhorSolucao2 = INF;
+
+    vector<vector<pair<int, int>>> melhorMatrizAGM1;
+    melhorMatrizAGM1.clear();
+    vector<vector<pair<int, int>>> melhorMatrizAGM2;
+    melhorMatrizAGM2.clear();
+
+    for(int i = 0;i<k_iteracoes;i++){
+
+        /* matriz em que o vector de fora representa cada nó e,
+        para cada nó, há um vector de pares, em que cada par representa
+        uma aresta daquele nó. O par tem o formato {peso, posicao_notarget} */
+        vector<vector<pair<int, int>>> matriz(this->getOrder());
+
+
+        // Preenchendo e ordenando a matriz
+        preencheMatriz(this, matriz);
+        ordenaArestas(matriz, 1);
+
+        //imprimirMatriz(matriz);
+
+        // controles
+        vector<pair<int, int>> pesoEGrauNo(this->getOrder(), {0, 0}); // par {peso, grau}
+        vector<bool> dentroRestricao(this->getOrder(), true);         // vector para controlar os nós que estão dentro da restrição
+
+        // matriz que vai ter as arestas da agm
+        vector<vector<pair<int, int>>> matrizAGM(this->getOrder());
+
+        kruskalAdaptado(this, matriz, matrizAGM, pesoEGrauNo, dentroRestricao, &melhorSolucao1, melhorMatrizAGM1, alfa);
+        ordenaArestas(matrizAGM, 0);
+
+        if(melhorSolucao1 < melhorSolucao2){
+            
+            melhorMatrizAGM2 = melhorMatrizAGM1;
+            melhorSolucao2 = melhorSolucao1;
+
+        }
+        cout << "MELHOR SOLUÇÃO: "<< melhorSolucao2<<endl;
+        
+    }
+    double temp = fimProces(&inicio, &fim);
+    imprimirMatriz(melhorMatrizAGM2);
+    cout << "\nPeso da Arvore Geradora com Restrição de Grau: " << melhorSolucao2 << "\nTempo total: " << temp << " segundos" << endl;
+}
+void Graph::greedRactiveRandom(){
+
+    int d;         // Grau de restrição;
+    int numIt;     // Número de iterações;
+    int numBloco;  // Número de iterações até atualizar novamente o vetor de probabilidades;
+    int numAlfas;  // Variável ustilizada para armazenar a quantidade de alfas que serão analizados;
+    int index;     // índice do alfa escolhido para a iteração;
+    float solucao;   // Armazena a solução da iteração;
+    float auxAlfa; // Variável auxiliar utilizada para armazenar o valor do alfa;
+
+    cout << "\nQual será o número total de iterações?" << endl;
+    cin >> numIt;
+    cout << endl;
+
+    cout << "\nQual será a quantidade de iterações por bloco?" << endl;
+    cin >> numBloco;
+    cout << endl;
+
+    cout << "\nINICIANDO A EXECUÇÃO DO ALGORITMO GULOSO RANDOMIZADO REATIVO ..." << endl;
+    chrono::time_point<chrono::system_clock> inicio, fim;
+
+    iniciaProces(&inicio);
+    vector<float> alfas;   // Vetor utilizado para armazenar os valores de alfa;
+    vector<float> solBest;   // Vetor utilizado para armazenar melhor solução encontrada por cada alfa (Os valores são referentes ao alfa que se encontra no elemento de mesmo índice do vetor de alfas);
+    vector<media> medias;  // Vetor utilizado para armazenar a média das soluções de cada alfa (Os valores são referentes ao alfa que se encontra no elemento de mesmo índice do vetor de alfas);
+    vector<float> prob;    // Vetor utilizado para armazenar a probabilidade de cada alfa (Os valores são referentes ao alfa que se encontra no elemento de mesmo índice do vetor de alfas);;
+    vector<float> q;       // Vetor utilizado para armazenar o q (operação necessária para o cálculo da probabilidade) de cada alfa (Os valores são referentes ao alfa que se encontra no elemento de mesmo índice do vetor de alfas);;
+
+    alfas.push_back(0.05);
+    alfas.push_back(0.10);
+    alfas.push_back(0.15);
+    alfas.push_back(0.30);
+    alfas.push_back(0.50);
+
+    vector<vector<pair<int, int>>> melhorMatrizAGM1;
+    melhorMatrizAGM1.clear();
+    
+    numAlfas = alfas.size();
+
+    cout << "numAlfas: " << numAlfas << endl;
+
+    for(int i=0; i<numAlfas; i++){
+        solBest.push_back(0.0);
+    }
+
+    for(int i=0; i<numAlfas; i++){
+        q.push_back(0.0);
+    }
+
+    inicializaVetores(prob, medias, numAlfas); // Chamada da função para inicializar os vetores de médias e probabilidades;
+
+    cout << "\nMedias: " << endl;
+    for(int i=0; i< medias.size(); i++){
+        cout << medias[i].media << " | ";
+    }
+
+    cout << "\nProbs: " << endl;
+    for(int i=0; i< prob.size(); i++){
+        cout << prob[i] << " | ";
+    }
+
+    vector<pair<int, pair<int, int>>> AGM_RESULTANTE1;
+    vector<pair<int, pair<int, int>>> AGM_RESULTANTE2;
+    int melhorSolucao1= 0;
+    int melhorSolucao2= INF;
+    int posNoInicial;
+
+    int i = 0;
+    while (i <= numIt){
+        if (i!=0 && i % numBloco == 0)
+        {
+            cout << "\nProbs: " << endl;
+            for(int i=0; i< prob.size(); i++){
+                cout << prob[i] << " | ";
+            }
+            cout << endl;
+            atualizaProbabilidades(medias, prob, solBest, q); // Chamada da função que irá atualizar o vetor de probabilidades;
+            cout << "\nProbs: " << endl;
+            for(int i=0; i< prob.size(); i++){
+                cout << prob[i] << " | ";
+            }
+            cout << endl;
+        }
+
+        int index = escolheAlfa(prob);
+        cout << "\nindexAlfa: " << index << endl;
+        auxAlfa = alfas[index];
+        cout << "auxAlfa: " << auxAlfa << endl;
+
+
+        /* matriz em que o vector de fora representa cada nó e,
+        para cada nó, há um vector de pares, em que cada par representa
+        uma aresta daquele nó. O par tem o formato {peso, posicao_notarget} */
+        vector<vector<pair<int, int>>> matriz(this->getOrder());
+        matriz.clear();
+
+        // Preenchendo e ordenando a matriz
+        preencheMatriz(this, matriz);
+        ordenaArestas(matriz, 1);
+
+        //imprimirMatriz(matriz);
+
+        // controles
+        vector<pair<int, int>> pesoEGrauNo(this->getOrder(), {0, 0}); // par {peso, grau}
+        vector<bool> dentroRestricao(this->getOrder(), true);         // vector para controlar os nós que estão dentro da restrição
+
+        // matriz que vai ter as arestas da agm
+        vector<vector<pair<int, int>>> matrizAGM(this->getOrder());
+        
+        kruskalAdaptado(this, matriz, matrizAGM, pesoEGrauNo, dentroRestricao, &melhorSolucao1, melhorMatrizAGM1, auxAlfa);
+        ordenaArestas(matrizAGM, 0);
+
+        cout<< i<<" melhorSolucao2 " << melhorSolucao1 << endl;
+
+        atualizaMedias(medias, melhorSolucao1, alfas, auxAlfa);
+
+
+        cout << "\nMedias: " << endl;
+        for(int i=0; i< medias.size(); i++){
+            cout << medias[i].media << " | ";
+        }
+        cout << endl;
+
+        if(solBest[index] == 0){
+            solBest[index] = melhorSolucao1;
+        }
+
+        if(solBest[index] > melhorSolucao1){
+            solBest[index] = melhorSolucao1;
+        }
+
+        AGM_RESULTANTE1.clear();
+        AGM_RESULTANTE2.clear();
+        int melhorSolucao1= 0;
+        int melhorSolucao2= INF;
+        i++;
+    }
+
+    for(int i=0; i<solBest.size(); i++){
+        cout << solBest[i] << " | ";
+    }
+    cout << endl;
+
+    int auxSolBest = INF;
+    for(int i=0; i<solBest.size(); i++){
+        if(solBest[i] < auxSolBest && solBest[i]!=0){
+            auxSolBest = solBest[i];
+        }
+    }
+  double temp = fimProces(&inicio, &fim);
+    cout << "\nMelhor Peso da Arvore Geradora com Restrição de Grau = " << auxSolBest
+         << "\nTempo total: " << temp << " segundos" << endl;
+
+}
+
+/**
+ * @brief 
+ * 
+ */
 void Graph::greed2(){
 
     float alfa = 0;
@@ -2155,6 +2292,10 @@ void Graph::greed2(){
          << "\nTempo total: " << temp << " segundos" << endl;
 
 }
+/**
+ * @brief 
+ * 
+ */
 void Graph::greedRandom2(){
 
     float alfa;
@@ -2189,16 +2330,18 @@ void Graph::greedRandom2(){
         }
         
     }
-      double temp = fimProces(&inicio, &fim);
+    double temp = fimProces(&inicio, &fim);
     imprimeSolucao(AGM_RESULTANTE2, posNoInicial, alfa);
     cout << "SOLUÇÃO FINAL " <<melhorSolucao2
-         << "\nTempo total: " << temp << " segundos" << endl;
+        << "\nTempo total: " << temp << " segundos" << endl;
 
 }
-
+/**
+ * @brief 
+ * 
+ */
 void Graph::greedRactiveRandom2(){
 
-    int d;         // Grau de restrição;
     int numIt;     // Número de iterações;
     int numBloco;  // Número de iterações até atualizar novamente o vetor de probabilidades;
     int numAlfas;  // Variável ustilizada para armazenar a quantidade de alfas que serão analizados;
@@ -2213,9 +2356,6 @@ void Graph::greedRactiveRandom2(){
     else
         if(querVisuzalizar == "2")visuzalizar = 0;
         else {cout << "OPÇÃO INVALIDA, 2 SELECIONADO AUTOMATICAMENTE"<<endl;visuzalizar = 0;}
-
-    d = 3;
-
 
     cout << "\nQual será o número total de iterações?" << endl;
     cin >> numIt;
@@ -2335,516 +2475,49 @@ void Graph::greedRactiveRandom2(){
     
 }
 
-void geraAG(Graph *grafo, vector<vector<pair<int, int>>> &matriz, vector<vector<pair<int, int>>> &matrizAG, vector<pair<int, int>> &pesoEGrauNo, vector<bool> &dentroRestricao, float alfa)
-{
-    vector<pair<int, pair<int, int>>> arestas; //vector<{peso, {pos_noOrigem, pos_noDestino}}>
-    arestas.clear();
-
-    grafo->cleanVisited();
-    Node *noAux = grafo->getFirstNode();
-    Edge *arestaAux = noAux->getFirstEdge();
-
-    int u = noAux->getId(); // id do nó de origem
-    int pos_u = noAux->getPosition();
-    int v;
-    int pos_v;
-
-    if (arestaAux != nullptr)
-    {
-        v = arestaAux->getTargetId(); //id do nó destino
-        pos_v = grafo->getNode(v)->getPosition();
-    }
-    // Percorrer todas as arestas do Grafo
-    for (int i = 1; i < grafo->getOrder(); i++)
-    {
-        if (arestaAux == nullptr)
-            arestas.push_back({INF, {pos_u, pos_u}});
-
-        while (arestaAux != nullptr)
-        {
-            // Coloca a aresta no vetor de arestas
-            if (!grafo->getNode(v)->getVisited())
-                arestas.push_back({arestaAux->getWeight(), {pos_u, pos_v}});
-
-            // Atualiza os auxiliares se a aresta não for null
-            arestaAux = arestaAux->getNextEdge();
-            if (arestaAux != nullptr)
-            {
-                v = arestaAux->getTargetId();
-                pos_v = grafo->getNode(v)->getPosition();
-            }
-        }
-
-        noAux->setVisited(true);
-        noAux = grafo->getNodePosition(i);
-        arestaAux = noAux->getFirstEdge();
-        u = noAux->getId();
-        pos_u = noAux->getPosition();
-        if (arestaAux != nullptr)
-        {
-            v = arestaAux->getTargetId();
-            pos_v = grafo->getNode(v)->getPosition();
-        }
-    }
-
-    // Ordena do menor peso para o maior
-    sort(arestas.begin(), arestas.end());
-
-    int k;
-    vector<bool> naAG(grafo->getOrder(), false);
-    vector<bool> estaConexo(grafo->getOrder(), false);
-    estaConexo[randAlfa(alfa, estaConexo.size())] = true;
-
-    do
-    {
-        k = randAlfa(alfa, arestas.size());
-        //cout << k << " - ";
-        int pos_origem = arestas[k].second.first;
-        int pos_destino = arestas[k].second.second;
-        int peso = arestas[k].first;
-
-        if (!naAG[pos_origem] || !naAG[pos_destino])
-        {
-            if ((estaConexo[pos_origem] && !estaConexo[pos_destino]) || (!estaConexo[pos_origem] && estaConexo[pos_destino]))
-            {                
-                // verifica o grau
-                if (pesoEGrauNo[pos_origem].second < D && pesoEGrauNo[pos_destino].second < D)
-                {
-                    naAG[pos_origem] = true;
-                    naAG[pos_destino] = true;
-                    if (estaConexo[pos_origem] && !estaConexo[pos_destino])
-                        estaConexo[pos_destino] = true;
-                    else if (!estaConexo[pos_origem] && estaConexo[pos_destino])
-                        estaConexo[pos_origem] = true;
-
-                    int it = acha(matriz[pos_origem], {peso, pos_destino});
-                    if (it != INF)
-                    {
-                        matriz[pos_origem].erase(matriz[pos_origem].begin() + it);
-                        matrizAG[pos_origem].push_back({peso, pos_destino});
-                    }
-                    else
-                    {
-                        it = acha(matriz[pos_destino], {peso, pos_origem});
-                        if (it != INF)
-                        {
-                            matriz[pos_destino].erase(matriz[pos_destino].begin() + it);
-                            matrizAG[pos_destino].push_back({peso, pos_origem});
-                        }
-                    }
-                    pesoEGrauNo[pos_origem].first += peso;
-                    pesoEGrauNo[pos_destino].first += peso;
-                    pesoEGrauNo[pos_origem].second++;
-                    pesoEGrauNo[pos_destino].second++;
-                    if (pesoEGrauNo[pos_origem].second > D)
-                        dentroRestricao[pos_origem] = false;
-                    if (pesoEGrauNo[pos_destino].second > D)
-                        dentroRestricao[pos_destino] = false;
-                }
-            }
-        }
-
-        //cout << "(" << arestas.size() << ")" << k << " - ";
-        arestas.erase(arestas.begin() + k);
-        //cout << "count de false em naAG: " << count(naAG.begin(), naAG.end(), false) << endl;
-    } while ((find(naAG.begin(), naAG.end(), false) != naAG.end()) || (find(estaConexo.begin(), estaConexo.end(), false) != estaConexo.end())); // itera até todos os nós estarem na AG
-    cout << "1grau: ";
-    for (int i = 0; i < pesoEGrauNo.size(); i++)
-    {
-        cout << i << "(" << pesoEGrauNo[i].second << ")  ";
-    }
-    cout << "\n";
-}
-
-bool cicloNaMatrizAG(vector<vector<pair<int, int>>> &matrizAG, int x, int y)
-{
-    // Se os dois forem origem de alguma aresta, formará ciclo
-    if (matrizAG[x].size() != 0 && matrizAG[y].size() != 0)
-        return true;
-
-    bool tag1 = false;
-    for (int i = 0; i < matrizAG.size(); i++)
-    {
-        for (int j = 0; j < matrizAG[i].size(); j++)
-        {
-            if (matrizAG[i][j].second == x)
-                tag1 = true;
-        }
-    }
-    bool tag2 = false;
-    for (int i = 0; i < matrizAG.size(); i++)
-    {
-        for (int j = 0; j < matrizAG[i].size(); j++)
-        {
-            if (matrizAG[i][j].second == y)
-                tag2 = true;
-        }
-    }
-    if (tag1 && tag2)
-        return true;
-    return false;
-}
-
-void restringeGrau(vector<vector<pair<int, int>>> &matriz, vector<vector<pair<int, int>>> &matrizAG, vector<pair<int, int>> &pesoEGrauNo, vector<bool> &dentroRestricao, int *pesoAG)
-{
-    while (find(dentroRestricao.begin(), dentroRestricao.end(), false) != dentroRestricao.end())
-    {
-        int pos_noFora = (int)(find(dentroRestricao.begin(), dentroRestricao.end(), false) - dentroRestricao.begin());
-
-        vector<pair<int, pair<int, int>>> arestasAux; // vector<{peso, {pos_origem, pos_destino}}>
-        arestasAux.clear();
-        pair<int, pair<int, int>> aresta;
-
-        // arestasAux vai receber a lista de arestas dos candidatos a serem substituidos. Eles virão da matrizAG
-        // Pega todas as arestas do nó fora da restrição que estão na AG
-        for (int i = 0; i < matrizAG.size(); i++)
-        {
-            if (matrizAG[i].size() != 0)
-            {
-                for (int j = 0; j < matrizAG[i].size(); j++)
-                {
-                    aresta = {matrizAG[i][j].first, {i, matrizAG[i][j].second}};
-                    if (i == pos_noFora)
-                    {
-                        arestasAux.push_back(aresta);
-                    }
-                    else if (aresta.second.second == pos_noFora)
-                    {
-                        arestasAux.push_back(aresta);
-                    }
-                }
-            }
-        }
-        sort(arestasAux.begin(), arestasAux.end()); // Ordena as arestas por peso de forma crescente
-        cout << "\n";
-        for (int i = 0; i < arestasAux.size(); i++)
-        {
-            cout << arestasAux[i].first << "-" << arestasAux[i].second.first << "-" << arestasAux[i].second.second << " | ";
-        }
-        cout << "\n";
-
-        cout << "\n";
-        int pos_u, pos_v, pos_destino;
-        // do-while para encontrar qual aresta do nó fora está apta a ser trocada
-        do
-        {
-            cout << "arestasAux.size: " << arestasAux.size() << endl;
-            aresta = arestasAux.back(); //pega a mais pesada primeiro
-            arestasAux.erase(arestasAux.end());
-            cout << "aresta: " << aresta.first << "-" << aresta.second.first << "-" << aresta.second.second << endl;
-
-            pos_u = aresta.second.first;
-            pos_v = aresta.second.second;
-
-            if (pos_u == pos_noFora)
-                pos_destino = pos_v;
-            else if (pos_v == pos_noFora)
-                pos_destino = pos_u;
-
-        } while (pesoEGrauNo[pos_destino].second > D && arestasAux.size() > 0);
-
-        cout << "saiu do do-while com aresta: " << aresta.first << " - " << pos_u << " - " << pos_v << endl;
-
-        // retira aresta da matrizAG
-        int it = acha(matrizAG[pos_u], {aresta.first, pos_v});
-        matrizAG[pos_u].erase(matrizAG[pos_u].begin() + it);
-
-        //------------------------------
-        // Agora, o arestasAux vai receber a lista de arestas dos candidatos a substituir a aresta. Eles virão da matriz
-        arestasAux.clear();
-        pair<int, pair<int, int>> aresta2; // entrará no lugar de aresta
-
-        for (int i = 0; i < matriz.size(); i++)
-        {
-            if (matriz[i].size() != 0)
-            {
-                for (int j = 0; j < matriz[i].size(); j++)
-                {
-                    aresta2 = {matriz[i][j].first, {i, matriz[i][j].second}};
-                    if (i == pos_destino)
-                    {
-                        arestasAux.push_back(aresta2);
-                    }
-                    else if (aresta2.second.second == pos_destino)
-                    {
-                        arestasAux.push_back(aresta2);
-                    }
-                }
-            }
-        }
-
-        sort(arestasAux.begin(), arestasAux.end(), maiorAresta); // Ordena as arestas por peso de forma decrescente
-
-        int pos_x, pos_y; // um dos dois, pos_x ou pos_y, será igual a pos_destino
-        int pos_candidato;
-
-        // do-while para encontrar qual aresta poderá ser acrescentada sem extrapolar o grau do no candidato
-        do
-        {
-            aresta2 = arestasAux.back(); //pega a mais pesada primeiro
-            arestasAux.erase(arestasAux.end());
-
-            pos_x = aresta2.second.first;
-            pos_y = aresta2.second.second;
-
-            // retira aresta2 da matriz
-            it = acha(matriz[pos_x], {aresta2.first, pos_y});
-            matriz[pos_x].erase(matriz[pos_x].begin() + it);
-
-            do
-            {
-                if (pos_x == pos_destino)
-                    pos_candidato = pos_y;
-                else if (pos_y == pos_destino)
-                    pos_candidato = pos_x;
-            } while (cicloNaMatrizAG(matrizAG, pos_x, pos_y));
-
-        } while (pesoEGrauNo[pos_candidato].second >= D && arestasAux.size() > 0);
-
-        //------------------------
-        // Agora, com aresta e aresta2 determinados, basta fazer a substituição na matrizAG e atualizar os parametros
-
-        pesoEGrauNo[pos_u].first -= aresta.first;
-        pesoEGrauNo[pos_u].second--;
-        pesoEGrauNo[pos_v].first -= aresta.first;
-        pesoEGrauNo[pos_v].second--;
-        pesoAG -= aresta.first;
-
-        // coloca aresta2 na matrizAG
-        matrizAG[pos_x].push_back({aresta2.first, pos_y});
-
-        pesoEGrauNo[pos_x].first += aresta2.first;
-        pesoEGrauNo[pos_x].second++;
-        pesoEGrauNo[pos_y].first += aresta2.first;
-        pesoEGrauNo[pos_y].second++;
-        pesoAG += aresta2.first;
-
-        // atualiza dentroRestrição
-        if (pesoEGrauNo[pos_u].second <= D)
-            dentroRestricao[pos_u] = true;
-        if (pesoEGrauNo[pos_v].second <= D)
-            dentroRestricao[pos_v] = true;
-        if (pesoEGrauNo[pos_x].second <= D)
-            dentroRestricao[pos_x] = true;
-        if (pesoEGrauNo[pos_x].second <= D)
-            dentroRestricao[pos_y] = true;
-    }
-}
-
-/**
- * @brief Algorítimo Guloso Randomizado
- * 
- */
-void Graph::greedRandom()
-{
-
-    int d;
-    float auxAlfa;
-    int iteracoes;
-
-    cout << "\nInicializando a execução do Algoritmo Guloso Randomizado..." << endl;
-    cout << "\nQual será o grau d de restrição?" << endl;
-    cin >> d;
-    cout << endl;
-
-    cout << "\nDigite o valor do alfa: " << endl;
-    cin >> auxAlfa;
-    cout << endl;
-
-    cout << "\nDigite o numero de iteracoes: " << endl;
-    cin >> iteracoes;
-    cout << endl;
-
-    chrono::time_point<chrono::system_clock> inicio, fim;
-    iniciaProces(&inicio);
-
-    vector<vector<pair<int, int>>> matriz(this->getOrder());
-    preencheMatriz(this, matriz);
-    ordenaArestas(matriz, 1);
-
-    vector<pair<int, int>> pesoEGrauNo(this->getOrder(), {0, 0});
-    vector<bool> dentroRestricao(this->getOrder(), true);
-
-    vector<vector<pair<int, int>>> matrizAG(this->getOrder());
-
-    vector<int> solucoes(iteracoes);
-    int i = 0;
-    int pesoAG;
-    while (i < iteracoes)
-    {
-        i++;
-        geraAG(this, matriz, matrizAG, pesoEGrauNo, dentroRestricao, auxAlfa);
-        pesoAG = pesoTotalAGM(pesoEGrauNo);
-        ordenaArestas(matrizAG, 0);
-        int numArestas = 0;
-        for (int i = 0; i < matrizAG.size(); i++)
-        {
-            numArestas += matrizAG[i].size();
-        }
-        cout << "numArestas Matriz AG: " << numArestas << endl;
-        //imprimirMatriz(matrizAG);
-        //restringeGrau(matriz, matrizAG, pesoEGrauNo, dentroRestricao, &pesoAG);
-        imprimirMatriz(matrizAG);
-
-        cout << "Aqui";
-
-        solucoes.push_back(pesoAG);
-    }
-
-    double temp = fimProces(&inicio, &fim);
-
-    sort(solucoes.begin(), solucoes.end());
-
-    cout << "\nMelhor Peso da Arvore Geradora com Restrição de Grau = " << solucoes[solucoes.size() - 1]
-         << "\nTempo total: " << temp / iteracoes << " segundos" << endl;
-}
-
-/**
- * @brief Algorítimo Guloso Randomizado Reativo
- * 
- */
-// Passar como parâmetro: instancia, vetor de alfas, num iterações, num bloco;
-void Graph::greedRactiveRandom()
-{
-
-    int d;         // Grau de restrição;
-    int numIt;     // Número de iterações;
-    int numBloco;  // Número de iterações até atualizar novamente o vetor de probabilidades;
-    int numAlfas;  // Variável ustilizada para armazenar a quantidade de alfas que serão analizados;
-    int index;     // índice do alfa escolhido para a iteração;
-    int solucao;   // Armazena a solução da iteração;
-    float auxAlfa; // Variável auxiliar utilizada para armazenar o valor do alfa;
-
-    d = 3;
-    numIt = 10;
-    numBloco = 5;
-
-    //cout << "\nInicializando a execução do Algoritmo Guloso Randomizado Reativo..." << endl;
-    //cout << "\nQual será o grau d de restrição?" << endl;
-    //cin >> d;
-    //cout << endl;
-
-    //cout << "\nQual será o número total de iterações?" << endl;
-    //cin >> numIt;
-    //cout << endl;
-
-    //cout << "\nQual será a quantidade de iterações por bloco?" << endl;
-    //cin >> numBloco;
-    //cout << endl;
-
-    vector<float> alfas;   // Vetor utilizado para armazenar os valores de alfa;
-    vector<float> solBest; // Vetor utilizado para armazenar melhor solução encontrada por cada alfa (Os valores são referentes ao alfa que se encontra no elemento de mesmo índice do vetor de alfas);
-    vector<media> medias;  // Vetor utilizado para armazenar a média das soluções de cada alfa (Os valores são referentes ao alfa que se encontra no elemento de mesmo índice do vetor de alfas);
-    vector<float> prob;    // Vetor utilizado para armazenar a probabilidade de cada alfa (Os valores são referentes ao alfa que se encontra no elemento de mesmo índice do vetor de alfas);;
-    vector<float> q;       // Vetor utilizado para armazenar o q (operação necessária para o cálculo da probabilidade) de cada alfa (Os valores são referentes ao alfa que se encontra no elemento de mesmo índice do vetor de alfas);;
-
-    alfas.push_back(0.05);
-    alfas.push_back(0.10);
-    alfas.push_back(0.15);
-    alfas.push_back(0.30);
-    alfas.push_back(0.50);
-
-    numAlfas = alfas.size();
-
-    cout << "numAlfas: " << numAlfas << endl;
-
-    inicializaVetores(prob, medias, numAlfas); // Chamada da função para inicializar os vetores de médias e probabilidades;
-
-    cout << "\nMedias: " << endl;
-    for(int i=0; i< medias.size(); i++){
-        cout << medias[i].media << " | ";
-    }
-
-    cout << "\nProbs: " << endl;
-    for(int i=0; i< prob.size(); i++){
-        cout << prob[i] << " | ";
-    }
-
-    cout << "\nVetor de alfas inicializado com sucesso!" << endl;
-
-    chrono::time_point<chrono::system_clock> inicio, fim;
-    iniciaProces(&inicio);
-
-    for (int i = 0; i < numIt; i++)
-    {
-        if ((i!=0) && (i % numBloco == 0))
-        {
-            cout << "\nProbs: " << endl;
-            for(int i=0; i< prob.size(); i++){
-                cout << prob[i] << " | ";
-            }
-            cout << endl;
-            //atualizaProbabilidades(medias, prob, solBest, q); // Chamada da função que irá atualizar o vetor de probabilidades;
-            cout << "\nProbs: " << endl;
-            for(int i=0; i< prob.size(); i++){
-                cout << prob[i] << " | ";
-            }
-            cout << endl;
-        }
-
-        vector<vector<pair<int, int>>> matriz(this->getOrder());
-        preencheMatriz(this, matriz);
-        ordenaArestas(matriz, 1);
-
-        vector<pair<int, int>> pesoEGrauNo(this->getOrder(), {0, 0});
-        vector<bool> dentroRestricao(this->getOrder(), true);
-
-        vector<vector<pair<int, int>>> matrizAG(this->getOrder());
-
-        int pesoAG;
-
-        int index = escolheAlfa(prob);
-        cout << index;
-        auxAlfa = alfas[index];
-
-        geraAG(this, matriz, matrizAG, pesoEGrauNo, dentroRestricao, auxAlfa);
-        pesoAG = pesoTotalAGM(pesoEGrauNo);
-        ordenaArestas(matrizAG, 0);
-        int numArestas = 0;
-        for (int i = 0; i < matrizAG.size(); i++)
-        {
-            numArestas += matrizAG[i].size();
-        }
-        cout << "numArestas Matriz AG: " << numArestas << endl;
-        //imprimirMatriz(matrizAG);
-        //restringeGrau(matriz, matrizAG, pesoEGrauNo, dentroRestricao, &pesoAG);
-        imprimirMatriz(matrizAG);
-
-        cout << "Aqui";
-
-        solucao = pesoAG;
-
-        //atualizaMedias(medias, solucao, alfas, auxAlfa, solBest);
-        cout << "\nMedias: " << endl;
-        for(int i=0; i< medias.size(); i++){
-            cout << medias[i].media << " | ";
-        }
-        cout << endl;
-    }
-
-    int auxSolBest;
-    for(int i=0; i<solBest.size(); i++){
-        if(i == 0){
-            auxSolBest = solBest[i];
-        }
-
-        if(solBest[i] < auxSolBest){
-            auxSolBest = solBest[i];
-        }
-    }
-
-    double temp = fimProces(&inicio, &fim);
-
-    cout << "\nMelhor Peso da Arvore Geradora com Restrição de Grau = " << auxSolBest
-         << "\nTempo total: " << temp / numIt << " segundos" << endl;
-}
 
 //TODO: Funções auxiliares para os algorítimos gulósos randomizados -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+/**
+ * @brief 
+ * 
+ * @param matriz 
+ */
+void imprimirMatriz(vector<vector<pair<int, int>>> &matriz)
+{
+    ofstream arq("saida.dot");
+
+    arq << "graph {\n";
+    int sizeAll = 0;
+    int soma = 0;
+    int qnt2 = 0;
+    for (int i = 0; i < matriz.size(); i++)
+    {
+        for (int j = 0; j < matriz[i].size(); j++)
+        {
+
+            arq << i << " -- " << matriz[i][j].second << "[ label = " << matriz[i][j].first << "]\n";
+            cout << qnt2 << " " << i << " -- " << matriz[i][j].second << "[ label = " << matriz[i][j].first << " ]\n";
+            soma += matriz[i][j].first;
+            qnt2++;
+        }
+    }
+    arq << "}\n";
+    cout << "SOMA: " << soma << endl;
+    arq.close();
+}
+/**
+ * @brief 
+ * 
+ * @param alfa 
+ * @param tam_vetor 
+ * @return int 
+ */
 int randAlfa(float alfa, int tam_vetor)
 {
     float k;
-    if (alfa > 0.0)
+    int aux = int(tam_vetor * alfa);
+    if (alfa > 0.0 && aux > 0)
         k = (rand() % ((int)(alfa * tam_vetor)));
     else
         k = 0.0;
