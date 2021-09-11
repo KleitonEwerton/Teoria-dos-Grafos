@@ -23,9 +23,9 @@ Matrícula       Nome                                E-mail
 ## Parte 2: Apresentar os algoritmos abaixo para o problema:
 ### Arvore Geradora Mínima com Restrição de Grau
 
-- [ ] Algoritmo guloso
-- [ ] Algoritmo guloso randomizado;
-- [ ] Algoritmo guloso randomizado reativo;
+- [X] Algoritmo guloso
+- [X] Algoritmo guloso randomizado;
+- [X] Algoritmo guloso randomizado reativo;
 
 
 ## Como Compilar?
