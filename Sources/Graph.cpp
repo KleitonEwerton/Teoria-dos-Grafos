@@ -1680,76 +1680,6 @@ bool maior(pair<int, int> i, pair<int, int> j)
     return (i.first > j.first);
 }
 
-void ajustaGrauGuloso(vector<vector<pair<int, int>>> &matriz, vector<vector<pair<int, int>>> &matrizAGM, vector<pair<int, int>> &pesoEGrauNo, vector<bool> &dentroRestricao, int *pesoAGM)
-{
-    // Enquanto não estiver tudo dentro da restrição
-    while (find(dentroRestricao.begin(), dentroRestricao.end(), false) != dentroRestricao.end())
-    {
-        cout << "\nQntd de nós ainda fora da restrição: " << count(dentroRestricao.begin(), dentroRestricao.end(), false) << endl;
-
-        // index do nó que está fora da restrição de grau
-        int index = (int)(find(dentroRestricao.begin(), dentroRestricao.end(), false) - dentroRestricao.begin());
-        cout << "Posição do nó fora da restrição: " << index << endl;
-        //cout << "ID do fora da restrição: " << this->getNodePosition(index)->getId() << endl;
-
-        // SUBSTITUIÇÃO DE ARESTA
-
-        // 1o descarta as arestas que nao poderão ser inseridas caso o nó já esteja no limite
-        pair<int, int> aresta1 = matrizAGM[index].back(); // par {peso, posição_notarget}
-        while (pesoEGrauNo[aresta1.second].second > D)
-        {
-            matriz[aresta1.second].clear();
-            matrizAGM[index].pop_back();
-            aresta1 = matrizAGM[index].back();
-            while (matriz[aresta1.second].size() == 0)
-            {
-                matrizAGM[index].pop_back();
-                aresta1 = matrizAGM[index].back();
-            }
-        }
-        matrizAGM[index].pop_back();
-
-        // 2o pega na matriz a primeira aresta mais leve do nó
-        pair<int, int> aresta2 = matriz[aresta1.second].back();
-
-        // se a entrada da aresta violar a restrição de grau, pegar a próxima menor
-        while (pesoEGrauNo[aresta2.second].second >= D)
-        {
-            matriz[aresta2.second].clear();
-            matriz[aresta1.second].pop_back();
-            aresta2 = matriz[aresta1.second].back();
-            while (matriz[aresta2.second].size() == 0)
-            {
-                matriz[aresta1.second].pop_back();
-                aresta2 = matriz[aresta1.second].back();
-            }
-        }
-
-        // 3o com a aresta pronta, retira-la da matriz, colocá-la na matrizAGM e atualizar os valores dos controles
-        matriz[aresta1.second].pop_back();
-        matrizAGM[aresta1.second].push_back(aresta2);
-
-        // atualiza peso e grau dos nós
-        pesoEGrauNo[index].first -= aresta1.first;
-        pesoEGrauNo[index].second--;
-        pesoEGrauNo[aresta1.second].first -= aresta1.first;
-        pesoEGrauNo[aresta1.second].first += aresta2.first;
-        pesoEGrauNo[aresta2.second].second++;
-
-        // atualiza o status das restrições
-        if (pesoEGrauNo[index].second <= D)
-            dentroRestricao[index] = true;
-        if (pesoEGrauNo[aresta1.second].second <= D)
-            dentroRestricao[aresta1.second] = true;
-        if (pesoEGrauNo[aresta2.second].second <= D)
-            dentroRestricao[aresta2.second] = true;
-        // atualiza peso agm
-        pesoAGM = pesoAGM - aresta1.first + aresta2.first;
-    }
-}
-
-
-
 /**
  * @brief 
  * 
@@ -1783,8 +1713,6 @@ void ordenaArestas(vector<vector<pair<int, int>>> &matriz, int op)
             sort(matriz[i].begin(), matriz[i].end(), maior);
     }
 }
-
-
 
 /* A função ordenaArestas recebe como parâmetro uma matriz em que o vector de fora
     representa cada nó e, para cada nó, há um vector de pares, em que
@@ -1829,62 +1757,6 @@ void preencheMatriz(Graph *grafo, vector<vector<pair<int, int>>> &matriz)
         pos_u = noAux->getPosition();
         if (arestaAux != nullptr)
             v = arestaAux->getTargetId();
-    }
-}
-
-
-void preencheMatrizAGMGuloso(Graph *grafo, vector<int> &agm, vector<pair<int, pair<int, int>>> &arestas, vector<vector<pair<int, int>>> &matriz, vector<vector<pair<int, int>>> &matrizAGM, vector<pair<int, int>> &pesoEGrauNo, vector<bool> &dentroRestricao)
-{
-    for (int i = 0; i < agm.size(); i++)
-    {
-        //cout << "i = " << i << " tem-se: {" << matriz[i][0].first << ", " << matriz[i][0].second << "}" << endl;
-        if (agm[i] != INF)
-        {
-            // arestas = {peso, {pos_noOrigem, pos_noDest}}
-            int pos_u = arestas[agm[i]].second.first;
-            int pos_v = arestas[agm[i]].second.second;
-            int peso = arestas[agm[i]].first;
-
-            int grau;
-
-            pair<int, int> aresta(peso, pos_u);
-            //cout << "aresta: {" << aresta.first << ", " << aresta.second << endl;
-            int it = acha(matriz[pos_v], aresta);
-
-            if (it != INF)
-            {
-                //cout << " . ";
-                matrizAGM[pos_v].push_back(aresta);              // insere a aresta na matrizAGM
-                matriz[pos_v].erase(matriz[pos_v].begin() + it); // apaga da matriz
-            }
-            else
-            {
-                aresta = {peso, pos_v};
-                it = acha(matriz[pos_u], aresta);
-                if (it != INF)
-                {
-                   
-                    matrizAGM[pos_u].push_back(aresta);              // insere a aresta na matrizAGM
-                    matriz[pos_u].erase(matriz[pos_u].begin() + it); // apaga da matriz
-                }
-            }
-
-            pesoEGrauNo[pos_u].second++;
-            pesoEGrauNo[pos_v].second++;
-            
-            if (pesoEGrauNo[pos_u].second > D)
-            
-                dentroRestricao[pos_u] = false;
-                
-            
-            if (pesoEGrauNo[pos_v].second > D)
-            
-                dentroRestricao[pos_v] = false;
-                
-            
-            pesoEGrauNo[pos_u].first += peso;
-            pesoEGrauNo[pos_v].first += peso;
-        }
     }
 }
 /**
@@ -1937,108 +1809,10 @@ void preencheMatrizAGM(Graph *grafo, vector<int> &agm, vector<pair<int, pair<int
 
                 }
             }
+            
         }
     }
 }
-
-void kruskalAdaptadoGuloso(Graph *grafo, vector<vector<pair<int, int>>> &matriz, vector<vector<pair<int, int>>> &matrizAGM, vector<pair<int, int>> &pesoEGrauNo, vector<bool> &dentroRestricao, float alfa = -1.0)
-{
-
-    vector<pair<int, pair<int, int>>> arestas; //vector<{peso, {pos_noOrigem, pos_noDestino}}>
-    arestas.clear();
-
-    grafo->cleanVisited();
-    Node *noAux = grafo->getFirstNode();
-    Edge *arestaAux = noAux->getFirstEdge();
-
-    int u = noAux->getId(); // id do nó de origem
-    int pos_u = noAux->getPosition();
-    int v;
-    int pos_v;
-
-    if (arestaAux != nullptr)
-    {
-        v = arestaAux->getTargetId(); //id do nó destino
-        pos_v = grafo->getNode(v)->getPosition();
-    }
-    // Percorrer todas as arestas do Grafo
-    for (int i = 1; i < grafo->getOrder(); i++)
-    {
-        if (arestaAux == nullptr)
-            arestas.push_back({INF, {pos_u, pos_u}});
-
-        while (arestaAux != nullptr)
-        {
-            // Coloca a aresta no vetor de arestas
-            if (!grafo->getNode(v)->getVisited())
-                arestas.push_back({arestaAux->getWeight(), {pos_u, pos_v}});
-
-            // Atualiza os auxiliares se a aresta não for null
-            arestaAux = arestaAux->getNextEdge();
-            if (arestaAux != nullptr)
-            {
-                v = arestaAux->getTargetId();
-                pos_v = grafo->getNode(v)->getPosition();
-            }
-        }
-
-        noAux->setVisited(true);
-        noAux = grafo->getNodePosition(i);
-        arestaAux = noAux->getFirstEdge();
-        u = noAux->getId();
-        pos_u = noAux->getPosition();
-        if (arestaAux != nullptr)
-        {
-            v = arestaAux->getTargetId();
-            pos_v = grafo->getNode(v)->getPosition();
-        }
-    }
-
-    // Ordena do menor peso para o maior
-    sort(arestas.begin(), arestas.end()); //!! ----------------------------------
-
-    int ordem = grafo->getOrder();
-    SubArvore *subarvores = new SubArvore[(ordem * sizeof(SubArvore))]; // vetor para armazenar todas as subárvores
-
-    for (int i = 0; i < ordem; i++)
-    {
-        subarvores[i].pai = i;
-        subarvores[i].ordem = 1;
-    }
-
-    // 4º PASSO: Montar a Árvore Geradora Mínima
-
-    vector<int> agm; // vetor com o índice associado à posição de cada aresta da árvore geradora mínima no vector 'arestas' do subgrafo
-    agm.clear();
-
-    // Iterar até atingir condição de parada
-    int cont = 0;
-    while (agm.size() < ordem - 1 && cont < arestas.size())
-    {
-        pair<int, int> proxAresta = arestas[cont].second;
-        int u = proxAresta.first;
-        int pos_u = proxAresta.first;
-        int v = proxAresta.second;
-        int pos_v = proxAresta.second;
-
-        if (pos_u == pos_v)
-            agm.push_back(cont);
-
-        // Se u e v não estão na mesma subárvore
-        if (qualSubArvore(subarvores, pos_u) != qualSubArvore(subarvores, pos_v))
-        {
-            agm.push_back(cont);
-            unirSubArvores(subarvores, pos_u, pos_v);
-        }
-        cont++;
-    }
-
-    preencheMatrizAGMGuloso(grafo, agm, arestas, matriz, matrizAGM, pesoEGrauNo, dentroRestricao);
-
-    delete[] subarvores;
-    return;
-}
-
 void kruskalAdaptado(Graph *grafo, vector<vector<pair<int, int>>> &matriz, vector<vector<pair<int, int>>> &matrizAGM, vector<pair<int, int>> &pesoEGrauNo, int *pesoFinal, vector<vector<pair<int, int>>> &matrizAGMFINAL,float alfa = 0)
 {
 
@@ -2163,6 +1937,7 @@ int pesoTotalAGM(vector<pair<int, int>> &pesoNoTotal)
         peso += pesoNoTotal[i].first;
     return peso / 2;
 }
+
 /**
  * @brief Algoritmo Guloso
  * 
@@ -2170,41 +1945,39 @@ int pesoTotalAGM(vector<pair<int, int>> &pesoNoTotal)
  */
 void Graph::greed()
 {
+  
     /* matriz em que o vector de fora representa cada nó e,
     para cada nó, há um vector de pares, em que cada par representa
     uma aresta daquele nó. O par tem o formato {peso, posicao_notarget} */
     vector<vector<pair<int, int>>> matriz(this->getOrder());
 
     chrono::time_point<chrono::system_clock> inicio, fim;
-    iniciaProces(&inicio);
+    iniciaProces(&inicio);                                                          //Inicia o contador de tempo
 
-    // Preenchendo e ordenando a matriz
-    preencheMatriz(this, matriz);
-    ordenaArestas(matriz, 1);
+    preencheMatriz(this, matriz);                                                   // Preenchendo e ordenando a matriz
+    ordenaArestas(matriz, 1);                                                       //Ordenas as arestas
 
-    //imprimirMatriz(matriz);
 
     // controles
-    vector<pair<int, int>> pesoEGrauNo(this->getOrder(), {0, 0}); // par {peso, grau}
-    vector<bool> dentroRestricao(this->getOrder(), true);         // vector para controlar os nós que estão dentro da restrição
+    vector<pair<int, int>> pesoEGrauNo(this->getOrder(), {0, 0});                   // par {peso, grau}
+    vector<bool> dentroRestricao(this->getOrder(), true);                           // vector para controlar os nós que estão dentro da restrição
 
-    // matriz que vai ter as arestas da agm
-    vector<vector<pair<int, int>>> matrizAGM(this->getOrder());
+    vector<vector<pair<int, int>>> matrizAGM(this->getOrder());                     // matriz que vai ter as arestas da agm
 
-    kruskalAdaptadoGuloso(this, matriz, matrizAGM, pesoEGrauNo, dentroRestricao);
-    ordenaArestas(matrizAGM, 0);
+    int melhorSolucao2 = INF;                                                       //Armazena a melhor solução ao longo da algoritmo
+    vector<vector<pair<int, int>>> melhorMatrizAGM2;                                //Metriz que armazena a melhor solução, usado para salvar no arquivo
+    melhorMatrizAGM2.clear();                                               
 
-    int pesoAGM = pesoTotalAGM(pesoEGrauNo);
-    imprimirMatriz(matrizAGM);
-    ajustaGrauGuloso(matriz, matrizAGM, pesoEGrauNo, dentroRestricao, &pesoAGM);
+    //Aqui e nossa heuristica, uma adaptação do kruskal 
+    kruskalAdaptado(this, matriz, matrizAGM, pesoEGrauNo, &melhorSolucao2, melhorMatrizAGM2);
 
-    double temp = fimProces(&inicio, &fim);
 
-    cout << "\ndepois:" << endl;
-    // imprimirMatriz(matrizAGM);
+    int pesoAGM = pesoTotalAGM(pesoEGrauNo);                                        //Pega o peso total                                  
+    imprimirMatriz(matrizAGM);                                                      //Salva a solução no arquivo saida.dot
+    
+    double temp = fimProces(&inicio, &fim);                                         //Fim do contador de tempo
 
-    cout << "\nPeso da Arvore Geradora com Restrição de Grau: " << pesoAGM
-         << "\nTempo total: " << temp << " segundos" << endl;
+    cout << "\nPeso da Arvore Geradora com Restrição de Grau: " << melhorSolucao2 << "\nTempo total: " << temp << " segundos" << endl;
     return;
 }
 
@@ -2328,7 +2101,7 @@ void Graph::greedRactiveRandom(){
     int posNoInicial;                                                           //Posição inicial do primeiro vertice pos_u = 0  ID =1 pos_u = 1 ID = 2 assim por diante
 
     int i = 0;
-    while (i <= numIt){
+    while (i < numIt){
         if (i!=0 && i % numBloco == 0)                                          //Condição de interração por bloco
         {
             cout << "\nProbs: " << endl;
