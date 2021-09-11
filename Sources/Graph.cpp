@@ -1543,6 +1543,7 @@ void Graph::topologicalSortUtil(Node *node, Edge *edge, stack<int> &Stack)
 void imprimeSolucao(vector<pair<int, pair<int, int>>> &AGM_RESULTANTE, int posInicial, float alfa){
 
     ofstream arq("meuGrafo.dot");               //Arquivo de saida
+    ofstream saida("saida.txt", ios::out| ios::app);               //Arquivo de saida
     arq << "graph {\n";
 
     int soma = 0;                               //Soma dos pesos
@@ -1552,16 +1553,18 @@ void imprimeSolucao(vector<pair<int, pair<int, int>>> &AGM_RESULTANTE, int posIn
         
             //É mostrado a posição do vertice no grafo é não seu ID
             arq << AGM_RESULTANTE[i].second.first << " -- " << AGM_RESULTANTE[i].second.second << "[ label = " << AGM_RESULTANTE[i].first << "]\n";
-            cout <<"QUANTIDADE DE ARESTAS: " << qnt2+1 << " posição de u: " << AGM_RESULTANTE[i].second.first << " -- posição de v: " << AGM_RESULTANTE[i].second.second << " PESO DA ARESTA " << AGM_RESULTANTE[i].first << " ]\n";
+            saida <<"QUANTIDADE DE ARESTAS: " << qnt2+1 << " posição de u: " << AGM_RESULTANTE[i].second.first << " -- posição de v: " << AGM_RESULTANTE[i].second.second << " PESO DA ARESTA " << AGM_RESULTANTE[i].first << " ]\n";
             soma += AGM_RESULTANTE[i].first;
             qnt2++;
 
     }
 
     arq << "}\n";
-    cout << "SOMA DA AGM DE ORDEM "<< AGM_RESULTANTE.size()+1 <<" COMEÇANDO PELO VERTICE DE POSIÇÃO "<< posInicial<< " E COM O ALFA "<< alfa<< " : " << soma << endl;
+    saida << "SOMA DA AGM DE ORDEM "<< AGM_RESULTANTE.size()+1 <<" COMEÇANDO PELO VERTICE DE POSIÇÃO "<< posInicial<< " E COM O ALFA "<< alfa<< " : " << soma << endl;
     arq.close();
-    cout << "SOLUÇÃO SALVA NO ARQUIVO saida.dot"<<endl;
+    saida.close();
+    cout << "SOLUÇÃO SALVA NO ARQUIVO saida.dot e saida.txt"<<endl;
+    
 
 }
 /**
@@ -2147,7 +2150,7 @@ void Graph::greed2(){
         
     }
     double temp = fimProces(&inicio, &fim);
-   // imprimeSolucao(AGM_RESULTANTE2, posNoInicial, alfa);
+    imprimeSolucao(AGM_RESULTANTE2, posNoInicial, alfa);
     cout << "SOLUÇÃO FINAL: " <<melhorSolucao2
          << "\nTempo total: " << temp << " segundos" << endl;
 
