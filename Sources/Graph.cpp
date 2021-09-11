@@ -2130,6 +2130,10 @@ void Graph::greed2(){
         if(querVisuzalizar == "2")visuzalizar = 0;
         else {cout << "OPÇÃO INVALIDA, 2 SELECIONADO AUTOMATICAMENTE"<<endl;visuzalizar = 0;}
     cout << "\nINICIANDO A EXECUÇÃO DO ALGORITMO GULOSO 2 ..." << endl;
+
+    chrono::time_point<chrono::system_clock> inicio, fim;
+    iniciaProces(&inicio);
+    
     for(int i = 0;i<1;i++){
 
         geraAGM(this, AGM_RESULTANTE1,&melhorSolucao1, alfa, &posNoInicial, visuzalizar);
@@ -2142,8 +2146,10 @@ void Graph::greed2(){
         }
         
     }
-    imprimeSolucao(AGM_RESULTANTE2, posNoInicial, alfa);
-    cout << "SOLUÇÃO FINAL: " <<melhorSolucao2<<endl;
+    double temp = fimProces(&inicio, &fim);
+   // imprimeSolucao(AGM_RESULTANTE2, posNoInicial, alfa);
+    cout << "SOLUÇÃO FINAL: " <<melhorSolucao2
+         << "\nTempo total: " << temp << " segundos" << endl;
 
 }
 void Graph::greedRandom2(){
@@ -2160,6 +2166,9 @@ void Graph::greedRandom2(){
         if(querVisuzalizar == "2")visuzalizar = 0;
         else {cout << "OPÇÃO INVALIDA, 2 SELECIONADO AUTOMATICAMENTE"<<endl;visuzalizar = 0;}
     cout << "\nINICIANDO A EXECUÇÃO DO ALGORITMO GULOSO RANDOMIZADO 2 ..." << endl;
+    chrono::time_point<chrono::system_clock> inicio, fim;
+    iniciaProces(&inicio);
+
     vector<pair<int, pair<int, int>>> AGM_RESULTANTE1;
     vector<pair<int, pair<int, int>>> AGM_RESULTANTE2;
     int melhorSolucao1= 0;
@@ -2177,8 +2186,10 @@ void Graph::greedRandom2(){
         }
         
     }
-    imprimeSolucao(AGM_RESULTANTE2, posNoInicial, alfa);
-    cout << "SOLUÇÃO FINAL " <<melhorSolucao2<<endl;
+      double temp = fimProces(&inicio, &fim);
+   // imprimeSolucao(AGM_RESULTANTE2, posNoInicial, alfa);
+    cout << "SOLUÇÃO FINAL " <<melhorSolucao2
+         << "\nTempo total: " << temp << " segundos" << endl;
 
 }
 
@@ -2212,6 +2223,8 @@ void Graph::greedRactiveRandom2(){
     cout << endl;
 
     cout << "\nINICIANDO A EXECUÇÃO DO ALGORITMO GULOSO RANDOMIZADO REATIVO 2..." << endl;
+        chrono::time_point<chrono::system_clock> inicio, fim;
+    iniciaProces(&inicio);
     vector<float> alfas;   // Vetor utilizado para armazenar os valores de alfa;
     vector<float> solBest;   // Vetor utilizado para armazenar melhor solução encontrada por cada alfa (Os valores são referentes ao alfa que se encontra no elemento de mesmo índice do vetor de alfas);
     vector<media> medias;  // Vetor utilizado para armazenar a média das soluções de cada alfa (Os valores são referentes ao alfa que se encontra no elemento de mesmo índice do vetor de alfas);
@@ -2313,8 +2326,10 @@ void Graph::greedRactiveRandom2(){
             auxSolBest = solBest[i];
         }
     }
-
-    cout << "\nMelhor Peso da Arvore Geradora com Restrição de Grau = " << auxSolBest << endl;
+  double temp = fimProces(&inicio, &fim);
+    cout << "\nMelhor Peso da Arvore Geradora com Restrição de Grau = " << auxSolBest
+         << "\nTempo total: " << temp << " segundos" << endl;
+    
 }
 
 void geraAG(Graph *grafo, vector<vector<pair<int, int>>> &matriz, vector<vector<pair<int, int>>> &matrizAG, vector<pair<int, int>> &pesoEGrauNo, vector<bool> &dentroRestricao, float alfa)
