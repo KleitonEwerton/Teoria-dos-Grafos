@@ -2190,7 +2190,7 @@ void Graph::greedRandom2(){
         
     }
       double temp = fimProces(&inicio, &fim);
-   // imprimeSolucao(AGM_RESULTANTE2, posNoInicial, alfa);
+    imprimeSolucao(AGM_RESULTANTE2, posNoInicial, alfa);
     cout << "SOLUÇÃO FINAL " <<melhorSolucao2
          << "\nTempo total: " << temp << " segundos" << endl;
 
