@@ -1527,27 +1527,16 @@ void Graph::topologicalSortUtil(Node *node, Edge *edge, stack<int> &Stack)
 
 void imprimeSolucao(vector<pair<int, pair<int, int>>> &AGM_RESULTANTE, int posInicial, float alfa){
 
-    ofstream arq("meuGrafo.dot");                                                                   //Arquivo de saida
-    ofstream saida("saida.txt", ios::out| ios::app);                                                //Arquivo de saida
+    ofstream arq("saida.dot");                                                //Arquivo de saida
     arq << "graph {\n";
 
-    int soma = 0;                                                                                   //Soma dos pesos
-    int qnt2 = 0;                                                                                   //Quantidade de arestas - 1, já AGM_RESULTANTE.size é a ordem da AGM - 1
-
-    for(int i = 0;i<AGM_RESULTANTE.size(); i++){
+    for(int i = 0;i<AGM_RESULTANTE.size(); i++)
+        //É mostrado a posição do vertice no grafo é não seu ID
+        //pos_u = 0 o ID é 1, pos_u 1 ID = 2 assim por diante
+        arq << AGM_RESULTANTE[i].second.first+1 << " -- " << AGM_RESULTANTE[i].second.second+1 << "[ label = " << AGM_RESULTANTE[i].first << "]\n";
         
-            //É mostrado a posição do vertice no grafo é não seu ID
-            arq << AGM_RESULTANTE[i].second.first << " -- " << AGM_RESULTANTE[i].second.second << "[ label = " << AGM_RESULTANTE[i].first << "]\n";
-            saida <<"QUANTIDADE DE ARESTAS: " << qnt2+1 << " posição de u: " << AGM_RESULTANTE[i].second.first << " -- posição de v: " << AGM_RESULTANTE[i].second.second << " PESO DA ARESTA " << AGM_RESULTANTE[i].first << " ]\n";
-
-            soma += AGM_RESULTANTE[i].first;
-            qnt2++;
-
-    }
     arq << "}\n";
-    saida << "SOMA DA AGM DE ORDEM "<< AGM_RESULTANTE.size()+1 <<" COMEÇANDO PELO VERTICE DE POSIÇÃO "<< posInicial<< " E COM O ALFA "<< alfa<< " : " << soma << endl;
     arq.close();
-    saida.close();
     cout << "SOLUÇÃO SALVA NO ARQUIVO saida.dot e saida.txt"<<endl;
 
 }
@@ -1561,12 +1550,10 @@ void imprimeSolucao(vector<pair<int, pair<int, int>>> &AGM_RESULTANTE, int posIn
  * @param pesoEGrauNo 
  * @param naAgm 
  */
-void arestaDoNo(Graph *grafo, int posNo, vector<pair<int, pair<int, int>>> &arestas, vector<int> &pesoEGrauNo, vector<bool> &naAgm, bool visualizar){
+void arestaDoNo(Graph *grafo, int posNo, vector<pair<int, pair<int, int>>> &arestas, vector<int> &pesoEGrauNo, vector<bool> &naAgm){
     Node *noAux = grafo->getNodePosition(posNo);
     Edge *arestaAux = nullptr;
 
-    if(visualizar)cout << "Pegando as arestas do vertice da posição "<< posNo <<" que estão dentro das retrições \n"<<  endl;
-    
     int pos_u, pos_v;
     if(noAux == nullptr)
         return;
@@ -1608,7 +1595,7 @@ void arestaDoNo(Graph *grafo, int posNo, vector<pair<int, pair<int, int>>> &ares
  * @param alfa 
  * @param posNoInicial 
  */
-void geraAGM(Graph *grafo, vector<pair<int, pair<int, int>>> &AGM_RESULTANTE, int *melhor_solucao, float alfa, int *posNoInicial, int visualizar){
+void geraAGM(Graph *grafo, vector<pair<int, pair<int, int>>> &AGM_RESULTANTE, int *melhor_solucao, float alfa, int *posNoInicial){
     
     unsigned seed = time(0);                                                    //Muda a seed dos aleatorios
     vector<pair<int, pair<int, int>>> arestas;                                  //vector<{peso, {pos_noOrigem, pos_noDestino}}>
@@ -1628,7 +1615,7 @@ void geraAGM(Graph *grafo, vector<pair<int, pair<int, int>>> &AGM_RESULTANTE, in
     posInicial = rand()%grafo->getOrder()-1;                                    //PEGA UM VERTICE ALEATORIO DO GRAU POR SUA POSIÇÃO DE INSERSÃO
     *posNoInicial = posInicial;
 
-    arestaDoNo(grafo, posInicial, arestas,pesoEGrauNo, naAGM, visualizar);      //ADICIONA NO CONJUNTO DE SOLUÇÕES AS ARESTAS QUE PODEM ENTRAR NA AGM
+    arestaDoNo(grafo, posInicial, arestas,pesoEGrauNo, naAGM);                  //ADICIONA NO CONJUNTO DE SOLUÇÕES AS ARESTAS QUE PODEM ENTRAR NA AGM
 
     bool cond = true;
     int cont = 0;
@@ -1661,7 +1648,7 @@ void geraAGM(Graph *grafo, vector<pair<int, pair<int, int>>> &AGM_RESULTANTE, in
                         pesoEGrauNo[pos_v] += 1;                                //AUMENTA SEU GRAU
                         arestas.erase(arestas.begin() + k);                     //REMOVE DO VERTOR DE POSIVEIS SOLUÇÕES
 
-                        arestaDoNo(grafo, pos_v, arestas,pesoEGrauNo, naAGM, visualizar); //ADICIONA TODAS A ARESTAS DO NO RECEM ADICIONADO NO VETOR DE POSSIVEIS SOLUÇÕES 
+                        arestaDoNo(grafo, pos_v, arestas,pesoEGrauNo, naAGM); //ADICIONA TODAS A ARESTAS DO NO RECEM ADICIONADO NO VETOR DE POSSIVEIS SOLUÇÕES 
                     }
                 }
             } else{
@@ -1832,7 +1819,7 @@ void kruskalAdaptado(Graph *grafo, vector<vector<pair<int, int>>> &matriz, vecto
     vector<pair<int, pair<int, int>>> arestas; //vector<{peso, {pos_noOrigem, pos_noDestino}}>
     arestas.clear();
 
-    grafo->cleanVisited();
+    grafo->cleanVisited();                     //como não visitados
     Node *noAux = grafo->getFirstNode();
     Edge *arestaAux = noAux->getFirstEdge();
 
@@ -1965,35 +1952,30 @@ void Graph::greed()
     vector<vector<pair<int, int>>> matriz(this->getOrder());
 
     chrono::time_point<chrono::system_clock> inicio, fim;
-    iniciaProces(&inicio);
+    iniciaProces(&inicio);                                                          //Inicia o contador de tempo
 
-    // Preenchendo e ordenando a matriz
-    preencheMatriz(this, matriz);
-    ordenaArestas(matriz, 1);
+    preencheMatriz(this, matriz);                                                   // Preenchendo e ordenando a matriz
+    ordenaArestas(matriz, 1);                                                       //Ordenas as arestas
 
-    //imprimirMatriz(matriz);
 
     // controles
-    vector<pair<int, int>> pesoEGrauNo(this->getOrder(), {0, 0}); // par {peso, grau}
-    vector<bool> dentroRestricao(this->getOrder(), true);         // vector para controlar os nós que estão dentro da restrição
+    vector<pair<int, int>> pesoEGrauNo(this->getOrder(), {0, 0});                   // par {peso, grau}
+    vector<bool> dentroRestricao(this->getOrder(), true);                           // vector para controlar os nós que estão dentro da restrição
 
-    // matriz que vai ter as arestas da agm
-    vector<vector<pair<int, int>>> matrizAGM(this->getOrder());
+    vector<vector<pair<int, int>>> matrizAGM(this->getOrder());                     // matriz que vai ter as arestas da agm
 
-    int melhorSolucao2 = INF;
-    vector<vector<pair<int, int>>> melhorMatrizAGM2;
-    melhorMatrizAGM2.clear();
+    int melhorSolucao2 = INF;                                                       //Armazena a melhor solução ao longo da algoritmo
+    vector<vector<pair<int, int>>> melhorMatrizAGM2;                                //Metriz que armazena a melhor solução, usado para salvar no arquivo
+    melhorMatrizAGM2.clear();                                               
 
+    //Aqui e nossa heuristica, uma adaptação do kruskal 
     kruskalAdaptado(this, matriz, matrizAGM, pesoEGrauNo, &melhorSolucao2, melhorMatrizAGM2);
-    ordenaArestas(matrizAGM, 0);
 
-    int pesoAGM = pesoTotalAGM(pesoEGrauNo);
-    imprimirMatriz(matrizAGM);
+
+    int pesoAGM = pesoTotalAGM(pesoEGrauNo);                                        //Pega o peso total                                  
+    imprimirMatriz(matrizAGM);                                                      //Salva a solução no arquivo saida.dot
     
-    double temp = fimProces(&inicio, &fim);
-
-    cout << "\ndepois:" << endl;
-    // imprimirMatriz(matrizAGM);
+    double temp = fimProces(&inicio, &fim);                                         //Fim do contador de tempo
 
     cout << "\nPeso da Arvore Geradora com Restrição de Grau: " << melhorSolucao2 << "\nTempo total: " << temp << " segundos" << endl;
     return;
@@ -2011,13 +1993,13 @@ void Graph::greedRandom(){
     cout << "\nINICIANDO A EXECUÇÃO DO ALGORITMO GULOSO RANDOMIZADO ..." << endl;
     
     chrono::time_point<chrono::system_clock> inicio, fim;
-    iniciaProces(&inicio);
-    int melhorSolucao1 = 0;
-    int melhorSolucao2 = INF;
+    iniciaProces(&inicio);                                                                          //Inicia o contador de tempo
+    int melhorSolucao1 = 0;                                                                         //Aux
+    int melhorSolucao2 = INF;                                                                       //Armazenar a melhor solução ao longo do processo
 
-    vector<vector<pair<int, int>>> melhorMatrizAGM1;
-    melhorMatrizAGM1.clear();
-    vector<vector<pair<int, int>>> melhorMatrizAGM2;
+    vector<vector<pair<int, int>>> melhorMatrizAGM1;                                                //aux   
+    melhorMatrizAGM1.clear();               
+    vector<vector<pair<int, int>>> melhorMatrizAGM2;                                                //Matriz AGM da melhor solução
     melhorMatrizAGM2.clear();
 
     for(int i = 0;i<k_iteracoes;i++){
@@ -2028,11 +2010,9 @@ void Graph::greedRandom(){
         vector<vector<pair<int, int>>> matriz(this->getOrder());
 
 
-        // Preenchendo e ordenando a matriz
-        preencheMatriz(this, matriz);
-        ordenaArestas(matriz, 1);
-
-        //imprimirMatriz(matriz);
+        
+        preencheMatriz(this, matriz);               // Preenchendo e ordenando a matriz                   
+        ordenaArestas(matriz, 1);                   //Ordena as arestas
 
         // controles
         vector<pair<int, int>> pesoEGrauNo(this->getOrder(), {0, 0}); // par {peso, grau}
@@ -2041,8 +2021,9 @@ void Graph::greedRandom(){
         // matriz que vai ter as arestas da agm
         vector<vector<pair<int, int>>> matrizAGM(this->getOrder());
 
+        //Nossa heuristica
         kruskalAdaptado(this, matriz, matrizAGM, pesoEGrauNo,  &melhorSolucao1, melhorMatrizAGM1, alfa);
-        ordenaArestas(matrizAGM, 0);
+
 
         if(melhorSolucao1 < melhorSolucao2){
             
@@ -2054,18 +2035,19 @@ void Graph::greedRandom(){
         
     }
     double temp = fimProces(&inicio, &fim);
-    imprimirMatriz(melhorMatrizAGM2);
+
+    imprimirMatriz(melhorMatrizAGM2);                                       //Salva no arquivo saida.dot
+
     cout << "\nPESO DA ARVORE GERADORA COM RESTIÇÃO DE GRAU " << melhorSolucao2 << "\nTEMPO TOTAL " << temp << " SEGUNDOS" << endl;
 }
 void Graph::greedRactiveRandom(){
 
-    int d;                                                                      // Grau de restrição;
     int numIt;                                                                  // Número de iterações;
-    int numBloco;  // Número de iterações até atualizar novamente o vetor de probabilidades;
-    int numAlfas;  // Variável ustilizada para armazenar a quantidade de alfas que serão analizados;
-    int index;     // índice do alfa escolhido para a iteração;
-    float solucao;   // Armazena a solução da iteração;
-    float auxAlfa; // Variável auxiliar utilizada para armazenar o valor do alfa;
+    int numBloco;                                                               // Número de iterações até atualizar novamente o vetor de probabilidades;
+    int numAlfas;                                                               // Variável ustilizada para armazenar a quantidade de alfas que serão analizados;
+    int index;                                                                  // índice do alfa escolhido para a iteração;
+    float solucao;                                                              // Armazena a solução da iteração;
+    float auxAlfa;                                                              // Variável auxiliar utilizada para armazenar o valor do alfa;
 
     cout << "\nQual será o número total de iterações?" << endl;
     cin >> numIt;
@@ -2076,9 +2058,9 @@ void Graph::greedRactiveRandom(){
     cout << endl;
 
     cout << "\nINICIANDO A EXECUÇÃO DO ALGORITMO GULOSO RANDOMIZADO REATIVO ..." << endl;
-    chrono::time_point<chrono::system_clock> inicio, fim;
+    chrono::time_point<chrono::system_clock> inicio, fim;                                                           
+    iniciaProces(&inicio);                                                  //Inicia o contador
 
-    iniciaProces(&inicio);
     vector<float> alfas;   // Vetor utilizado para armazenar os valores de alfa;
     vector<float> solBest;  // Vetor utilizado para armazenar melhor solução encontrada por cada alfa (Os valores são referentes ao alfa que se encontra no elemento de mesmo índice do vetor de alfas);
     vector<media> medias;  // Vetor utilizado para armazenar a média das soluções de cada alfa (Os valores são referentes ao alfa que se encontra no elemento de mesmo índice do vetor de alfas);
@@ -2094,54 +2076,48 @@ void Graph::greedRactiveRandom(){
     vector<vector<pair<int, int>>> melhorMatrizAGM1;
     melhorMatrizAGM1.clear();
     
-    numAlfas = alfas.size();
+    numAlfas = alfas.size();                                                    //Quantidade de alfas no vetor
 
     cout << "numAlfas: " << numAlfas << endl;
 
     for(int i=0; i<numAlfas; i++){
-        solBest.push_back(0.0);
+        q.push_back(0.0);                                                       //Adciona o valores iniciais ao q e a solBest
+        solBest.push_back(0.0);   
     }
-
-    for(int i=0; i<numAlfas; i++){
-        q.push_back(0.0);
-    }
-
-    inicializaVetores(prob, medias, numAlfas); // Chamada da função para inicializar os vetores de médias e probabilidades;
+                                                  
+    inicializaVetores(prob, medias, numAlfas);                                  // Chamada da função para inicializar os vetores de médias e probabilidades;
 
     cout << "\nMedias: " << endl;
-    for(int i=0; i< medias.size(); i++){
+    for(int i=0; i< medias.size(); i++)                                         //Imprime as medias iniciais
         cout << medias[i].media << " | ";
-    }
+
 
     cout << "\nProbs: " << endl;
-    for(int i=0; i< prob.size(); i++){
+    for(int i=0; i< prob.size(); i++)                                           //Imprime as probabilidades iniciais
         cout << prob[i] << " | ";
-    }
+    
 
-    vector<pair<int, pair<int, int>>> AGM_RESULTANTE1;
-    vector<pair<int, pair<int, int>>> AGM_RESULTANTE2;
-    int melhorSolucao1= 0;
-    int melhorSolucao2= INF;
-    int posNoInicial;
+    int melhorSolucao2= INF;                                                    //Armazena a melhro solução
+    int posNoInicial;                                                           //Posição inicial do primeiro vertice pos_u = 0  ID =1 pos_u = 1 ID = 2 assim por diante
 
     int i = 0;
     while (i <= numIt){
-        if (i!=0 && i % numBloco == 0)
+        if (i!=0 && i % numBloco == 0)                                          //Condição de interração por bloco
         {
             cout << "\nProbs: " << endl;
-            for(int i=0; i< prob.size(); i++){
+            for(int i=0; i< prob.size(); i++)                                   //imprime as probabilidades
                 cout << prob[i] << " | ";
-            }
+            
             cout << endl;
-            atualizaProbabilidades(medias, prob, solBest, q); // Chamada da função que irá atualizar o vetor de probabilidades;
+            atualizaProbabilidades(medias, prob, solBest, q);                   // Chamada da função que irá atualizar o vetor de probabilidades;
             cout << "\nProbs: " << endl;
             for(int i=0; i< prob.size(); i++){
-                cout << prob[i] << " | ";
+                cout << prob[i] << " | ";                                       //imprime as probabilidades
             }
             cout << endl;
         }
 
-        int index = escolheAlfa(prob);
+        int index = escolheAlfa(prob);                                          //Seciona um novo alfa
         cout << "\nindexAlfa: " << index << endl;
         auxAlfa = alfas[index];
         cout << "auxAlfa: " << auxAlfa << endl;
@@ -2153,11 +2129,11 @@ void Graph::greedRactiveRandom(){
         vector<vector<pair<int, int>>> matriz(this->getOrder());
         matriz.clear();
 
-        // Preenchendo e ordenando a matriz
-        preencheMatriz(this, matriz);
-        ordenaArestas(matriz, 1);
+        
+        preencheMatriz(this, matriz);           // Preenchendo e ordenando a matriz    
+        ordenaArestas(matriz, 1);               //Ordena as arestas
 
-        //imprimirMatriz(matriz);
+        
 
         // controles
         vector<pair<int, int>> pesoEGrauNo(this->getOrder(), {0, 0}); // par {peso, grau}
@@ -2166,13 +2142,12 @@ void Graph::greedRactiveRandom(){
         // matriz que vai ter as arestas da agm
         vector<vector<pair<int, int>>> matrizAGM(this->getOrder());
         
-        kruskalAdaptado(this, matriz, matrizAGM, pesoEGrauNo, &melhorSolucao1, melhorMatrizAGM1, auxAlfa);
+        //Nossa heuristica
+        kruskalAdaptado(this, matriz, matrizAGM, pesoEGrauNo, &melhorSolucao2, melhorMatrizAGM1, auxAlfa);
 
-        ordenaArestas(matrizAGM, 0);
+        cout<< i<<" Melhor Solução " << melhorSolucao2 << endl;
 
-        cout<< i<<" melhorSolucao2 " << melhorSolucao1 << endl;
-
-        atualizaMedias(medias, melhorSolucao1, alfas, auxAlfa);
+        atualizaMedias(medias, melhorSolucao2, alfas, auxAlfa);
 
         cout << "\nMedias: " << endl;
 
@@ -2182,15 +2157,15 @@ void Graph::greedRactiveRandom(){
         cout << endl;
 
         if(solBest[index] == 0)
-            solBest[index] = melhorSolucao1;
+            solBest[index] = melhorSolucao2;        //Atualiza Solbest
         
 
-        if(solBest[index] > melhorSolucao1)
-            solBest[index] = melhorSolucao1;
+        if(solBest[index] > melhorSolucao2)
+            solBest[index] = melhorSolucao2;        //Atualiza Solbest
         
 
-        AGM_RESULTANTE1.clear();
-        AGM_RESULTANTE2.clear();
+        
+        melhorMatrizAGM1.clear();
         int melhorSolucao1= 0;
         int melhorSolucao2= INF;
         i++;
@@ -2222,40 +2197,28 @@ void Graph::greed2(){
 
     float alfa = 0;
     
-    vector<pair<int, pair<int, int>>> AGM_RESULTANTE1;
-    vector<pair<int, pair<int, int>>> AGM_RESULTANTE2;
-    int melhorSolucao1= 0;
-    int melhorSolucao2= INF;
-    int posNoInicial;
+    vector<pair<int, pair<int, int>>> AGM_RESULTANTE2;                          //Armazena a melhor AGM
+    int melhorSolucao2= 0;                                                      //aux
+    int posNoInicial;                                                           //Posição inicial do primeiro vertice pos_u = 0  ID =1 pos_u = 1 ID = 2 assim por diante
 
-    cout << "GOSTARIA DE VER O PROGRESSO DE INSERSÃO OCORRER(REQUER MAIS TEMPO)?\n1 PARA SIM\n2 PARA NÃO"<<endl;
-    string querVisuzalizar;int visuzalizar = 0;
-    cin >> querVisuzalizar;
-    if(querVisuzalizar == "1")visuzalizar = 1;
-    else
-        if(querVisuzalizar == "2")visuzalizar = 0;
-        else {cout << "OPÇÃO INVALIDA, 2 SELECIONADO AUTOMATICAMENTE"<<endl;visuzalizar = 0;}
+    
     cout << "\nINICIANDO A EXECUÇÃO DO ALGORITMO GULOSO 2 ..." << endl;
 
     chrono::time_point<chrono::system_clock> inicio, fim;
-    iniciaProces(&inicio);
-    
-    for(int i = 0;i<1;i++){
+    iniciaProces(&inicio);                                                      //Inicia o contador
 
-        geraAGM(this, AGM_RESULTANTE1,&melhorSolucao1, alfa, &posNoInicial, visuzalizar);
-        cout<< i<<" MELHOR SOLUCÃO " << melhorSolucao1 << endl; 
-        if(melhorSolucao1 < melhorSolucao2){
-            
-            melhorSolucao2 = melhorSolucao1;
-            AGM_RESULTANTE2 = AGM_RESULTANTE1;
 
-        }
+
+
+    //Heuristica 2
+    geraAGM(this, AGM_RESULTANTE2,&melhorSolucao2, alfa, &posNoInicial);
         
-    }
-    double temp = fimProces(&inicio, &fim);
+
+
+
+    double temp = fimProces(&inicio, &fim);                                     //Finaliza o contador
     imprimeSolucao(AGM_RESULTANTE2, posNoInicial, alfa);
-    cout << "SOLUÇÃO FINAL: " <<melhorSolucao2
-         << "\nTempo total: " << temp << " segundos" << endl;
+    cout << "SOLUÇÃO FINAL: " <<melhorSolucao2<< "\nTempo total: " << temp << " segundos" << endl;
 
 }
 /**
@@ -2267,31 +2230,32 @@ void Graph::greedRandom2(){
     float alfa;
     cout << "QUAL O ALFA"<<endl;
     cin >> alfa;
-
-    cout << "GOSTARIA DE VER O PROGRESSO DE INSERSÃO OCORRER(REQUER MAIS TEMPO)?\n1 PARA SIM\n2 PARA NÃO"<<endl;
-    string querVisuzalizar;int visuzalizar = 0;
-    cin >> querVisuzalizar;
-    if(querVisuzalizar == "1")visuzalizar = 1;
-    else
-        if(querVisuzalizar == "2")visuzalizar = 0;
-        else {cout << "OPÇÃO INVALIDA, 2 SELECIONADO AUTOMATICAMENTE"<<endl;visuzalizar = 0;}
+    int k_iteracoes = 1;
+    cout << "QUANTIDADE DE ITERAÇÕES: "<<endl;
+    cin >> k_iteracoes;
+    
     cout << "\nINICIANDO A EXECUÇÃO DO ALGORITMO GULOSO RANDOMIZADO 2 ..." << endl;
     chrono::time_point<chrono::system_clock> inicio, fim;
-    iniciaProces(&inicio);
+    iniciaProces(&inicio);                                                              //Inicia o contador
 
-    vector<pair<int, pair<int, int>>> AGM_RESULTANTE1;
-    vector<pair<int, pair<int, int>>> AGM_RESULTANTE2;
-    int melhorSolucao1= 0;
-    int melhorSolucao2= INF;
+    vector<pair<int, pair<int, int>>> AGM_RESULTANTE1;                                  //aux
+    vector<pair<int, pair<int, int>>> AGM_RESULTANTE2;                                  //Matriz agm da melhor solução
+    int melhorSolucao1= 0;                                                              //aux
+    int melhorSolucao2= INF;                                                            //Melhor solução
     int posNoInicial;
-    for(int i = 0;i<1;i++){
+    for(int i = 0;i<k_iteracoes;i++){
 
-        geraAGM(this, AGM_RESULTANTE1,&melhorSolucao1, alfa, &posNoInicial, visuzalizar);
+
+        //Heuristica
+        geraAGM(this, AGM_RESULTANTE1,&melhorSolucao1, alfa, &posNoInicial);
+
+
+
         cout<< i<<" MELHOR SOLUÇÃO " << melhorSolucao1 << endl; 
         if(melhorSolucao1 < melhorSolucao2){
             
             melhorSolucao2 = melhorSolucao1;
-            AGM_RESULTANTE2 = AGM_RESULTANTE1;
+            AGM_RESULTANTE2 = AGM_RESULTANTE1;                                          //Atualiza solução
 
         }
         
@@ -2315,13 +2279,6 @@ void Graph::greedRactiveRandom2(){
     float solucao;   // Armazena a solução da iteração;
     float auxAlfa; // Variável auxiliar utilizada para armazenar o valor do alfa;
 
-    cout << "GOSTARIA DE VER O PROGRESSO DE INSERSÃO OCORRER(REQUER MAIS TEMPO)?\n1 PARA SIM\n2 PARA NÃO"<<endl;
-    string querVisuzalizar;int visuzalizar = 0;
-    cin >> querVisuzalizar;
-    if(querVisuzalizar == "1")visuzalizar = 1;
-    else
-        if(querVisuzalizar == "2")visuzalizar = 0;
-        else {cout << "OPÇÃO INVALIDA, 2 SELECIONADO AUTOMATICAMENTE"<<endl;visuzalizar = 0;}
 
     cout << "\nQual será o número total de iterações?" << endl;
     cin >> numIt;
@@ -2397,7 +2354,7 @@ void Graph::greedRactiveRandom2(){
         cout << "\nINDEXALFA: " << index << endl;                                               //Posição desse alfa no vetor de alfas
         cout << "ALFA: " << auxAlfa << endl;                                                    //O alfa escolido
 
-        geraAGM(this, AGM_RESULTANTE1,&melhorSolucao1, auxAlfa, &posNoInicial, visuzalizar);    //Gera uma nova AGM
+        geraAGM(this, AGM_RESULTANTE1,&melhorSolucao1, auxAlfa, &posNoInicial);                 //Gera uma nova AGM
 
         cout<< i<<" MELHOR SOLUÇÃO ATÉ O MOMENTO " << melhorSolucao1 << endl;
 
@@ -2457,11 +2414,13 @@ void imprimirMatriz(vector<vector<pair<int, int>>> &matriz)
     int sizeAll = 0;
     for (int i = 0; i < matriz.size(); i++)
         for (int j = 0; j < matriz[i].size(); j++)
-            arq << i << " -- " << matriz[i][j].second << "[ label = " << matriz[i][j].first << "]\n";
+            //pos_u sendo 0 ID =  1, pos_v 1 ID 2 assim por diante
+            arq << i+1 << " -- " << matriz[i][j].second +1<< "[ label = " << matriz[i][j].first << "]\n";
     
 
     arq << "}\n";
     arq.close();
+    cout << "SOLUÇÃO SALVA NO ARQUIVO saida.dot e saida.txt"<<endl;
 }
 /**
  * @brief 
