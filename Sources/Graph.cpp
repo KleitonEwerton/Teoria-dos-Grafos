@@ -1567,90 +1567,102 @@ void imprimeSolucao(vector<pair<int, pair<int, int>>> &AGM_RESULTANTE, int posIn
     
 
 }
+
 /**
- * @brief                                               Função usada para pegar todas as arestas de um determinado vertice apartir de sua posição
+ * @brief                                                       Gera uma matriz completa do grafo
  * 
- * @param grafo 
- * @param posNo 
- * @param arestas 
- * @param pesoEGrauNo 
- * @param naAgm 
+ * @param grafo                                                 Grafo que terá sua matriz montada
+ * @param matriz                                                Matrix quadratica que receberá os pesos da aresta pos_u e pos_v
+ */                                                             //que são os vertices enseridos no grafo nessa posição, nossas instâncias, devido a forma como e feito a inserção permitem
+void matrizCompleta(Graph *grafo, int **matriz){                //que pos_u = = 0, represente o ID = 1, pos_v = 1 represente o ID = 2, assim por diante
+
+    Node *node = grafo->getFirstNode();
+    Edge *edge = nullptr;
+
+    for(int i  =0;i<grafo->getOrder();i++)                      //Passa por toda a matriz e adiciona na matriz peso INF
+        for(int j = 0; j < grafo->getOrder(); j++)
+            matriz[i][j] = INF;
+
+    while (node != nullptr)
+    {
+        edge = node->getFirstEdge();
+
+        while (edge != nullptr)
+        {
+            if(node->getPosition() != edge->getTargetPosition())
+                matriz[node->getPosition()][edge->getTargetPosition()]=edge->getWeight();   //Passa por todo o grafo e adiciona na matriz peso do Vertice
+
+            edge = edge->getNextEdge();                                      
+        }
+        
+        node = node->getNextNode();
+    }
+
+}
+
+/**
+ * @brief                                                               Função usada para pegar todas as arestas de um determinado vertice apartir de sua posição
+ * 
+ * @param grafo                                                         GRAFO QUE SERÁ ANALIZADO
+ * @param posNo                                                         POSIÇÃO DO NO ALVO
+ * @param arestas                                                       VECTOR DE ARESTAS DE POSIVEIS SOLUÇÕES
+ * @param pesoEGrauNo                                                   ARMAZENA O GRAU DE UM VERTICE
+ * @param naAgm                                                         SE O NO ESTA NA AGM
  */
-void arestaDoNo(Graph *grafo, int posNo, vector<pair<int, pair<int, int>>> &arestas, vector<int> &pesoEGrauNo, vector<bool> &naAgm, bool visualizar){
+
+void arestaDoNo(Graph *grafo, int posNo, vector<pair<int, pair<int, int>>> &arestas, vector<int> &pesoEGrauNo, vector<bool> &naAgm, bool visualizar, int **matriz){
     Node *noAux = grafo->getNodePosition(posNo);
     Edge *arestaAux = nullptr;
 
     if(visualizar)cout << "Pegando as arestas do vertice da posição "<< posNo <<" que estão dentro das retrições \n"<<  endl;
     
     int pos_u, pos_v;
-    if(noAux == nullptr)
-        return;
+    pos_u = posNo;
 
-    else{
-        pos_u = posNo;
-        arestaAux = noAux->getFirstEdge();          //PEGA A PRIMEIRA ARESTA ADJACENTE AO VERTICE pos_u(POSISÃO EM QUE ELE É INSERIDO NO GRAFO, PELAS NOSSAS INSTÂNCIAS
-                                                    //UM NÓ COM pos_u = 0 representa o ID = 1, pos_u = 1 representa o ID = 2, assim por diante)
+    for(int i = 0;i<grafo->getOrder();i++)
+    {
+        pos_v = i;
+        if(!naAgm[pos_v])                                                               //Não permite nos repetidos
+            if(pesoEGrauNo[pos_u] < D && pesoEGrauNo[pos_v]< D)                         //Não permite aresta cujo algum dos vertices possui grau maoir que D
+                if(matriz[pos_u][pos_v] != INF)                                         
+                    if(pos_v != pos_u)                                                  //Não permite self loop
+                        arestas.push_back({matriz[pos_u][pos_v], {pos_u, pos_v}});
     }
-    
-    while (arestaAux != nullptr){                   //REPETE ATÉ A ARESTA FOR NULL
-
-        pos_v = arestaAux->getTargetPosition();
-
-        //ADICIONA A ARESTA QUE LIGA O VERTICE DE POSIÇÃO pos_u ao vertice de POSIÇÃO pos_v CASO É ESTEJA NA CODIÇÃO DE INSERSÃO
-        if (pesoEGrauNo[pos_u] < D && pesoEGrauNo[pos_v]< D && !naAgm[pos_v] && pos_v != pos_u)
-            arestas.push_back({arestaAux->getWeight(), {pos_u, pos_v}});
-        
-        arestaAux = arestaAux->getNextEdge();       //Proxima aresta
-    }
-    
 
     int i = 0;
-    while(i < arestas.size())
-        if (naAgm[arestas[i].second.first] && naAgm[arestas[i].second.second])
-           arestas.erase(arestas.begin() + i);
+    while(i < arestas.size())                                                           //Remove todas as arestas que possuem alguns vertice fora da restrição 
+        if (naAgm[arestas[i].second.first] && naAgm[arestas[i].second.second])          //Se os dois vertices já estão na AGM remove do conjunto de arestas, se um dos vertices
+           arestas.erase(arestas.begin() + i);                                          //Possue grau maior que D remove do conjunto de arestas
            
         else
             if (pesoEGrauNo[arestas[i].second.first] >= D || pesoEGrauNo[arestas[i].second.second] >= D)
                 arestas.erase(arestas.begin() + i);
             else i++;
 
-
-    // for(int i = 0;i<arestas.size();i++){
-
-    //     if (naAgm[arestas[i].second.first] && naAgm[arestas[i].second.second])
-    //        arestas.erase(arestas.begin() + i);
-        
-
-    //     if (pesoEGrauNo[arestas[i].second.first] >= D || pesoEGrauNo[arestas[i].second.second] >= D)
-    //        arestas.erase(arestas.begin() + i);
-        
-    // }
-        
-    
-
-    stable_sort(arestas.begin(), arestas.end());    //Organiza por peso as arestas
+    stable_sort(arestas.begin(), arestas.end());    //Ordena por peso as arestas
     
 }
 
 /**
- * @brief                                                   Função utilizada para criar a arvore geradora minima, com restrição de grau. com D = 3
- * 
- * @param grafo                                             
- * @param AGM_RESULTANTE 
- * @param melhor_solucao 
- * @param alfa 
- * @param posNoInicial 
+ * @brief                                                                           Função utilizada para criar a arvore geradora minima, com restrição de grau. com D = 3
+ *          
+ * @param grafo                                                                     GRAFO QUE SERÁ ANALIZADO
+ * @param matriz 
+ * @param AGM_RESULTANTE                                                            AGM FINAL
+ * @param melhor_solucao                                                            PESO DA MELHOR SOLUÇÃO
+ * @param alfa                                                                      ALFA PARA SELEÇÃO ALEATORIA
+ * @param posNoInicial                                                              POSIÇÃO DO NO INICIAL(POSIÇÃO EM QUE ELE FOI ENSERIDO NO GRAU)
+ * @param visualizar                                                                OPÇÃO SE O USUARIO QUE ACOMPANHAR O PROGRESSO
  */
-void geraAGM(Graph *grafo, vector<pair<int, pair<int, int>>> &AGM_RESULTANTE, int *melhor_solucao, float alfa, int *posNoInicial, int visualizar){
+void geraAGM(Graph *grafo, int **matriz,vector<pair<int, pair<int, int>>> &AGM_RESULTANTE, int *melhor_solucao, float alfa, int *posNoInicial, int visualizar){
     
-    unsigned seed = time(0);                                                    //Muda a seed dos aleatorios
-    vector<pair<int, pair<int, int>>> arestas;                                  //vector<{peso, {pos_noOrigem, pos_noDestino}}>
-    vector<int> pesoEGrauNo(grafo->getOrder(), 0);                              //CONTEM O GRAU DO VERTICE POS_U INSERIDO NA AGM
-    vector<bool> naAGM(grafo->getOrder(), false);                               //MARCA SE O VERTICE pos_x ESTÁ NA AGM
+    unsigned seed = time(0);                                                        //Muda a seed dos aleatorios
+    vector<pair<int, pair<int, int>>> arestas;                                      //vector<{peso, {pos_noOrigem, pos_noDestino}}>
+    vector<int> pesoEGrauNo(grafo->getOrder(), 0);                                  //CONTEM O GRAU DO VERTICE POS_U INSERIDO NA AGM
+    vector<bool> naAGM(grafo->getOrder(), false);                                   //MARCA SE O VERTICE pos_x ESTÁ NA AGM
 
-
-    vector<pair<int, pair<int, int>>> AGM(grafo->getOrder());                   //VETOR QUE VAI GUARDA AS ARESTAS DA AGM pos_u -- pos_v ONDE 
-                                                                                //pos_u e pos_v é a ordem que em esses vértices foram inseridos no grafo
+    vector<pair<int, pair<int, int>>> AGM(grafo->getOrder());                       //VETOR QUE VAI GUARDA AS ARESTAS DA AGM pos_u -- pos_v ONDE 
+                                                                                    //pos_u e pos_v é a ordem que em esses vértices foram inseridos no grafo
     AGM.clear();
 
     int pos_u;
@@ -1658,46 +1670,46 @@ void geraAGM(Graph *grafo, vector<pair<int, pair<int, int>>> &AGM_RESULTANTE, in
     int peso;
     int posInicial = 0;
 
-    srand(seed);                                                                //Seed dos aleatorios
-    posInicial = rand()%grafo->getOrder()-1;                                    //PEGA UM VERTICE ALEATORIO DO GRAU POR SUA POSIÇÃO DE INSERSÃO
+    srand(seed);                                                                    //Seed dos aleatorios
+    posInicial = rand()%grafo->getOrder()-1;                                        //PEGA UM VERTICE ALEATORIO DO GRAU POR SUA POSIÇÃO DE INSERSÃO
     *posNoInicial = posInicial;
 
-    arestaDoNo(grafo, posInicial, arestas,pesoEGrauNo, naAGM, visualizar);      //ADICIONA NO CONJUNTO DE SOLUÇÕES AS ARESTAS QUE PODEM ENTRAR NA AGM
+    arestaDoNo(grafo, posInicial, arestas,pesoEGrauNo, naAGM, visualizar, matriz);  //ADICIONA NO CONJUNTO DE SOLUÇÕES AS ARESTAS QUE PODEM ENTRAR NA AGM
 
     bool cond = true;
     int cont = 0;
-    while ((find(naAGM.begin(), naAGM.end(), false) != naAGM.end()) && cond){   //ENQUANTO TODOS OS VERTICES NÃO ESTIVEREM NA AGM
+    while ((find(naAGM.begin(), naAGM.end(), false) != naAGM.end()) && cond){       //ENQUANTO TODOS OS VERTICES NÃO ESTIVEREM NA AGM
 
-            int k = 0;                                                          //A K-ESSIMA ARESTAS A SER INSERIDA, SE POSSIVEL, NO RANDOMIDO 
-                                                                                //O K VARIA DE 0 A arestas.size * alfa
+            int k = 0;                                                              //A K-ESSIMA ARESTAS A SER INSERIDA, SE POSSIVEL, NO RANDOMIDO 
+                                                                                    //O K VARIA DE 0 A arestas.size * alfa
             if(arestas.size() > 0){
 
                                             
-                if(int(arestas.size() * alfa) > 1)                              //O K VARIA DE 0 A arestas.size * alfa SE O ALFA FOR MAIOR QUE 0 E O VETOR DE ARESTA TIVER MAIS DE 2 CONTIDOS
+                if(int(arestas.size() * alfa) > 1)                                  //O K VARIA DE 0 A arestas.size * alfa SE O ALFA FOR MAIOR QUE 0 E O VETOR DE ARESTA TIVER MAIS DE 2 CONTIDOS
                     k = rand()%int(arestas.size() * alfa);                  
                 
-                pos_u = arestas[k].second.first;                                //VERTICE COM POSISÃO DE INSERÇÃO pos_u
-                pos_v = arestas[k].second.second;                               //VERTICE COM POSISÃO DE INSERÇÃO pos_v
-                peso = arestas[k].first;                                        //PESO DA ARESTA pos_u pos_v
+                pos_u = arestas[k].second.first;                                    //VERTICE COM POSISÃO DE INSERÇÃO pos_u
+                pos_v = arestas[k].second.second;                                   //VERTICE COM POSISÃO DE INSERÇÃO pos_v
+                peso = arestas[k].first;                                            //PESO DA ARESTA pos_u pos_v
         
                 if((naAGM[pos_u] && naAGM[pos_v]) || (pesoEGrauNo[pos_u] >= D || pesoEGrauNo[pos_v] >= D)){
 
-                    arestas.erase(arestas.begin() + k);                         //REMOVE A ARESTA SE O GRAU DO pos_u ou pos_v for maior que D,
-                                                                                //ALÉM DE REMOVE-LO SE pos_u e pos_v JÁ CONSTAR NA AGM
+                    arestas.erase(arestas.begin() + k);                             //REMOVE A ARESTA SE O GRAU DO pos_u ou pos_v for maior que D,
+                                                                                    //ALÉM DE REMOVE-LO SE pos_u e pos_v JÁ CONSTAR NA AGM
 
                 }else{
-                    if(pos_u != pos_v){                                         //GARANTE QUE NÃO TENHA SELF LOOP
+                    if(pos_u != pos_v){                                             //GARANTE QUE NÃO TENHA SELF LOOP
                         
-                        AGM.push_back({peso, {pos_u,pos_v}});                   //ADICIONA NA SOLUÇÃO A ARESTA pos_u pos_v
-                        naAGM[pos_u] = true;                                    //MARCA COM JÁ ADICIONADO
-                        naAGM[pos_v] = true;                                    //MARCA COM JÁ ADICIONADO
-                        pesoEGrauNo[pos_u] += 1;                                //AUMENTA SEU GRAU
-                        pesoEGrauNo[pos_v] += 1;                                //AUMENTA SEU GRAU
-                        arestas.erase(arestas.begin() + k);                     //REMOVE DO VERTOR DE POSIVEIS SOLUÇÕES
+                        AGM.push_back({peso, {pos_u,pos_v}});                       //ADICIONA NA SOLUÇÃO A ARESTA pos_u pos_v
+                        naAGM[pos_u] = true;                                        //MARCA COM JÁ ADICIONADO
+                        naAGM[pos_v] = true;                                        //MARCA COM JÁ ADICIONADO
+                        pesoEGrauNo[pos_u] += 1;                                    //AUMENTA SEU GRAU
+                        pesoEGrauNo[pos_v] += 1;                                    //AUMENTA SEU GRAU
+                        arestas.erase(arestas.begin() + k);                         //REMOVE DO VERTOR DE POSIVEIS SOLUÇÕES
 
                         if(visualizar)cout << "Vértice de poição "<< pos_v << " adicionado a AGM" << endl;
 
-                        arestaDoNo(grafo, pos_v, arestas,pesoEGrauNo, naAGM, visualizar); //ADICIONA TODAS A ARESTAS DO NO RECEM ADICIONADO NO VETOR DE POSSIVEIS SOLUÇÕES 
+                        arestaDoNo(grafo, pos_v, arestas,pesoEGrauNo, naAGM, visualizar, matriz); //ADICIONA TODAS A ARESTAS DO NO RECEM ADICIONADO NO VETOR DE POSSIVEIS SOLUÇÕES 
                     }
                 }
             } else{
@@ -1713,7 +1725,6 @@ void geraAGM(Graph *grafo, vector<pair<int, pair<int, int>>> &AGM_RESULTANTE, in
         
     *melhor_solucao = soma;                                 //ATUALIZA O VALOR DO PONTEIRO
     AGM_RESULTANTE = AGM;                                   //ATUALIZA O VALOR DO PONTEIRO
-
 }
 
 /**
@@ -2134,12 +2145,18 @@ void Graph::greed2(){
         else {cout << "OPÇÃO INVALIDA, 2 SELECIONADO AUTOMATICAMENTE"<<endl;visuzalizar = 0;}
     cout << "\nINICIANDO A EXECUÇÃO DO ALGORITMO GULOSO 2 ..." << endl;
 
+    int **matriz;                                                               //Matriz contendo os pesos das arestas
+    matriz = new int*[this->getOrder()];                                        //pos_u -- pos_v = peso
+    for(int i = 0; i<this->getOrder();i++)                                      //Na nossa instância se pos_u = 0 o ID será 1 se pos_u = 1 ID 2, assim por diante
+        matriz[i] = new int[this->getOrder()];                                  //O Mesmo vale para pos_v
+    matrizCompleta(this, matriz);                                               //Adiciona os pesos
+
     chrono::time_point<chrono::system_clock> inicio, fim;
     iniciaProces(&inicio);
     
     for(int i = 0;i<1;i++){
 
-        geraAGM(this, AGM_RESULTANTE1,&melhorSolucao1, alfa, &posNoInicial, visuzalizar);
+        geraAGM(this, matriz,AGM_RESULTANTE1,&melhorSolucao1, alfa, &posNoInicial, visuzalizar);
         cout<< i<<" MELHOR SOLUCÃO " << melhorSolucao1 << endl; 
         if(melhorSolucao1 < melhorSolucao2){
             
@@ -2151,6 +2168,9 @@ void Graph::greed2(){
     }
     double temp = fimProces(&inicio, &fim);
     imprimeSolucao(AGM_RESULTANTE2, posNoInicial, alfa);
+    for(int i = 0; i<this->getOrder();i++)
+        delete matriz[i];
+    delete [] matriz;
     cout << "SOLUÇÃO FINAL: " <<melhorSolucao2
          << "\nTempo total: " << temp << " segundos" << endl;
 
@@ -2169,6 +2189,13 @@ void Graph::greedRandom2(){
         if(querVisuzalizar == "2")visuzalizar = 0;
         else {cout << "OPÇÃO INVALIDA, 2 SELECIONADO AUTOMATICAMENTE"<<endl;visuzalizar = 0;}
     cout << "\nINICIANDO A EXECUÇÃO DO ALGORITMO GULOSO RANDOMIZADO 2 ..." << endl;
+    
+    int **matriz;                                                               //Matriz contendo os pesos das arestas
+    matriz = new int*[this->getOrder()];                                        //pos_u -- pos_v = peso
+    for(int i = 0; i<this->getOrder();i++)                                      //Na nossa instância se pos_u = 0 o ID será 1 se pos_u = 1 ID 2, assim por diante
+        matriz[i] = new int[this->getOrder()];                                  //O Mesmo vale para pos_v
+    matrizCompleta(this, matriz);                                               //Adiciona os pesos
+
     chrono::time_point<chrono::system_clock> inicio, fim;
     iniciaProces(&inicio);
 
@@ -2179,7 +2206,7 @@ void Graph::greedRandom2(){
     int posNoInicial;
     for(int i = 0;i<1;i++){
 
-        geraAGM(this, AGM_RESULTANTE1,&melhorSolucao1, alfa, &posNoInicial, visuzalizar);
+        geraAGM(this, matriz,AGM_RESULTANTE1,&melhorSolucao1, alfa, &posNoInicial, visuzalizar);
         cout<< i<<" MELHOR SOLUÇÃO " << melhorSolucao1 << endl; 
         if(melhorSolucao1 < melhorSolucao2){
             
@@ -2189,7 +2216,12 @@ void Graph::greedRandom2(){
         }
         
     }
-      double temp = fimProces(&inicio, &fim);
+    double temp = fimProces(&inicio, &fim);
+
+    for(int i = 0; i<this->getOrder();i++)
+        delete matriz[i];
+    delete [] matriz;
+
     imprimeSolucao(AGM_RESULTANTE2, posNoInicial, alfa);
     cout << "SOLUÇÃO FINAL " <<melhorSolucao2
          << "\nTempo total: " << temp << " segundos" << endl;
@@ -2224,6 +2256,12 @@ void Graph::greedRactiveRandom2(){
     cout << "\nQual será a quantidade de iterações por bloco?" << endl;
     cin >> numBloco;
     cout << endl;
+
+    int **matriz;                                                               //Matriz contendo os pesos das arestas
+    matriz = new int*[this->getOrder()];                                        //pos_u -- pos_v = peso
+    for(int i = 0; i<this->getOrder();i++)                                      //Na nossa instância se pos_u = 0 o ID será 1 se pos_u = 1 ID 2, assim por diante
+        matriz[i] = new int[this->getOrder()];                                  //O Mesmo vale para pos_v
+    matrizCompleta(this, matriz); 
 
     cout << "\nINICIANDO A EXECUÇÃO DO ALGORITMO GULOSO RANDOMIZADO REATIVO 2..." << endl;
         chrono::time_point<chrono::system_clock> inicio, fim;
@@ -2292,7 +2330,7 @@ void Graph::greedRactiveRandom2(){
         auxAlfa = alfas[index];
         cout << "auxAlfa: " << auxAlfa << endl;
 
-        geraAGM(this, AGM_RESULTANTE1,&melhorSolucao1, auxAlfa, &posNoInicial, visuzalizar);
+        geraAGM(this, matriz,AGM_RESULTANTE1,&melhorSolucao1, auxAlfa, &posNoInicial, visuzalizar);
         cout<< i<<" melhorSolucao2 " << melhorSolucao1 << endl;
 
         atualizaMedias(medias, melhorSolucao1, alfas, auxAlfa);
@@ -2329,7 +2367,11 @@ void Graph::greedRactiveRandom2(){
             auxSolBest = solBest[i];
         }
     }
-  double temp = fimProces(&inicio, &fim);
+    double temp = fimProces(&inicio, &fim);
+    for(int i = 0; i<this->getOrder();i++)
+        delete matriz[i];
+    delete [] matriz;
+    //!FALTA IMPRIMIR SER QUIZERMOS
     cout << "\nMelhor Peso da Arvore Geradora com Restrição de Grau = " << auxSolBest
          << "\nTempo total: " << temp << " segundos" << endl;
     
